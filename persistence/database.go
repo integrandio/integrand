@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	_ "github.com/mattn/go-sqlite3"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type NullFloat64 struct{ sql.NullFloat64 }
@@ -52,14 +53,11 @@ type Datastore struct {
 
 func setupConnection(isDevMode bool) (*Datastore, error) {
 	var db_file string
-	var initSqlFile string
 
 	if isDevMode {
 		db_file = ":memory:"
-		initSqlFile = "data/scripts/test.sql"
 	} else {
 		db_file = os.Getenv("DB_FILE_LOCATION")
-		initSqlFile = "data/scripts/user.sql"
 	}
 	db, err := sql.Open("sqlite3", db_file)
 	if err != nil {
@@ -75,17 +73,27 @@ func setupConnection(isDevMode bool) (*Datastore, error) {
 		return nil, err
 	}
 
-	initQuery, err := os.ReadFile(initSqlFile)
-	if err != nil {
-		return nil, err
-	}
-	if _, err := db.Exec(string(initQuery)); err != nil {
-		return nil, err
-	}
-
-	providerDB := &Datastore{
+	integrandDB := &Datastore{
 		db:      db,
 		RWMutex: &sync.RWMutex{},
 	}
-	return providerDB, nil
+
+	// Insert our root user into the db...
+	// TODO: Clean this up
+	plainPassword := os.Getenv("ROOT_PASSWORD")
+	password, err := bcrypt.GenerateFromPassword([]byte(plainPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+	user := User{
+		Email:    os.Getenv("ROOT_EMAIL"),
+		Password: string(password),
+		AuthType: EMAIL,
+	}
+	_, err = integrandDB.CreateEmailUser(user)
+	if err != nil {
+		return nil, err
+	}
+
+	return integrandDB, nil
 }

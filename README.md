@@ -5,7 +5,7 @@
     
 ![LucidMQ](https://integrand.io/static/images/logos/Integrand-logo.svg)
 
-**Simple-Ops Event Streaming. Build your real time applications without the headache of ops overhead.**
+**Simple-Ops Webhook Streaming. Build your real time integrations without the headache of infrastructure.**
 
 <a href="https://integrand.io">Website</a> •
 <a href="https://integrand.io/docs/">Documentation</a> 
@@ -16,12 +16,8 @@
 ![Github Issues](https://img.shields.io/github/issues/integrandio/integrand-app)
 
 </p>
-</div>
-
-**Simple-Ops Webhook Streaming. Build your real time integrations without the headache of infrastructure.**
-
-
 > :warning: **This project is in Alpha Stage**: Expect breaking changes
+</div>
 
 ## What is Integrand?
 
@@ -54,22 +50,21 @@ docker run -d \
       -v $PWD/data:/data \
       -p 8000:8000 \
       -e ROOT_EMAIL="test@example.com" \
-      -e ROOT_EMAIL="MyPassword" \
-      registry.vineglue.com/integrand/integrand:latest
+      -e ROOT_PASSWORD="MyPassword" \
+      registry.vineglue.com/integrand-app:latest
 ```
 
 ### 🐙 Docker Compose:
-
 ```yaml
 services:
   openobserve:
-    image: registry.vineglue.com/integrand/integrand:latest
+    image: registry.vineglue.com/integrand-app:latest
     restart: unless-stopped
     environment:
       ROOT_EMAIL: "root@example.com"
-      ROOT_EMAIL: "MyPassword"
+      ROOT_PASSWORD: "MyPassword"
     ports:
-      - "5080:5080"
+      - "8000:8000"
     volumes:
       - data:/data
 volumes:

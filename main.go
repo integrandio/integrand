@@ -13,6 +13,8 @@ import (
 func main() {
 	utils.GetEnvrionmentVariableString("DEV_MODE", "true")
 	utils.GetEnvrionmentVariableString("DB_FILE_LOCATION", "integrand.db")
+	utils.GetEnvrionmentVariableString("ROOT_EMAIL", "admin")
+	utils.GetEnvrionmentVariableString("ROOT_PASSWORD", "admin")
 	// to change the flags on the default logger
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	persistence.Initialize()

@@ -3,7 +3,7 @@ package web
 import (
 	"fmt"
 	"html/template"
-	"integrand/persistence"
+	"integrand/services"
 	"log"
 	"net/http"
 	"os"
@@ -11,12 +11,12 @@ import (
 )
 
 func LoginPage(w http.ResponseWriter, r *http.Request) {
-	sess := persistence.GetSession(w, r)
+	sess := services.GetSession(w, r)
 	switch r.Method {
 	case http.MethodPost:
 		email := r.FormValue("email")
 		password := r.FormValue("password")
-		_, err := persistence.EmailAuthenticate(email, password)
+		_, err := services.EmailAuthenticate(email, password)
 		if err != nil {
 			log.Println(err)
 			// Invalid credentials, show the login page with an error message.

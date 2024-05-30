@@ -52,6 +52,21 @@ func (dstore *Datastore) GetEmailUser(email string) (User, error) {
 	return u, nil
 }
 
+func (dstore *Datastore) CreateEmailUser(u User) (int, error) {
+	insertQuery := "INSERT INTO users(id, email, password, auth_type) VALUES(NULL, ?, ?, ?);"
+	dstore.RWMutex.Lock()
+	res, err := dstore.db.Exec(insertQuery, u.Email, u.Password, EMAIL)
+	dstore.RWMutex.Unlock()
+	if err != nil {
+		return 0, err
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+	return int(id), nil
+}
+
 func (dstore *Datastore) GetSocialUser(email string) (User, error) {
 	log.Println(email)
 	selectQuery := "SELECT id, socialID FROM users WHERE email=?;"
@@ -78,7 +93,7 @@ func (dstore *Datastore) CreateSocialUser(u User) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	rowsCreated, err := res.RowsAffected()
+	rowsCreated, err := res.LastInsertId()
 	if err != nil {
 		return 0, err
 	}

@@ -2,7 +2,7 @@ package web
 
 import (
 	"encoding/json"
-	"integrand/persistence"
+	"integrand/services"
 	"log"
 	"net/http"
 )
@@ -31,7 +31,7 @@ func NewNewWebRouter() *http.ServeMux {
 
 func apiBrowserAPIAuthenticate(w http.ResponseWriter, r *http.Request) error {
 	// First let's try to authenticate with our session
-	sess := persistence.GetSession(w, r)
+	sess := services.GetSession(w, r)
 	user, err := sess.Get("email")
 	if err != nil {
 		log.Fatalln(err)
@@ -41,14 +41,14 @@ func apiBrowserAPIAuthenticate(w http.ResponseWriter, r *http.Request) error {
 		enableCors(&w)
 		// This is publicly exposed, we need to protect with a token
 		header := r.Header.Get("Authorization")
-		err := persistence.AuthorizeToken(header)
+		err := services.AuthorizeToken(header)
 		return err
 	}
 	return nil
 }
 
 func sessionAuthenticate(w http.ResponseWriter, r *http.Request) {
-	sess := persistence.GetSession(w, r)
+	sess := services.GetSession(w, r)
 	user, err := sess.Get("email")
 	if err != nil {
 		log.Fatalln(err)
