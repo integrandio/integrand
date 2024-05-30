@@ -1,0 +1,62 @@
+.multiselect {
+  width: 200px;
+}
+
+.selectBox {
+  position: relative;
+}
+
+.selectBox select {
+  width: 100%;
+  font-weight: bold;
+}
+
+#checkboxes {
+  display: none;
+  border: 1px #dadada solid;
+  position: absolute;
+  background-color: white;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+#checkboxes label {
+  display: block;
+}
+
+#checkboxes label:hover {
+  background-color: #1e90ff;
+}
+
+.tableHeaderLink {
+  cursor: pointer;
+  /* bqe  */
+  visibility: visible;
+  /* ly */
+  display: inline-flex;
+
+  .svgSpan {
+    /* jt  */
+    margin-left: 0.5rem;
+    /* uo  */
+    flex: none;
+    /* adp  */
+    border-radius: 0.25rem;
+    /* aih  */
+    --tw-bg-opacity: 1;
+    background-color: rgb(243 244 246 / var(--tw-bg-opacity));
+    /* axu  */
+    --tw-text-opacity: 1;
+    color: rgb(17 24 39 / var(--tw-text-opacity));
+    /* bqi (hover)*/
+    --tw-bg-opacity: 1;
+    background-color: rgb(229 231 235 / var(--tw-bg-opacity));
+
+    .svger {
+      /* nz  */
+      height: 1.25rem;
+      /* sb */
+      width: 1.25rem;
+    }
+  }
+}

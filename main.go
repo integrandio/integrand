@@ -1,0 +1,23 @@
+package main
+
+import (
+	"fmt"
+	"integrand/persistence"
+	"integrand/utils"
+	"integrand/web"
+	"log"
+	"log/slog"
+	"net/http"
+)
+
+func main() {
+	utils.GetEnvrionmentVariableString("DEV_MODE", "true")
+	utils.GetEnvrionmentVariableString("DB_FILE_LOCATION", "integrand.db")
+	// to change the flags on the default logger
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	persistence.Initialize()
+	router := web.NewNewWebRouter()
+	port := ":8000"
+	slog.Info(fmt.Sprintf("Server started on http//:localhost%s\n", port))
+	log.Fatal(http.ListenAndServe(port, router))
+}

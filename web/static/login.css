@@ -1,0 +1,298 @@
+.login-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.loginForm {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    max-width: 500px;
+    width: 80%;
+}
+
+.login-label {
+    display: block;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: .5rem;
+}
+
+.login-input {
+    display: block;
+    height: 50px;
+    width: 100%;
+    padding: 0 10px;
+    margin-top: .5rem;
+}
+
+.social-signin {
+    text-align: center;
+    max-width: 500px;
+    width: 80%;
+    margin-top: 1rem;
+}
+
+.google-button {
+    border: 1px solid #c2c8d0;
+    border-radius: 100px;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    width: 100%; 
+}
+
+.content-holder {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.content-holder svg {
+    margin-right: 5px;
+}
+
+.loginContainer {
+    /* lx */
+    display: flex;
+    /* qx  */
+    min-height: 900px;
+    /* yr */
+    flex-direction: column;
+    /* aio */
+    --tw-bg-opacity: 1;
+    background-color: rgb(249 250 251 / var(--tw-bg-opacity));
+}
+
+.loginWrapper {
+    /* lx  */
+    display: flex;
+    /* rb  */
+    min-height: 100%;
+    /* um  */
+    flex: 1 1 0%;
+    /* yr  */
+    flex-direction: column;
+    /* ze  */
+    justify-content: center;
+    /* arr  */
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+    /* cez  (min-width: 640px)*/
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    /* dde(min-width: 1024px) */
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+.loginHeader {
+    /* bvb  */
+    margin-left: auto;
+    margin-right: auto;
+    /* bzg  */
+    width: 100%;
+    /* bzp */
+    max-width: 28rem;
+
+    .logo {
+        /* gx  */
+        margin-left: auto;
+        margin-right: auto;
+        /* nh  */
+        height: 2.5rem;
+        /* tm */
+        width: auto;
+    }
+
+    .title {
+        /* lk  */
+        margin-top: 1.5rem;
+        /* avk  */
+        text-align: center;
+        /* avq  */
+        font-size: 1.5rem;
+        line-height: 2rem;
+        /* awc  */
+        font-weight: 700;
+        /* awr  */
+        line-height: 2.25rem;
+        /* aww  */
+        letter-spacing: -0.025em;
+        /* axu */
+        --tw-text-opacity: 1;
+        color: rgb(17 24 39 / var(--tw-text-opacity));
+    }
+}
+
+.signInContainer {
+    /* kw  */
+    margin-top: 2.5rem;
+    /* bvb  */
+    margin-left: auto;
+    margin-right: auto;
+    /* bzg  */
+    width: 100%;
+    /* bzn */
+    max-width: 480px;
+
+    .wrapper {
+        /* alm  */
+        --tw-bg-opacity: 1;
+        background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+        /* arj  */
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+        /* arr  */
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+        /* bbh  */
+        --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        --tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+        box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+        /* cdg   (min-width: 640px)*/
+        border-radius: 0.5rem;
+        /* cer (min-width: 640px)*/
+        padding-left: 3rem;
+        padding-right: 3rem;
+
+        .former > :not([hidden]) ~ :not([hidden]) {
+            /* aby */
+            --tw-space-y-reverse: 0;
+            margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));
+            margin-bottom: calc(1.5rem * var(--tw-space-y-reverse));
+        }
+
+        .labeler {
+            /* lu  */
+            display: block;
+            /* avz  */
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            /* awd  */
+            font-weight: 500;
+            /* awo  */
+            line-height: 1.5rem;
+            /* axu */
+            --tw-text-opacity: 1;
+            color: rgb(17 24 39 / var(--tw-text-opacity));
+        }
+
+        .input-wrapper {
+            /* lb */
+            margin-top: 0.5rem;
+
+            .inputter {
+                /* lu  */
+                display: block;
+                /* tn  */
+                width: 100%;
+                /* adu  */
+                border-radius: 0.375rem;
+                /* afa  */
+                border-width: 0px;
+                /* arp  */
+                padding-top: 0.375rem;
+                padding-bottom: 0.375rem;
+                /* axu  */
+                --tw-text-opacity: 1;
+                color: rgb(17 24 39 / var(--tw-text-opacity));
+                /* bbm  */
+                --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+                --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
+                box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+                /* bbs  */
+                --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+                --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+                box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+                /* bbw  */
+                --tw-ring-inset: inset;
+                /* bce  */
+                --tw-ring-opacity: 1;
+                --tw-ring-color: rgb(209 213 219 / var(--tw-ring-opacity));                
+                /* cia (min-width: 640px) */
+                font-size: 0.875rem;
+                line-height: 1.25rem;
+                /* cic (min-width: 640px) */
+                line-height: 1.5rem;
+            }
+
+            .inputter::-moz-placeholder {
+                /* bgc  */
+                --tw-text-opacity: 1;
+                color: rgb(156 163 175 / var(--tw-text-opacity));
+            }
+            .inputter::placeholder {
+                /* bgc  */
+                --tw-text-opacity: 1;
+                color: rgb(156 163 175 / var(--tw-text-opacity));
+            }
+            .inputter:focus {
+                /* bnd  */
+                --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+                --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+                box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+                /* bne  */
+                --tw-ring-inset: inset;
+                /* bnq  */
+                --tw-ring-opacity: 1;
+                --tw-ring-color: rgb(79 70 229 / var(--tw-ring-opacity));
+            }
+        }
+
+        .submit-button {
+            /* lx  */
+            display: flex;
+            /* tn  */
+            width: 100%;
+            /* ze  */
+            justify-content: center;
+            /* adu  */
+            border-radius: 0.375rem;
+            /* ajp  */
+            --tw-bg-opacity: 1;
+            background-color: rgb(79 70 229 / var(--tw-bg-opacity));
+            /* are  */
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+            /* arp  */
+            padding-top: 0.375rem;
+            padding-bottom: 0.375rem;
+            /* avz  */
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            /* awf  */
+            font-weight: 600;
+            /* awo  */
+            line-height: 1.5rem;
+            /* bag  */
+            --tw-text-opacity: 1;
+            color: rgb(255 255 255 / var(--tw-text-opacity));
+            /* bbm  */
+            --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
+            box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+        }
+        .submit-button:hover {
+            /* bir  */
+            --tw-bg-opacity: 1;
+            background-color: rgb(99 102 241 / var(--tw-bg-opacity));
+        }
+        .submit-button:focus-visible {
+            /* box  */
+            outline-style: solid;
+            /* boy  */
+            outline-width: 2px;
+            /* bpa  */
+            outline-offset: 2px;
+            /* bph */
+            outline-color: #4f46e5;
+        }
+    }
+}

@@ -1,0 +1,42 @@
+.datasource-container {
+    display: flex;
+    flex-direction: column;
+
+    /* gx  */
+    margin-left: auto;
+    margin-right: auto;
+
+    /* ua  */
+    max-width: 80rem;
+
+    /* arh  */
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.database-cards-list {
+    /* lf  */
+    margin-top: 0.75rem;
+    /* mb  */
+    display: grid;
+    /* yg  */
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    /* zq  */
+    gap: 1.25rem;
+}
+
+@media (min-width: 640px) {
+    .database-cards-list {
+        /* caq  (min-width: 640px)*/
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        /* cbr  (min-width: 640px)*/
+        gap: 1.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .database-cards-list {
+        /* cyq (min-width: 1024px)*/
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}

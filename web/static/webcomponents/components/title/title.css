@@ -1,0 +1,34 @@
+.heading-container {
+    /* gx  */
+    margin-left: auto;
+    margin-right: auto;
+    /* ua  */
+    max-width: 80rem;
+    /* arh  */
+    padding-left: 1rem;
+    padding-right: 1rem;
+    /* arr  */
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+
+    .title-wrapper {
+        /* aff  */
+        border-bottom-width: 1px;
+        /* afu  */
+        --tw-border-opacity: 1;
+        border-color: rgb(229 231 235 / var(--tw-border-opacity));
+        /* asu */
+        padding-bottom: 1.25rem;
+        
+        .title {
+            /* avx  */
+            font-size: 1rem;
+            line-height: 1.5rem;
+            /* awf  */
+            font-weight: 600;
+            /* axu */
+            --tw-text-opacity: 1;
+            color: rgb(17 24 39 / var(--tw-text-opacity));
+        }
+    }
+}

@@ -1,0 +1,143 @@
+.resultsDiv {
+    position: relative;
+    display: none;
+    /* tn */
+    width: 100%;
+    /* uc */
+    max-width: 32rem;
+    height: 2rem;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+.item-link {
+    /* This is jank, let's fix later */
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+.searchBarContainer {
+    /* tn */
+    width: 100%;
+    /* uc */
+    max-width: 32rem;
+
+    .searchLabel {
+        /* t */
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+    }
+    .searchBarWrapper {
+        /* ab */
+        position: relative;
+
+        .svgWrapper {
+            /* u  */
+            pointer-events: none;
+            /* aa  */
+            position: absolute;
+            /* as  */
+            top: 0px;
+            bottom: 0px;
+            /* cg  */
+            left: 0px;
+            /* lx  */
+            display: flex;
+            /* yz  */
+            align-items: center;
+            /* atl */
+            padding-left: 0.75rem;
+
+            .svger {
+                /* nz  */
+                height: 1.25rem;
+                /* sb  */
+                width: 1.25rem;
+                /* axo */
+                --tw-text-opacity: 1;
+                color: rgb(156 163 175 / var(--tw-text-opacity));
+            }
+        }
+
+        .searchBarInput {
+            /* lu  */
+            display: block;
+            /* tn  */
+            width: 100%;
+            /* adu  */
+            border-radius: 0.375rem;
+            /* afa  */
+            border-width: 0px;
+            /* alm  */
+            --tw-bg-opacity: 1;
+            background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+            /* arp  */
+            padding-top: 0.375rem;
+            padding-bottom: 0.375rem;
+            /* atf  */
+            padding-left: 2.5rem;
+            /* aub  */
+            padding-right: 0.75rem;
+            /* axu  */
+            --tw-text-opacity: 1;
+            color: rgb(17 24 39 / var(--tw-text-opacity));
+            /* bbs  */
+            --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+            --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+            box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+            /* bbw  */
+            --tw-ring-inset: inset;
+            /* bce  */
+            --tw-ring-opacity: 1;
+            --tw-ring-color: rgb(209 213 219 / var(--tw-ring-opacity));
+            /* cia  (min-width:640 )*/
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            /* cic (min-width:640 )*/
+            line-height: 1.5rem;
+        }
+        .searchBarInput::-moz-placeholder{
+            /* bgc  */
+            --tw-text-opacity: 1;
+            color: rgb(156 163 175 / var(--tw-text-opacity));
+        }
+        .searchBarInput::placeholder{
+            --tw-text-opacity: 1;
+            color: rgb(156 163 175 / var(--tw-text-opacity));
+        }
+        .searchBarInput:focus {
+            /* bnd  */
+            --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+            --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+            box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+            /* bne  */
+            --tw-ring-inset: inset;
+            /* bnq  */
+            --tw-ring-opacity: 1;
+            --tw-ring-color: rgb(79 70 229 / var(--tw-ring-opacity));
+        }
+    }
+}
+
+
+@media (min-width: 1024px) {
+    .searchBarContainer {
+        /* cxm (min-width 1024)*/
+        max-width: 20rem;
+    }
+
+    .resultsDiv {
+        max-width: 20rem;
+    }
+    
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Automate your firm today | Integrand</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+        <link rel="icon" type="image/x-icon" href="/favicon.ico">
+        <link rel="stylesheet" type="text/css" href="/static/reset.css">
+        <link rel="stylesheet" type="text/css" href="/static/appShell.css">
+        <script type="module" src="/static/webcomponents/router.js"></script>
+        <script type="module" src="/static/webcomponents/utils.js"></script>
+        <!-- Reuseable components -->
+        <script defer type="module" src="/static/webcomponents/components/data-cards-container/data-cards-container.js"></script>
+        <script defer type="module" src="/static/webcomponents/components/data-element-card/data-element-card.js"></script>
+        <script defer type="module" src="/static/webcomponents/components/long-data-element-card/long-data-element-card.js"></script> 
+        <script defer type="module" src="/static/webcomponents/components/multi-selectable-checkbox-button/multi-selectable-checkbox-button.js"></script>
+        <script defer type="module" src="/static/webcomponents/components/title/title.js"></script>
+        <script defer type="module" src="/static/webcomponents/components/page-heading/page-heading.js"></script>
+        <script defer type="module" src=/static/webcomponents/components/page-heading-button/page-heading-button.js></script>
+        <!-- Pages -->
+        <script defer type="module" src="/static/webcomponents/wc-notfound.js"></script>
+        <script defer type="module" src="/static/webcomponents/pages/home/home.js"></script>
+        <!-- Connectors -->
+        <script defer type="module" src="/static/webcomponents/pages/connectors/connectors-home/connectors-home.js"></script>
+        <script defer type="module" src="/static/webcomponents/pages/connectors/endpoint/endpoint.js"></script>
+        <!-- Topics -->
+        <script defer type="module" src="/static/webcomponents/pages/topics/topics-home/topics-home.js"></script>
+        <script defer type="module" src="/static/webcomponents/pages/topics/topic/topic.js"></script>
+        
+    </head>
+    <body class="appShellContainer">
+        {{ template "appShell.html" }}
+        <main class="appShell-content-container">
+            #replace_me#
+        </main>
+    </body>
+</html>

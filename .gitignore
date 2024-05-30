@@ -1,0 +1,9 @@
+*.db
+.env
+**/*.DS_Store
+thing.css
+
+test-request.txt
+
+data/databases
+data/commitlog
