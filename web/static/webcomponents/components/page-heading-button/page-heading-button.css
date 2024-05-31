@@ -10,11 +10,8 @@
 
     .page-heading-button-sub-wrapper {
       padding-bottom: 1rem;
-      /* aff  */
       border-bottom-width: 1px;
-      /* afu  */
-      --tw-border-opacity: 1;
-      border-color: rgb(229 231 235 / var(--tw-border-opacity));
+      border-color: var(--main-border-color);
       
       .title-container {
         /* tq */
@@ -41,10 +38,7 @@
         margin-top: 1rem;
         /* lx  */
         display: flex;
-        /* ckk (min-width: 768px) */
-        margin-left: 0px;
-        /* cko (min-width: 768px)*/
-        margin-top: 0px;
+
   
         .button {
           /* jw  */
@@ -57,7 +51,7 @@
           border-radius: 0.375rem;
           /* ajp */
           --tw-bg-opacity: 1;
-          background-color: rgb(79 70 229 / var(--tw-bg-opacity));
+          background-color: var(--primary-color);
           /* are */
           padding-left: 0.75rem;
           padding-right: 0.75rem;
@@ -81,7 +75,7 @@
         .button:hover {
           /* biq */
           --tw-bg-opacity: 1;
-          background-color: rgb(67 56 202 / var(--tw-bg-opacity));
+          background-color: rgb(28 74 176 / var(--tw-bg-opacity));
         }
   
         .button:focus-visible {
@@ -92,25 +86,8 @@
           /* bow focus visible*/
           outline-offset: 2px;
           /* bpd focus visible*/
-          outline-color: #4f46e5;
+          outline-color: #2563eb;
         }
-      }
-    }
-  }
-  
-  
-}
-
-@media (min-width: 768px) {
-  .page-heading-button-container {
-    .page-heading-button-wrapper {
-      .page-heading-button-sub-wrapper{
-        /* cla  (min-width: 768px))*/
-        display: flex;
-        /* cmt  (min-width: 768px))*/
-        align-items: center;
-        /* cmz (min-width: 768px))*/
-        justify-content: space-between;
       }
     }
   }
@@ -137,3 +114,26 @@
     }
   }
 }
+
+@media (min-width: 768px) {
+  .page-heading-button-container {
+    .page-heading-button-wrapper {
+      .page-heading-button-sub-wrapper{
+        /* cla  (min-width: 768px))*/
+        display: flex;
+        /* cmt  (min-width: 768px))*/
+        align-items: center;
+        /* cmz (min-width: 768px))*/
+        justify-content: space-between;
+
+        .button-container {
+          /* ckk (min-width: 768px) */
+          margin-left: 0px;
+          /* cko (min-width: 768px)*/
+          margin-top: 0px;
+        }
+      }
+    }
+  }
+}
+

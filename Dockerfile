@@ -21,17 +21,14 @@ FROM alpine:latest
 
 WORKDIR /root/
 
-#Copy the Scripts to the production image from the build stage
-COPY --from=builder /app/scripts ./scripts
+#Copy our staic files, templates and data
 COPY --from=builder /app/web/templates ./web/templates
-COPY --from=builder /app/data ./data
 COPY --from=builder /app/web/static ./web/static
-# Create our directory to put in our styles
-RUN mkdir ./web/static/styles
+COPY --from=builder /app/data ./data
 
-# Create our directory to place our SQLite databases in
+# Create our directory to place our SQLite database in
 RUN mkdir ./data/databases
-# Create or directory 
+# Create our directory where commitlog data will live
 RUN mkdir ./data/commitlog
 
 # Copy the binary to the production image from the builder stage.

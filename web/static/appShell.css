@@ -7,9 +7,7 @@
 .appShell-header-desktop {
   /* md  */
   display: none;
-
-  --tw-border-opacity: 1;
-  border-color: rgb(229 231 235 / var(--tw-border-opacity));
+  border-color: var(--main-border-color);
   border-right-width: 1px;
 
   .desktop-header-wrapper {
@@ -83,9 +81,7 @@
         /* ajr */
         --tw-bg-opacity: 1;
         background-color: rgb(249 250 251 / var(--tw-bg-opacity));
-        /* bag  */
-        --tw-text-opacity: 1;
-        color: rgb(79 70 229 / var(--tw-text-opacity));
+        color: var(--primary-color);
         /* bqe  (hover)*/
         visibility: visible;
         /* lx  */
@@ -106,9 +102,7 @@
         font-weight: 600;
 
         .svger {
-          /* bag  */
-          --tw-text-opacity: 1;
-          color: rgb(79 70 229 / var(--tw-text-opacity));
+          color: var(--primary-color);
           /* oc  */
           height: 1.5rem;
           /* se  */
@@ -152,16 +146,12 @@
         }
 
         .svger:hover {
-          /* brz (hover) */
-          --tw-text-opacity: 1;
-          color: rgb(79 70 229 / var(--tw-text-opacity));
+          color: var(--primary-color);
         }
       }
 
       .item-sublist:hover {
-        /* blt  (hover)*/
-        --tw-text-opacity: 1;
-        color: rgb(79 70 229 / var(--tw-text-opacity));
+        color: var(--primary-color);
         /* biu (hover) */
         --tw-bg-opacity: 1;
         background-color: rgb(249 250 251 / var(--tw-bg-opacity));

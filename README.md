@@ -16,8 +16,9 @@
 ![Github Issues](https://img.shields.io/github/issues/integrandio/integrand-app)
 
 </p>
-> :warning: **This project is in Alpha Stage**: Expect breaking changes
 </div>
+
+> :warning: **This project is in Alpha Stage**: Expect breaking changes
 
 ## What is Integrand?
 
