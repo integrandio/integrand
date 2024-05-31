@@ -5,6 +5,8 @@ import (
 	"log/slog"
 	"os"
 	"strconv"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 var DATASTORE *Datastore
@@ -28,6 +30,24 @@ func Initialize() {
 	err = initialize_broker()
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	// Insert our root user into the db...
+	// TODO: Clean this up, Should errors cause the
+	plainPassword := os.Getenv("ROOT_PASSWORD")
+	password, err := bcrypt.GenerateFromPassword([]byte(plainPassword), bcrypt.DefaultCost)
+	if err != nil {
+		log.Fatal(err)
+	}
+	user := User{
+		Email:    os.Getenv("ROOT_EMAIL"),
+		Password: string(password),
+		AuthType: EMAIL,
+	}
+	_, err = DATASTORE.CreateEmailUser(user)
+	if err != nil {
+		// if the user already exists, we don't want this program to crash
+		slog.Error(err.Error())
 	}
 }
 

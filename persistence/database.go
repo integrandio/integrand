@@ -8,7 +8,6 @@ import (
 	"sync"
 
 	_ "github.com/mattn/go-sqlite3"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type NullFloat64 struct{ sql.NullFloat64 }
@@ -76,23 +75,6 @@ func setupConnection(isDevMode bool) (*Datastore, error) {
 	integrandDB := &Datastore{
 		db:      db,
 		RWMutex: &sync.RWMutex{},
-	}
-
-	// Insert our root user into the db...
-	// TODO: Clean this up
-	plainPassword := os.Getenv("ROOT_PASSWORD")
-	password, err := bcrypt.GenerateFromPassword([]byte(plainPassword), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
-	}
-	user := User{
-		Email:    os.Getenv("ROOT_EMAIL"),
-		Password: string(password),
-		AuthType: EMAIL,
-	}
-	_, err = integrandDB.CreateEmailUser(user)
-	if err != nil {
-		return nil, err
 	}
 
 	return integrandDB, nil
