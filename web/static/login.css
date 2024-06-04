@@ -126,8 +126,7 @@
         /* aww  */
         letter-spacing: -0.025em;
         /* axu */
-        --tw-text-opacity: 1;
-        color: rgb(17 24 39 / var(--tw-text-opacity));
+        color: rgb(17 24 39 / var(--opacity));
     }
 }
 
@@ -180,8 +179,7 @@
             /* awo  */
             line-height: 1.5rem;
             /* axu */
-            --tw-text-opacity: 1;
-            color: rgb(17 24 39 / var(--tw-text-opacity));
+            color: rgb(17 24 39 / var(--opacity));
         }
 
         .input-wrapper {
@@ -201,8 +199,7 @@
                 padding-top: 0.375rem;
                 padding-bottom: 0.375rem;
                 /* axu  */
-                --tw-text-opacity: 1;
-                color: rgb(17 24 39 / var(--tw-text-opacity));
+                color: rgb(17 24 39 / var(--opacity));
                 /* bbm  */
                 --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
                 --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
@@ -225,13 +222,11 @@
 
             .inputter::-moz-placeholder {
                 /* bgc  */
-                --tw-text-opacity: 1;
-                color: rgb(156 163 175 / var(--tw-text-opacity));
+                color: rgb(156 163 175 / var(--opacity));
             }
             .inputter::placeholder {
                 /* bgc  */
-                --tw-text-opacity: 1;
-                color: rgb(156 163 175 / var(--tw-text-opacity));
+                color: rgb(156 163 175 / var(--opacity));
             }
             .inputter:focus {
                 /* bnd  */
@@ -272,8 +267,7 @@
             /* awo  */
             line-height: 1.5rem;
             /* bag  */
-            --tw-text-opacity: 1;
-            color: rgb(255 255 255 / var(--tw-text-opacity));
+            color: rgb(255 255 255 / var(--opacity));
             /* bbm  */
             --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
             --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);

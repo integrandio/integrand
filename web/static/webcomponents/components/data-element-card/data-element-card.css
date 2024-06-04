@@ -39,8 +39,7 @@
             /* awd  */
             font-weight: 500;
             /* bag */
-            --tw-text-opacity: 1;
-            color: rgb(255 255 255 / var(--tw-text-opacity));
+            color: rgb(255 255 255 / var(--opacity));
         }
 
         .imger {
@@ -103,8 +102,7 @@
                 /* awd  */
                 font-weight: 500;
                 /* axu */
-                --tw-text-opacity: 1;
-                color: rgb(17 24 39 / var(--tw-text-opacity));
+                color: rgb(17 24 39 / var(--opacity));
             }
             
             .subtitle {
@@ -116,8 +114,7 @@
                 font-size: 0.875rem;
                 line-height: 1.25rem;
                 /* axq */
-                --tw-text-opacity: 1;
-                color: rgb(107 114 128 / var(--tw-text-opacity));
+                color: rgb(107 114 128 / var(--opacity));
             }
         }
 

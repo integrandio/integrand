@@ -27,8 +27,8 @@
         /* awd  */
         font-weight: 500;
         /* axq  */
-        --tw-text-opacity: 1;
-        color: rgb(107 114 128 / var(--tw-text-opacity));
+        
+        color: rgb(107 114 128 / var(--opacity));
 
 
         .back-svg {
@@ -43,15 +43,15 @@
             /* up  */
             flex-shrink: 0;
             /* axo */
-            --tw-text-opacity: 1;
-            color: rgb(156 163 175 / var(--tw-text-opacity));
+            
+            color: rgb(156 163 175 / var(--opacity));
         }
     }
 
     .mobile-breadcrumb-link:hover {
         /* bky (hover)*/
-        --tw-text-opacity: 1;
-        color: rgb(55 65 81 / var(--tw-text-opacity));
+        
+        color: rgb(55 65 81 / var(--opacity));
     }
 }
 
@@ -76,14 +76,14 @@
                 /* awd  */
                 font-weight: 500;
                 /* axq  */
-                --tw-text-opacity: 1;
-                color: rgb(107 114 128 / var(--tw-text-opacity));
+                
+                color: rgb(107 114 128 / var(--opacity));
             }
 
             .list-item-div-link:hover {
                 /* bky (hover)*/
-                --tw-text-opacity: 1;
-                color: rgb(55 65 81 / var(--tw-text-opacity));
+                
+                color: rgb(55 65 81 / var(--opacity));
             }
         }
 
@@ -101,8 +101,8 @@
                 /* up  */
                 flex-shrink: 0;
                 /* axo */
-                --tw-text-opacity: 1;
-                color: rgb(156 163 175 / var(--tw-text-opacity));
+                
+                color: rgb(156 163 175 / var(--opacity));
             }
 
             .list-item-other-link {
@@ -114,15 +114,15 @@
                 /* awd  */
                 font-weight: 500;
                 /* axq  */
-                --tw-text-opacity: 1;
-                color: rgb(107 114 128 / var(--tw-text-opacity));
+                
+                color: rgb(107 114 128 / var(--opacity));
 
             }
 
             .list-item-other-link:hover {
                 /* bky (hover)*/
-                --tw-text-opacity: 1;
-                color: rgb(55 65 81 / var(--tw-text-opacity));
+                
+                color: rgb(55 65 81 / var(--opacity));
             }
         }
     }
@@ -155,8 +155,8 @@
         /* awp  */
         line-height: 1.75rem;
         /* axu  */
-        --tw-text-opacity: 1;
-        color: rgb(17 24 39 / var(--tw-text-opacity));
+        
+        color: rgb(17 24 39 / var(--opacity));
     }
 }
 

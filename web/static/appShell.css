@@ -1,7 +1,5 @@
 .appShellContainer {
-  /* alm */
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+  background-color: rgb(255 255 255 / var(--opacity));
 }
 
 .appShell-header-desktop {
@@ -22,8 +20,7 @@
     /* adj  */
     overflow-y: auto;
     /* ajp  */
-    --tw-bg-opacity: 1;
-    background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+    background-color: rgb(255 255 255 / var(--opacity));
     /* arj */
     padding-left: 1.5rem;
     padding-right: 1.5rem;
@@ -79,8 +76,7 @@
 
       .selected-item {
         /* ajr */
-        --tw-bg-opacity: 1;
-        background-color: rgb(249 250 251 / var(--tw-bg-opacity));
+        background-color: rgb(249 250 251 / var(--opacity));
         color: var(--primary-color);
         /* bqe  (hover)*/
         visibility: visible;
@@ -114,8 +110,7 @@
 
       .item-sublist {
         /* ayb  */
-        --tw-text-opacity: 1;
-        color: rgb(55 65 81 / var(--tw-text-opacity));
+        color: rgb(55 65 81 / var(--opacity));
         /* lx  */
         display: flex;
         /* aaf  */
@@ -135,8 +130,7 @@
 
         .svger {
           /* ayb  */
-          --tw-text-opacity: 1;
-          color: rgb(55 65 81 / var(--tw-text-opacity));
+          color: rgb(55 65 81 / var(--opacity));
           /* oc  */
           height: 1.5rem;
           /* se  */
@@ -153,8 +147,7 @@
       .item-sublist:hover {
         color: var(--primary-color);
         /* biu (hover) */
-        --tw-bg-opacity: 1;
-        background-color: rgb(249 250 251 / var(--tw-bg-opacity));
+        background-color: rgb(249 250 251 / var(--opacity));
         /* bqe  (hover)*/
         visibility: visible;
       }
@@ -189,8 +182,7 @@
         /* awo  */
         line-height: 1.5rem;
         /* bag  */
-        --tw-text-opacity: 1;
-        color: rgb(55 65 81 / var(--tw-text-opacity));
+        color: rgb(55 65 81 / var(--opacity));
         /* biu (hover)*/
         --tw-bg-opacity: 1;
         background-color: rgb(255 255 255 / var(--tw-bg-opacity));
@@ -259,8 +251,7 @@
     /* aqq  */
     padding: 0.625rem;
     /* ayb  */
-    --tw-text-opacity: 1;
-    color: rgb(199 210 254 / var(--tw-text-opacity));
+    color: rgb(199 210 254 / var(--opacity));
 
     .spanner {
       /* t */
@@ -294,8 +285,7 @@
     /* awo  */
     line-height: 1.5rem;
     /* bag */
-    --tw-text-opacity: 1;
-    color: rgb(55 65 81 / var(--tw-text-opacity));
+    color: rgb(55 65 81 / var(--opacity));
   }
 
   .spanner {
