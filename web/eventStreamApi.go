@@ -13,6 +13,7 @@ import (
 var (
 	topicsAllApi    = regexp.MustCompile(`^\/api/v1/topic[\/]*$`)
 	topicSingleApi  = regexp.MustCompile(`^\/api/v1/topic\/(.*)$`)
+	topicEventsApi  = regexp.MustCompile(`^\/api/v1/topic\/(.*)\/events$`)
 	topicConsumeApi = regexp.MustCompile(`^\/api/v1/topic\/(.*)\/consume$`)
 	//topicProduceApi = regexp.MustCompile(`^\/api/v1/topic\/(.*)\/produce$`)
 )
@@ -39,6 +40,8 @@ func (ea *topicAPI) eventRestHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	switch {
 	//Glue API Routes
+	case r.Method == http.MethodGet && topicEventsApi.MatchString(r.URL.Path):
+		ea.getEvents(w, r)
 	case r.Method == http.MethodGet && topicsAllApi.MatchString(r.URL.Path):
 		ea.getTopics(w, r)
 		return
@@ -50,6 +53,7 @@ func (ea *topicAPI) eventRestHandler(w http.ResponseWriter, r *http.Request) {
 	case r.Method == http.MethodDelete && topicSingleApi.MatchString(r.URL.Path):
 		ea.deleteTopic(w, r)
 		return
+
 	default:
 		notFoundApiError(w)
 		return
@@ -121,6 +125,64 @@ func (ta *topicAPI) deleteTopic(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	c := map[string]interface{}{"success": "successfully deleted topic"}
 	resJsonBytes, _ := generateSuccessMessage(c)
+	w.Write(resJsonBytes)
+}
+
+func (ea *topicAPI) getEvents(w http.ResponseWriter, r *http.Request) {
+	offsetParam := r.URL.Query().Get("offset")
+	limitParam := r.URL.Query().Get("limit")
+	offset := 0
+	if offsetParam != "" {
+		slog.Info("offset provided....")
+		var err error
+		offset, err = strconv.Atoi(offsetParam)
+		if err != nil {
+			// TODO: Determine what to do if this is wrong...
+			slog.Error(err.Error())
+			offset = 0
+		}
+	}
+
+	limit := 5
+	if limitParam != "" {
+		slog.Info("limit provided....")
+		var err error
+		limit, err = strconv.Atoi(limitParam)
+		if err != nil {
+			// TODO: Determine what to do if this is wrong...
+			slog.Error(err.Error())
+			limit = 5
+		}
+	}
+
+	matches := topicEventsApi.FindStringSubmatch(r.URL.Path)
+	eventStream, err := services.GetEventStream(matches[1])
+	if err != nil {
+		slog.Error(err.Error())
+		internalServerError(w)
+		return
+	}
+
+	var dataArray []string
+	for i := 0; i < limit; i++ {
+		//Iterate and loop through this...
+		jsonBytes, err := services.GetEvent(eventStream.TopicName, offset)
+		if err != nil {
+			//TODO: Fix this
+			if err.Error() == "offset out of bounds" {
+				break
+			} else {
+				slog.Error(err.Error())
+				break
+			}
+		}
+		//We need to convert the bytes to string
+		dataArray = append(dataArray, string(jsonBytes))
+		offset++
+	}
+
+	w.WriteHeader(http.StatusOK)
+	resJsonBytes, _ := generateSuccessMessage(dataArray)
 	w.Write(resJsonBytes)
 }
 

@@ -14,12 +14,24 @@ class EndpointPage extends HTMLElement {
         this.shawdow.append(jobTemplate.content.cloneNode(true))
     }
 
+    deleteConnectorAction() {
+        const url = `/api/v1/glue/${this.endpoint_id}`
+        fetch(url, {
+            method: "Delete",
+            headers: {"Content-Type": "application/json",}
+        }).then(res => {
+            // Check response to see if it's bad
+            res.json().then((endpointResponseData) => {
+                console.log(endpointResponseData)
+                window.location.replace("/app/connectors");
+            });
+        })
+    }
+
     generateMarkup(endpoint) {
         const endpoint_link = `/api/v1/glue/f/${endpoint.id}`
         var date = new Date(endpoint.lastModified);
         let job_markup = `
-        <div>
-            <wc-page-heading>Endpoint Details: ${endpoint.id}</wc-page-heading>
             <ul class="endpointContainerCard">
                 <li>
                     <p class="titler">Endpoint URL:<p>
@@ -37,9 +49,7 @@ class EndpointPage extends HTMLElement {
                     <p class="titler">Last Modified:</p>
                     <p>${date.toDateString()}</p>
                 </li>
-            </div>
-        </div>
-        `
+            </ul>`
         const div = fromHTML(job_markup);
         return div;
     }
@@ -50,6 +60,14 @@ class EndpointPage extends HTMLElement {
         let element = this.generateMarkup(jsonData.data)
         const contentTemplate = document.createElement("template")
         contentTemplate.content.append(element)
+
+        // Create the title and the delete button
+        const pageTitleElement = document.createElement("wc-page-heading-button")
+        pageTitleElement.innerText = `Endpoint ${this.endpoint_id}`;
+        pageTitleElement.buttonText = 'Delete';
+        pageTitleElement.buttonFunction = this.deleteConnectorAction.bind(this);
+        this.shawdow.append(pageTitleElement)
+
         this.shawdow.append(contentTemplate.content.cloneNode(true))
     }
 }

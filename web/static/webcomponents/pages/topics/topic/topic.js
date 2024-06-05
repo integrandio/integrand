@@ -15,7 +15,6 @@ class TopicPage extends HTMLElement {
     }
 
     deleteTopicAction() {
-        console.log("deleting topic")
         const url = `/api/v1/topic/${this.topic_id}`
         fetch(url, {
             method: "Delete",
@@ -61,6 +60,7 @@ class TopicPage extends HTMLElement {
         const contentTemplate = document.createElement("template")
         contentTemplate.content.append(element);
 
+        // Create the title and the delete button
         const pageTitleElement = document.createElement("wc-page-heading-button")
         pageTitleElement.innerText = `Topic ${this.topic_id}`;
         pageTitleElement.buttonText = 'Delete';

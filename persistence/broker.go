@@ -3,7 +3,6 @@ package persistence
 import (
 	"encoding/gob"
 	"errors"
-	"log"
 	"log/slog"
 	"os"
 
@@ -103,9 +102,9 @@ func (broker *Broker) DeleteTopic(topicName string) error {
 		}
 	}
 	if topicFound {
+		broker.Topics[foundTopicIndex].commitlog.Delete()
 		broker.Topics[foundTopicIndex] = broker.Topics[len(broker.Topics)-1]
 		broker.Topics = broker.Topics[:len(broker.Topics)-1]
-		log.Println(broker.Topics)
 	} else {
 		return errors.New("topic does not exist, unable to delete")
 	}
@@ -120,12 +119,11 @@ func (broker *Broker) DeleteTopic(topicName string) error {
 func (broker *Broker) takeTopicSnapshot() error {
 	snapshotPath := broker.BaseDirectory + "/topics.gob"
 
-	file, err := os.OpenFile(snapshotPath, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	file, err := os.OpenFile(snapshotPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
-
 	encoder := gob.NewEncoder(file)
 	err = encoder.Encode(broker.Topics)
 	if err != nil {

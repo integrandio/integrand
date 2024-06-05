@@ -12,11 +12,12 @@ class DataCardsContainer extends HTMLElement {
     }
 
     getHtmlElement() {
-        return `<div class="datasource-container">
-                <ul role="list" class="database-cards-list">
-                    <slot></slot>
-                </ul>
-                </div>`
+        return `
+        <div class="datasource-container">
+            <ul role="list" class="database-cards-list">
+                <slot></slot>
+            </ul>
+        </div>`
     }
 
     connectedCallback(){

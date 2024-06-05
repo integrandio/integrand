@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log/slog"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"sync"
@@ -14,9 +15,9 @@ import (
 
 var (
 	//Max bytes of the log, used by segment
-	SEGMENT_MAX_BYTES = utils.GetEnvrionmentVariableInt("SEGMENT_MAX_BYTES", 100000)
+	SEGMENT_MAX_BYTES = utils.GetEnvrionmentVariableInt("SEGMENT_MAX_BYTES", 1000000000)
 	//Max retention byte of the commitlog, used by cleaner
-	RETENTION_BYTES = utils.GetEnvrionmentVariableInt("RETENTION_BYTES", 5000000000)
+	RETENTION_BYTES = utils.GetEnvrionmentVariableInt("RETENTION_BYTES", 10000000000)
 )
 
 type Commitlog struct {
@@ -47,6 +48,31 @@ func New(path string) (*Commitlog, error) {
 	//Since our partition already exists we need to load them in
 	cl.loadSegments()
 	return &cl, nil
+}
+
+func (cl *Commitlog) Delete() error {
+	err := os.RemoveAll(cl.path)
+	return err
+}
+
+func (cl *Commitlog) Clear() error {
+	d, err := os.Open(cl.path)
+	if err != nil {
+		return err
+	}
+	defer d.Close()
+	names, err := d.Readdirnames(-1)
+	if err != nil {
+		return err
+	}
+	for _, name := range names {
+		err = os.RemoveAll(filepath.Join(cl.path, name))
+		if err != nil {
+			return err
+		}
+	}
+	//set the oldest offset and newest offset
+	return nil
 }
 
 func (cl *Commitlog) GetPath() string {

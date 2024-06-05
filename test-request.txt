@@ -1,0 +1,51 @@
+
+//TODO: To fix this one...
+curl --header "Content-Type: application/json" \
+  --request POST \
+  --data '{"username":1,"password":"xyz"}' \
+  http://localhost:8000/api/v1/glue/f/dQhIE
+
+// Glue API
+curl --header "Content-Type: application/json" \
+  --header "Authorization: Bearer 11111" \
+  --request GET \
+  http://localhost:8000/api/v1/glue
+
+curl --header "Content-Type: application/json" \
+  --header "Authorization: Bearer 11111" \
+  --request POST \
+  http://localhost:8000/api/v1/glue
+
+curl --header "Content-Type: application/json" \
+  --header "Authorization: Bearer 11111" \
+  --request GET \
+  http://localhost:8000/api/v1/glue/id
+
+curl --header "Content-Type: application/json" \
+  --header "Authorization: Bearer 11111" \
+  --request DELETE \
+  http://localhost:8000/api/v1/glue/id
+
+
+// Event API
+curl --header "Content-Type: application/json" \
+  --header "Authorization: Bearer 11111" \
+  --request GET \
+  http://localhost:8000/api/v1/topic
+
+//
+curl --header "Content-Type: application/json" \
+  --header "Authorization: Bearer 11111" \
+  --request GET \
+  http://localhost:8000/api/v1/topic/QXTso
+
+curl --header "Content-Type: application/json" \
+  --header "Authorization: Bearer 11111" \
+  --request GET \
+  "http://localhost:8000/api/v1/topic/bllms/events?offset=0&limit=5"
+
+//
+curl --header "Accept:text/event-stream" \
+  --header "Authorization: Bearer 11111" \
+  --request GET -N  \
+  http://localhost:8000/api/v1/topic/gjPnN/consume
