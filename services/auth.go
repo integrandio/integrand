@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"integrand/persistence"
+	"integrand/utils"
 	"log"
 	"net/http"
 	"strings"
@@ -19,8 +20,7 @@ func AuthorizeToken(headerValue string) error {
 		return errors.New("malformed token")
 	}
 	authToken := strings.TrimSpace(splitToken[1])
-	// TODO: Replace auth token with database logic
-	if authToken == "11111" {
+	if persistence.IsAPIKeyValid(authToken) {
 		return nil
 	} else {
 		return errors.New("invalid token")
@@ -67,6 +67,24 @@ func GetSession(w http.ResponseWriter, r *http.Request) persistence.SessionDB {
 		log.Fatal(err)
 	}
 	return session
+}
+
+func CreateAPIKey() (string, error) {
+	for {
+		key := utils.RandomString(32)
+		err := persistence.AddAPIKey(key)
+		if err == nil {
+			return key, nil
+		}
+		if err.Error() == "API key already exists" {
+			continue
+		}
+		return "", err
+	}
+}
+
+func DeleteAPIKey(key string) error {
+	return persistence.DeleteAPIKey(key)
 }
 
 func checkPasswordHash(password, hash string) bool {
