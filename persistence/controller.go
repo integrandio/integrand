@@ -46,6 +46,7 @@ func Initialize() {
 	}
 
 	// Insert our root user into the db...
+	// TODO: Clean this up, Should errors cause the
 	plainPassword := os.Getenv("ROOT_PASSWORD")
 	password, err := bcrypt.GenerateFromPassword([]byte(plainPassword), bcrypt.DefaultCost)
 	if err != nil {
@@ -75,7 +76,7 @@ func initialize_broker() error {
 	var err error
 	BROKER, err = NewBroker("data/commitlog")
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 	all_sticky_connections, err := DATASTORE.GetAllStickyConnections()
 	if err != nil {

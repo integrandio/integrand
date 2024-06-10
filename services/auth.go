@@ -27,8 +27,8 @@ func AuthorizeToken(headerValue string) error {
 	}
 }
 
-func EmailAuthenticate(email string, password string) (persistence.User, error) {
-	user, err := persistence.DATASTORE.GetEmailUser(email)
+func EmailAuthenticate(Email string, password string) (persistence.User, error) {
+	user, err := persistence.DATASTORE.GetEmailUser(Email)
 	if err != nil {
 		log.Println(err)
 		return persistence.User{}, err
