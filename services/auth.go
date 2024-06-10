@@ -83,8 +83,8 @@ func CreateAPIKey() (string, error) {
 	}
 }
 
-func DeleteAPIKey(key string) {
-	persistence.DeleteAPIKey(key)
+func DeleteAPIKey(key string) error {
+	return persistence.DeleteAPIKey(key)
 }
 
 func checkPasswordHash(password, hash string) bool {
