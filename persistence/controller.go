@@ -1,7 +1,6 @@
 package persistence
 
 import (
-	"errors"
 	"integrand/utils"
 	"log"
 	"log/slog"
@@ -17,13 +16,9 @@ var SESSION_MANAGER *SessionManager
 var BROKER *Broker
 
 // Data structure to store API keys
-var apiKeys struct {
+var API_KEYS struct {
 	sync.RWMutex
 	keys []string
-}
-
-func init() {
-	apiKeys.keys = make([]string, 0)
 }
 
 func Initialize() {
@@ -63,8 +58,9 @@ func Initialize() {
 		slog.Error(err.Error())
 	}
 
+	API_KEYS.keys = make([]string, 0)
 	// Generate and log an initial API key
-	initialAPIKey := utils.RandomString(32)
+	initialAPIKey := utils.RandomString(20)
 	err = AddAPIKey(initialAPIKey)
 	if err != nil {
 		log.Fatal("Error generating initial API key: ", err)
@@ -92,42 +88,4 @@ func initialize_broker() error {
 		}
 	}
 	return nil
-}
-
-// adds a new API key to the store
-func AddAPIKey(key string) error {
-	apiKeys.Lock()
-	defer apiKeys.Unlock()
-	for _, k := range apiKeys.keys {
-		if k == key {
-			return errors.New("API key already exists")
-		}
-	}
-	apiKeys.keys = append(apiKeys.keys, key)
-	return nil
-}
-
-// removes an API key from the store
-func DeleteAPIKey(key string) error {
-	apiKeys.Lock()
-	defer apiKeys.Unlock()
-	for i, k := range apiKeys.keys {
-		if k == key {
-			apiKeys.keys = append(apiKeys.keys[:i], apiKeys.keys[i+1:]...)
-			return nil
-		}
-	}
-	return errors.New("API key not found")
-}
-
-// checks if an API key is valid
-func IsAPIKeyValid(key string) bool {
-	apiKeys.RLock()
-	defer apiKeys.RUnlock()
-	for _, k := range apiKeys.keys {
-		if k == key {
-			return true
-		}
-	}
-	return false
 }

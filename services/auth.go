@@ -71,15 +71,12 @@ func GetSession(w http.ResponseWriter, r *http.Request) persistence.SessionDB {
 
 func CreateAPIKey() (string, error) {
 	for {
-		key := utils.RandomString(32)
+		key := utils.RandomString(20)
 		err := persistence.AddAPIKey(key)
-		if err == nil {
-			return key, nil
-		}
 		if err.Error() == "API key already exists" {
 			continue
 		}
-		return "", err
+		return key, nil
 	}
 }
 

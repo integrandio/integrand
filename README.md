@@ -31,7 +31,7 @@ Integrand is a monolith application that contains both backend and frontend maki
     ├── commitlog      # The base library containing code for the commitlog
     ├── persistence    # Contains code for interacting with persistant state
     ├── services       # Wrappers around persistence and other services
-    ├── Web            # Api and web client code
+    ├── web            # Api and web client code
     ├── utils          # Utils used across the application
     └── data           # Where our persistent data is stored, including SQL definitions
 
@@ -71,3 +71,19 @@ services:
 volumes:
   data:
 ```
+
+## Running Locally and Development
+1. Git clone the repo
+2. Create directories, `data/commitlog` and `data/databases` in the root of the project.
+2. `go run .` from the root directory to start the server.
+
+## Features
+
+### Stream Based Abstractions
+Integrand is built upon the foundations used to build other data intensive systems like Kafka and RabbitMQ. The log is a datastructure that makes practical sense for handling Webhooks from outside services.
+
+### Web Based UI
+Manage endpoints, topics and access via a clean, easy to use Web UI. Built using native web components, don't worry about large dependency trees and nightmare NPM management.
+
+## Programactic Access
+Manage your Integrand instance via the provided REST API if you prefer to not to leave your commandline. Regular REST and SSE enpoints are exposed to allow for building of different types of applications and integrations.
