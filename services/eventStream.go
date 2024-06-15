@@ -14,10 +14,12 @@ func GetEventStream(topicName string) (persistence.TopicDetails, error) {
 	return persistence.BROKER.GetTopic(topicName)
 }
 
-func CreateEventStream() (persistence.TopicDetails, error) {
+func CreateEventStream(topicName string) (persistence.TopicDetails, error) {
 	var topicDetails persistence.TopicDetails
-	// TODO: Should this be random?
-	topicName := utils.RandomString(5)
+	if topicName == "" {
+		// TODO: Should this be random?
+		topicName = utils.RandomString(5)
+	}
 	topic, err := persistence.BROKER.CreateTopic(topicName)
 	if err != nil {
 		return topicDetails, err

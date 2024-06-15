@@ -6,21 +6,26 @@ curl --header "Content-Type: application/json" \
   http://localhost:8000/api/v1/glue/f/dQhIE
 
 // Glue API
+// Get all Glue handler
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer 11111" \
   --request GET \
   http://localhost:8000/api/v1/glue
 
+// Create glue handler
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer 11111" \
   --request POST \
+  --data '{"id":"myEndpoint","topicName":"myTopic"}' \
   http://localhost:8000/api/v1/glue
 
+// Get Glue handler
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer 11111" \
   --request GET \
   http://localhost:8000/api/v1/glue/id
 
+// Delete Glue handler
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer 11111" \
   --request DELETE \
@@ -28,23 +33,34 @@ curl --header "Content-Type: application/json" \
 
 
 // Event API
+// Get all topics
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer 11111" \
   --request GET \
   http://localhost:8000/api/v1/topic
 
-//
+// Create topic
+curl --header "Content-Type: application/json" \
+  --header "Authorization: Bearer 11111" \
+  --request POST \
+  --data '{"topicName":"badTings"}' \
+  http://localhost:8000/api/v1/topic
+
+//Get a single topic
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer 11111" \
   --request GET \
   http://localhost:8000/api/v1/topic/QXTso
 
+// Fetch events from topic
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer 11111" \
   --request GET \
   "http://localhost:8000/api/v1/topic/bllms/events?offset=0&limit=5"
 
-//
+
+
+//Stream events from topic
 curl --header "Accept:text/event-stream" \
   --header "Authorization: Bearer 11111" \
   --request GET -N  \

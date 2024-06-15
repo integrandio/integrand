@@ -3,7 +3,7 @@
 <div align="center">
 <p align="center">
     
-![LucidMQ](https://integrand.io/static/images/logos/Integrand-logo.svg)
+![Integrand](https://integrand.io/static/images/logos/Integrand-logo.svg)
 
 **Simple-Ops Webhook Streaming. Build your real time integrations without the headache of infrastructure.**
 
@@ -43,6 +43,8 @@ Integrand is a monolith application that contains both backend and frontend maki
 - Easy to operate as Integrand is self contained. Don't worry about viewing deployment instructions and having to install multiple databases just to get it running. 
 
 ## ⚡️ Quick start
+
+The quickest was to get started is to pull down the docker image and get it running on your host. Integrand handles persisting data, so make sure that you have your volumes set up.
 
 ### 🐳 Docker
 ```bash
@@ -85,5 +87,7 @@ Integrand is built upon the foundations used to build other data intensive syste
 ### Web Based UI
 Manage endpoints, topics and access via a clean, easy to use Web UI. Built using native web components, don't worry about large dependency trees and nightmare NPM management.
 
-## Programactic Access
+### Programactic Access
 Manage your Integrand instance via the provided REST API if you prefer to not to leave your commandline. Regular REST and SSE enpoints are exposed to allow for building of different types of applications and integrations.
+
+The requests are all documented in the `test-request.txt` file as curl requests.

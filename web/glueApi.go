@@ -119,50 +119,51 @@ func (ga *glueAPI) getAllGlueHandlers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ga *glueAPI) getGlueHandler(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodGet:
-		matches := glueSingleApi.FindStringSubmatch(r.URL.Path)
-		if len(matches) < 2 {
-			notFoundApiError(w)
-			return
-		}
-		stickyConnection, err := services.GetStickyConnection(matches[1])
-		if err != nil {
-			slog.Error(err.Error())
-			internalServerError(w)
-			return
-		}
-		resJsonBytes, err := generateSuccessMessage(stickyConnection)
-		if err != nil {
-			internalServerError(w)
-			return
-		}
-		w.WriteHeader(http.StatusOK)
-		w.Write(resJsonBytes)
-	default:
+	matches := glueSingleApi.FindStringSubmatch(r.URL.Path)
+	if len(matches) < 2 {
 		notFoundApiError(w)
+		return
 	}
+	stickyConnection, err := services.GetStickyConnection(matches[1])
+	if err != nil {
+		slog.Error(err.Error())
+		internalServerError(w)
+		return
+	}
+	resJsonBytes, err := generateSuccessMessage(stickyConnection)
+	if err != nil {
+		internalServerError(w)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(resJsonBytes)
+}
+
+type CreateGlueBody struct {
+	RouteID   string `json:"id"`
+	TopicName string `json:"topicName"`
 }
 
 func (ga *glueAPI) createGlueHandler(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodPost:
-		stickyConnection, err := services.CreateStickyConnection()
-		if err != nil {
-			slog.Error(err.Error())
-			internalServerError(w)
-			return
-		}
-		resJsonBytes, err := generateSuccessMessage(stickyConnection)
-		if err != nil {
-			internalServerError(w)
-			return
-		}
-		w.WriteHeader(http.StatusOK)
-		w.Write(resJsonBytes)
-	default:
-		notFoundApiError(w)
+	var createBody CreateGlueBody
+	if err := json.NewDecoder(r.Body).Decode(&createBody); err != nil {
+		slog.Error(err.Error())
+		internalServerError(w)
+		return
 	}
+	stickyConnection, err := services.CreateStickyConnection(createBody.RouteID, createBody.TopicName)
+	if err != nil {
+		slog.Error(err.Error())
+		internalServerError(w)
+		return
+	}
+	resJsonBytes, err := generateSuccessMessage(stickyConnection)
+	if err != nil {
+		internalServerError(w)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(resJsonBytes)
 }
 
 func (ga *glueAPI) deleteGlueHandler(w http.ResponseWriter, r *http.Request) {

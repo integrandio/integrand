@@ -458,9 +458,8 @@ select {
 /* Global Variables/Styles */
 :root {
   --opacity: 1;
-  --main-border-color: rgb(229 231 235 / var(--opacity));
   --primary-color: rgb(37 99 235/var(--opacity));
-
+  --main-border-color: rgb(229 231 235 / var(--opacity));
 }
 .main_body {
   display: flex;

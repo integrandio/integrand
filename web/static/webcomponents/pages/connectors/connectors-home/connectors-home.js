@@ -17,7 +17,9 @@ class ConnectorsHome extends HTMLElement {
         let cardsContainer = this.shawdow.querySelector("#cardContainer");
         fetch('/api/v1/glue', {
             method: "POST",
-            headers: {"Content-Type": "application/json",}
+            mode: 'cors',
+            headers: {"Content-Type": "application/json",},
+            body: JSON.stringify({"id": "", "topicName": ""}),
         }).then(res => {
             // TODO: add element to the page 
             res.json().then((glueResponseData) => {

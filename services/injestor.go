@@ -30,25 +30,32 @@ func GetStickyConnection(stickyConnectionID string) (persistence.StickyConnectio
 	return persistence.DATASTORE.GetStickeyConnection(stickyConnectionID)
 }
 
-func CreateStickyConnection() (persistence.StickyConnection, error) {
-	id := utils.RandomString(5)
+func CreateStickyConnection(id string, topicName string) (persistence.StickyConnection, error) {
+	if id == "" {
+		id = utils.RandomString(5)
+	}
+	if topicName == "" {
+		// TODO: Should this be random?
+		topicName = utils.RandomString(5)
+	}
+
 	connectionKey := utils.RandomString(8)
-	// TODO: Should this be random?
-	topicName := utils.RandomString(5)
 
 	sticky_connection := persistence.StickyConnection{
 		RouteID:          id,
 		ConnectionApiKey: connectionKey,
 		LastModified:     time.Now(),
 	}
-	// TODO: Do we want to create topics here?
-	topic, err := persistence.BROKER.CreateTopic(topicName)
+
+	_, err := persistence.BROKER.GetTopic(topicName)
 	if err != nil {
-		return sticky_connection, err
+		// TODO: Create the topic if it does not exist
+		_, err := persistence.BROKER.CreateTopic(topicName)
+		if err != nil {
+			return sticky_connection, err
+		}
 	}
-
-	sticky_connection.TopicName = topic.TopicName
-
+	sticky_connection.TopicName = topicName
 	// TODO: we're missing the timestamp that the db assigns. At some point lets fix this.
 	_, err = persistence.DATASTORE.InsertStickyConnection(sticky_connection)
 	if err != nil {

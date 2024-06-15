@@ -17,7 +17,10 @@ class TopicsHome extends HTMLElement {
         let cardsContainer = this.shawdow.querySelector("#cardContainer");
         fetch('/api/v1/topic', {
             method: "POST",
-            headers: {"Content-Type": "application/json",}
+            mode: 'cors',
+            headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
+            //TODO: Adjust this body so it's dynamic
+            body: JSON.stringify({"topicName": ""})
         }).then(res => {
             // TODO: add element to the page 
             res.json().then((topicResponseData) => {

@@ -1,6 +1,7 @@
 package web
 
 import (
+	"encoding/json"
 	"fmt"
 	"integrand/services"
 	"log/slog"
@@ -97,8 +98,18 @@ func (ea *topicAPI) getTopic(w http.ResponseWriter, r *http.Request) {
 	w.Write(resJsonBytes)
 }
 
-func (ta *topicAPI) createTopic(w http.ResponseWriter, _ *http.Request) {
-	topic, err := services.CreateEventStream()
+type CreateTopicBody struct {
+	TopicName string `json:"topicName"`
+}
+
+func (ta *topicAPI) createTopic(w http.ResponseWriter, r *http.Request) {
+	var createBody CreateTopicBody
+	if err := json.NewDecoder(r.Body).Decode(&createBody); err != nil {
+		slog.Error(err.Error())
+		internalServerError(w)
+		return
+	}
+	topic, err := services.CreateEventStream(createBody.TopicName)
 	if err != nil {
 		slog.Error(err.Error())
 		internalServerError(w)
