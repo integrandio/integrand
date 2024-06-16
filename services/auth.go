@@ -73,8 +73,11 @@ func CreateAPIKey() (string, error) {
 	for {
 		key := utils.RandomString(20)
 		err := persistence.AddAPIKey(key)
-		if err.Error() == "API key already exists" {
-			continue
+		if err != nil {
+			if err.Error() == "API key already exists" {
+				continue
+			}
+			return "", err
 		}
 		return key, nil
 	}
