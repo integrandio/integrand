@@ -15,30 +15,14 @@ var (
 type keyAPI struct{}
 
 func (ka *keyAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch {
-	case keySingleApi.MatchString(r.URL.Path):
-		enableCors(&w)
-		ka.apier(w, r)
-	case keyAllApi.MatchString(r.URL.Path):
-		enableCors(&w)
-		ka.apier(w, r)
-	default:
-		notFoundApiError(w)
-	}
-}
-
-func (ka *keyAPI) apier(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 	switch {
 	case r.Method == http.MethodPost && keyAllApi.MatchString(r.URL.Path):
 		ka.createApiKeyHandler(w, r)
-		return
 	case r.Method == http.MethodDelete && keySingleApi.MatchString(r.URL.Path):
 		ka.deleteApiKeyHandler(w, r)
-		return
 	default:
 		notFoundApiError(w)
-		return
 	}
 }
 
