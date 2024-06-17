@@ -13,21 +13,58 @@ class ConnectorsHome extends HTMLElement {
         this.shawdow.append(jobsHomeTemplate.content.cloneNode(true))
     }
 
-    newConnectionAction() {
-        let cardsContainer = this.shawdow.querySelector("#cardContainer");
+    newConnector(e) {
+        e.preventDefault()
+        const modal = this.shawdow.querySelector('#modalThing');
+        const cardsContainer = this.shawdow.querySelector("#cardContainer");
+        const data = new FormData(e.target);
+        const value = Object.fromEntries(data.entries());
         fetch('/api/v1/glue', {
             method: "POST",
             mode: 'cors',
-            headers: {"Content-Type": "application/json",},
-            body: JSON.stringify({"id": "", "topicName": ""}),
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(value),
         }).then(res => {
-            // TODO: add element to the page 
-            res.json().then((glueResponseData) => {
-                const element = this.generateEndpointCard(glueResponseData.data)
-                cardsContainer.prepend(element)
-            });
-        })
+            if (res.ok) {
+                return res.json();
+              }
+            throw new Error('Something went wrong');
+        }).then(glueResponseData => {
+            const element = this.generateEndpointCard(glueResponseData.data)
+            cardsContainer.prepend(element)
+            const successMessage = `<h1>Connector Successfully Created</h1>`
+            const modal_element = fromHTML(successMessage);
+            modal.innerHTML = '';
+            modal.appendChild(modal_element)
+        }).catch((error) => {
+            const errorMessage = `<h1>Unable to Create Connector</h1>`
+            const modal_element = fromHTML(errorMessage);
+            modal.innerHTML = '';
+            modal.appendChild(modal_element)
+        });
     }
+
+    newConnectionAction() {
+        const modalMarkup = `
+            <wc-modal id="modalThing">
+                <wc-title>Create New Connector</wc-title>
+                <form id="myForm">
+                  <label for="id">id:</label><br>
+                  <input type="text" id="id" name="id" value=""><br>
+                  <label for="topicName">Topic Name:</label><br>
+                  <input type="text" id="topicName" name="topicName" value="">
+                  <br>
+                  <input type="submit" value="Create">
+                </form>
+            </wc-modal>`
+        const modal_element = fromHTML(modalMarkup);
+        this.shawdow.append(modal_element)
+        const formComponent = this.shawdow.querySelector('#myForm');
+        formComponent.addEventListener('submit', this.newConnector.bind(this));
+    };
     
     generateEndpointCard(endpoint) {
         const endpoint_link = `/app/connectors/${endpoint.id}`
