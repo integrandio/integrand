@@ -23,6 +23,11 @@ func NewNewWebRouter() *http.ServeMux {
 	mux.Handle("/api/v1/topic", topicApi)
 	mux.Handle("/api/v1/topic/", topicApi)
 
+	// Register keyAPI
+	keyApi := &keyAPI{}
+	mux.Handle("/api/v1/apikey", keyApi)
+	mux.Handle("/api/v1/apikey/", keyApi)
+
 	// Serve static files from the "static" directory.
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
 	return mux
