@@ -5,6 +5,7 @@ class Home extends HTMLElement {
         super()
         this.innerHTML = `
         <div>
+            <wc-modal></wc-modal>
             <wc-page-heading>
                 Home
             </wc-page-heading>
