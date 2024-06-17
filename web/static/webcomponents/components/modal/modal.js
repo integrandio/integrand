@@ -6,24 +6,10 @@ modalTemplate.innerHTML = `
 <div id="modal">
     <div class="modal-underlay"></div>
     <div id="modalContent" class="modal-content">
-        <h1>Hello world</h1>
+        <slot></slot>
     </div>
 </div>
 `
-
-function tester() {
-    console.log("we here")
-}
-
-function stopClose(event) {
-    event.stopPropagation()
-}
-
-function removeButton() {
-    const element = document.getElementById("modal");
-    console.log(element)
-    element.remove()
-}
 
 class Modal extends HTMLElement {
     constructor(){

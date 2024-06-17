@@ -13,22 +13,53 @@ class TopicsHome extends HTMLElement {
         this.shawdow.append(topicsHomeTemplate.content.cloneNode(true))
     }
 
-    newTopicAction() {
-        let cardsContainer = this.shawdow.querySelector("#cardContainer");
+    newTopic(e) {
+        e.preventDefault()
+        const modal = this.shawdow.querySelector('#modalThing');
+        const cardsContainer = this.shawdow.querySelector("#cardContainer");
+        const data = new FormData(e.target);
+        const value = Object.fromEntries(data.entries());
         fetch('/api/v1/topic', {
             method: "POST",
             mode: 'cors',
-            headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
-            //TODO: Adjust this body so it's dynamic
-            body: JSON.stringify({"topicName": ""})
+            headers: {"Content-Type": "application/json",},
+            body: JSON.stringify(value),
         }).then(res => {
-            // TODO: add element to the page 
-            res.json().then((topicResponseData) => {
-                console.log(topicResponseData)
-                const element = this.generateEndpointCard(topicResponseData.data)
-                cardsContainer.prepend(element)
-            });
-        })
+            if (res.ok) {
+                return res.json();
+              }
+            throw new Error('Something went wrong');
+        }).then(topicResponseData => {
+            const card_element = this.generateEndpointCard(topicResponseData.data)
+            cardsContainer.prepend(card_element)
+            const successMessage = `<h1>Topic Successfully Created</h1>`
+            const modal_element = fromHTML(successMessage);
+            modal.innerHTML = '';
+            modal.appendChild(modal_element)
+        }).catch((error) => {
+            const errorMessage = `<h1>Unable to Create Topic</h1>`
+            const modal_element = fromHTML(errorMessage);
+            modal.innerHTML = '';
+            modal.appendChild(modal_element)
+        });
+    }
+
+    newTopicAction() {
+        const modalMarkup = `
+        <wc-modal id="modalThing">
+            <wc-title>Create New Connector</wc-title>
+            <form id="myForm">
+              <label for="topicName">Topic Name:</label><br>
+              <input type="text" id="topicName" name="topicName" value="">
+              <br>
+              <input type="submit" value="Create">
+            </form>
+        </wc-modal>`
+
+        const modal_element = fromHTML(modalMarkup);
+        this.shawdow.append(modal_element)
+        const formComponent = this.shawdow.querySelector('#myForm');
+        formComponent.addEventListener('submit', this.newTopic.bind(this));
     }
 
 
@@ -56,8 +87,6 @@ class TopicsHome extends HTMLElement {
             const card_element = this.generateEndpointCard(topic)
             endpoint_card_container.appendChild(card_element)
         }
-        //let button_markup = this.generateNewEndpointButton()
-        //endpoint_card_container.appendChild(button_markup)
         return endpoint_card_container
     }
 
