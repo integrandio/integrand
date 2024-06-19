@@ -1,7 +1,6 @@
 package persistence
 
 import (
-	"integrand/utils"
 	"log"
 	"log/slog"
 	"os"
@@ -59,13 +58,13 @@ func Initialize() {
 	}
 
 	API_KEYS.keys = make([]string, 0)
+	apiKey := os.Getenv("INITIAL_API_KEY")
 	// Generate and log an initial API key
-	initialAPIKey := utils.RandomString(20)
-	err = AddAPIKey(initialAPIKey)
+	err = AddAPIKey(apiKey)
 	if err != nil {
 		log.Fatal("Error generating initial API key: ", err)
 	}
-	log.Printf("Initial API Key: %s\n", initialAPIKey)
+	log.Printf("Initial API Key: %s\n", apiKey)
 }
 
 func initialize_broker() error {
