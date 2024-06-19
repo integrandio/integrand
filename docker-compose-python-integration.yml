@@ -1,0 +1,29 @@
+# This docker compose file is solely used for running the integration tests
+version: "3.9"  # optional since v1.27.0
+services:
+  integrand-server:
+    image: integrand:latest
+    build: 
+      context: .
+      dockerfile: images/Integrand.Dockerfile
+    environment:
+      - INITIAL_API_KEY=myApiKey
+    ports:
+      - "8000:8000"
+    networks:
+      - testing-network
+  test-runner:
+    image: lucidmq-test
+    build: 
+      context: .
+      dockerfile: images/Python-Integration.Dockerfile
+    environment:
+      - INTEGRAND_URL=http://integrand-server:8000
+      - INTEGRAND_API_KEY=myApiKey
+    depends_on:
+      - integrand-server
+    networks:
+      - testing-network
+networks:
+  testing-network:
+    driver: bridge

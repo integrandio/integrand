@@ -91,7 +91,7 @@ class Integrand:
         return response_body
 
     def CreateTopic(self, topicName: str):
-        url = f'{self.integrand_base_endpoint}/api/v1/topic/{topicName}'
+        url = f'{self.integrand_base_endpoint}/api/v1/topic'
         headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {self.api_key}',
@@ -99,7 +99,7 @@ class Integrand:
         body = {
             "topicName": topicName 
         }
-        response = requests.get(url, headers=headers)
+        response = requests.post(url, headers=headers, json=body)
         response.raise_for_status()
         response_body = response.json()
         return response_body
@@ -110,7 +110,7 @@ class Integrand:
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {self.api_key}',
         }
-        response = requests.delet(url, headers=headers)
+        response = requests.delete(url, headers=headers)
         response.raise_for_status()
         response_body = response.json()
         return response_body
