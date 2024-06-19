@@ -46,5 +46,6 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v3
         with:
+          dockerfile: images/Integrand.Dockerfile
           push: true
           tags: registry.vineglue.com/integrand-app:${{ env.TAG }}
