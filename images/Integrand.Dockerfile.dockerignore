@@ -1,0 +1,7 @@
+.github
+data/databases
+data/commitlog
+integrand-py
+images
+.env
+*.txt
