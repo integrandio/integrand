@@ -21,7 +21,7 @@ jobs:
     steps:
       - 
         name: Checkout main
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - 
         name: Get Tag
         run: |
@@ -44,9 +44,9 @@ jobs:
       -
         name: Build and push
         id: docker_build
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./images
           dockerfile: ./images/Integrand.Dockerfile
           push: true
           tags: registry.vineglue.com/integrand-app:${{ env.TAG }}
