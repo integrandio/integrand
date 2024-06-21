@@ -16,29 +16,29 @@ func LoginPage(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		email := r.FormValue("email")
 		password := r.FormValue("password")
-		_, err := services.EmailAuthenticate(email, password)
+		user, err := services.EmailAuthenticate(email, password)
 		if err != nil {
 			log.Println(err)
 			// Invalid credentials, show the login page with an error message.
 			fmt.Fprintf(w, "Invalid credentials. Please try again.")
 			return
 		} else {
-			err = sess.Set("email", email)
+			err = sess.Set("userID", user.ID)
 			if err != nil {
 				log.Fatal(err)
 			}
 			// Successful login, redirect to a welcome page.
-			http.Redirect(w, r, "/app", http.StatusSeeOther)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 		}
 
 	case http.MethodGet:
-		user, err := sess.Get("email")
+		user, err := sess.Get("userID")
 		if err != nil {
 			log.Fatal(err)
 		}
 		if user != nil {
 			// Successful login, redirect to a welcome page.
-			http.Redirect(w, r, "/app", http.StatusSeeOther)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 			return
 		}
 		// If not a POST request, serve the login page template.
@@ -56,7 +56,7 @@ func LoginPage(w http.ResponseWriter, r *http.Request) {
 func applicationPage(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		sessionAuthenticate(w, r)
+		sessionAuthenticateOrRedirect(w, r)
 		fileContents, err := os.ReadFile("web/templates/baseApp.html")
 		if err != nil {
 			log.Println(err)

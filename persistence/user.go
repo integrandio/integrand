@@ -22,14 +22,33 @@ type User struct {
 	LastModified time.Time
 }
 
+func (dstore *Datastore) getAllUsers() ([]User, error) {
+	var users []User
+	selectQuery := "SELECT id, email, auth_type, created_at, last_modified FROM users;"
+	dstore.RWMutex.RLock()
+	rows, err := dstore.db.Query(selectQuery)
+	dstore.RWMutex.RUnlock()
+	if err != nil {
+		return users, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var user User
+		err := rows.Scan(&user.ID, &user.Email, &user.AuthType, &user.CreatedAt, &user.LastModified)
+		if err != nil {
+			return users, err
+		}
+		users = append(users, user)
+	}
+	return users, nil
+}
+
 func (dstore *Datastore) GetUserByID(id int) (User, error) {
 	selectQuery := "SELECT id, email, password FROM users WHERE id=?;"
 	dstore.RWMutex.RLock()
 	row := dstore.db.QueryRow(selectQuery, id)
 	dstore.RWMutex.RUnlock()
-
 	var u User
-
 	err := row.Scan(&u.ID, &u.Email, &u.Password)
 	if err != nil {
 		return u, err
@@ -44,7 +63,6 @@ func (dstore *Datastore) GetEmailUser(email string) (User, error) {
 	dstore.RWMutex.RUnlock()
 
 	var u User
-
 	err := row.Scan(&u.ID, &u.Email, &u.Password)
 	if err != nil {
 		return u, err
@@ -68,7 +86,6 @@ func (dstore *Datastore) CreateEmailUser(u User) (int, error) {
 }
 
 func (dstore *Datastore) GetSocialUser(email string) (User, error) {
-	log.Println(email)
 	selectQuery := "SELECT id, socialID FROM users WHERE email=?;"
 	dstore.RWMutex.RLock()
 	row := dstore.db.QueryRow(selectQuery, email)

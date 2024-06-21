@@ -23,7 +23,7 @@ class TopicPage extends HTMLElement {
             // Check response to see if it's bad
             res.json().then((topicResponseData) => {
                 console.log(topicResponseData)
-                window.location.replace("/app/topics");
+                window.location.replace("/topics");
             });
         })
     }

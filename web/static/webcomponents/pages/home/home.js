@@ -1,5 +1,4 @@
 
-
 class Home extends HTMLElement {
     constructor(){
         super()
@@ -10,13 +9,10 @@ class Home extends HTMLElement {
             </wc-page-heading>
             <div>
                 <div>
-                    <wc-title>Jobs</wc-title>
+                    <wc-title>Connectors</wc-title>
                 </div>
                 <div>
-                    <wc-title>Datasources</wc-title>
-                </div>
-                <div>
-                    <wc-title>Report</wc-title>
+                    <wc-title>Topics</wc-title>
                 </div>
             </div>
         </div>

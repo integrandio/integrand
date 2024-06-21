@@ -1,15 +1,12 @@
 <wc-router>
-  <wc-route path="/app" title="App Home" component="wc-home"></wc-route>
-  <wc-route path="/app/builder" title="Data Builder" component="data-builder"></wc-route>
-  
-  <wc-route path="/app/reports" title="Reports" component="reports-home"></wc-route>
-  <wc-route path="/app/reports/:data_url" title="Report Viewer" component="table" is="report-table"></wc-route>
+  <wc-route path="/" title="App Home" component="wc-home"></wc-route>
+  <wc-route path="/builder" title="Data Builder" component="data-builder"></wc-route>
 
-  <wc-route path="/app/connectors" title="All Connectors" component="connectors-home"></wc-route>
-  <wc-route path="/app/connectors/:endpoint_id" title="Endpoint" component="wc-endpoint"></wc-route>
+  <wc-route path="/connectors" title="All Connectors" component="connectors-home"></wc-route>
+  <wc-route path="/connectors/:endpoint_id" title="Endpoint" component="wc-endpoint"></wc-route>
 
-  <wc-route path="/app/topics" title="All Topics" component="topics-home"></wc-route>
-  <wc-route path="/app/topics/:topic_id" title="Topic" component="wc-topic"></wc-route>
+  <wc-route path="/topics" title="All Topics" component="topics-home"></wc-route>
+  <wc-route path="/topics/:topic_id" title="Topic" component="wc-topic"></wc-route>
 
   <wc-route path="*" title="404" component="wc-notfound"></wc-route>
   <wc-outlet></wc-outlet>

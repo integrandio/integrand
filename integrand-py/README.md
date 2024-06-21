@@ -25,5 +25,5 @@ PYTHONPATH=src pytest -s
 
 To run a specific class
 ```
-PYTHONPATH=src pytest test_integrand.py::{classname}
+PYTHONPATH=src pytest tests/test_integrand.py::{classname}
 ```

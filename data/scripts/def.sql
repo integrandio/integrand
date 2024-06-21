@@ -18,7 +18,18 @@ CREATE TABLE IF NOT EXISTS sessions (
 
 CREATE TABLE IF NOT EXISTS stickey_connections (
   id TEXT UNIQUE NOT NULL,
-  connection_api_key TEXT NOT NULL,
+  security_key TEXT NOT NULL,
   topic_name TEXT NOT NULL,
-  last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  user_id INTEGER,
+  FOREIGN KEY(user_ID) REFERENCES users(id)
 );
+
+CREATE TABLE IF NOT EXISTS api_keys (
+  id INTEGER NOT NULL PRIMARY KEY,
+  key TEXT UNIQUE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  user_id INTEGER,
+  FOREIGN KEY(user_ID) REFERENCES users(id)
+);
+

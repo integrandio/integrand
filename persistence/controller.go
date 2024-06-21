@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"os"
 	"strconv"
-	"sync"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -13,12 +12,6 @@ import (
 var DATASTORE *Datastore
 var SESSION_MANAGER *SessionManager
 var BROKER *Broker
-
-// Data structure to store API keys
-var API_KEYS struct {
-	sync.RWMutex
-	keys []string
-}
 
 func Initialize() {
 	devModeString := os.Getenv("DEV_MODE")
@@ -34,11 +27,6 @@ func Initialize() {
 
 	SESSION_MANAGER = NewSessionManager("integrand_session", 3600)
 
-	err = initialize_broker()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	// Insert our root user into the db...
 	// TODO: Clean this up, Should errors cause the
 	plainPassword := os.Getenv("ROOT_PASSWORD")
@@ -51,20 +39,24 @@ func Initialize() {
 		Password: string(password),
 		AuthType: EMAIL,
 	}
-	_, err = DATASTORE.CreateEmailUser(user)
+	id, err := DATASTORE.CreateEmailUser(user)
 	if err != nil {
 		// if the user already exists, we don't want this program to crash
 		slog.Error(err.Error())
 	}
-
-	API_KEYS.keys = make([]string, 0)
+	user.ID = id
 	apiKey := os.Getenv("INITIAL_API_KEY")
 	// Generate and log an initial API key
-	err = AddAPIKey(apiKey)
+	_, err = DATASTORE.InsertAPIKey(apiKey, user.ID)
 	if err != nil {
 		log.Fatal("Error generating initial API key: ", err)
 	}
 	log.Printf("Initial API Key: %s\n", apiKey)
+
+	err = initialize_broker()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func initialize_broker() error {
@@ -73,18 +65,28 @@ func initialize_broker() error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	all_sticky_connections, err := DATASTORE.GetAllStickyConnections()
+	users, err := DATASTORE.getAllUsers()
 	if err != nil {
+		slog.Error(err.Error())
 		return err
 	}
-	for _, stickyConnection := range all_sticky_connections {
-		_, err := BROKER.GetTopic(stickyConnection.TopicName)
+	for _, user := range users {
+		all_sticky_connections, err := DATASTORE.GetAllStickyConnections(user.ID)
 		if err != nil {
-			_, err = BROKER.CreateTopic(stickyConnection.TopicName)
+			slog.Error(err.Error())
+			return err
+		}
+		for _, stickyConnection := range all_sticky_connections {
+			_, err := BROKER.GetTopic(stickyConnection.TopicName, user.ID)
 			if err != nil {
-				return err
+				_, err = BROKER.CreateTopic(stickyConnection.TopicName, user.ID)
+				if err != nil {
+					slog.Error(err.Error())
+					return err
+				}
 			}
 		}
 	}
+
 	return nil
 }

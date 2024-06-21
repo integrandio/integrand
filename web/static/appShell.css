@@ -139,9 +139,6 @@
           flex-shrink: 0;
         }
 
-        .svger:hover {
-          color: var(--primary-color);
-        }
       }
 
       .item-sublist:hover {
@@ -150,6 +147,10 @@
         background-color: rgb(249 250 251 / var(--opacity));
         /* bqe  (hover)*/
         visibility: visible;
+
+        .svger {
+          color: var(--primary-color);
+        }
       }
     }
 

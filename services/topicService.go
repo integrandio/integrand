@@ -6,21 +6,21 @@ import (
 	"integrand/utils"
 )
 
-func GetEventStreams() ([]persistence.TopicDetails, error) {
-	return persistence.BROKER.GetTopics(), nil
+func GetEventStreams(userId int) ([]persistence.TopicDetails, error) {
+	return persistence.BROKER.GetTopics(userId), nil
 }
 
-func GetEventStream(topicName string) (persistence.TopicDetails, error) {
-	return persistence.BROKER.GetTopic(topicName)
+func GetEventStream(userId int, topicName string) (persistence.TopicDetails, error) {
+	return persistence.BROKER.GetTopic(topicName, userId)
 }
 
-func CreateEventStream(topicName string) (persistence.TopicDetails, error) {
+func CreateEventStream(userId int, topicName string) (persistence.TopicDetails, error) {
 	var topicDetails persistence.TopicDetails
 	if topicName == "" {
 		// TODO: Should this be random?
 		topicName = utils.RandomString(5)
 	}
-	topic, err := persistence.BROKER.CreateTopic(topicName)
+	topic, err := persistence.BROKER.CreateTopic(topicName, userId)
 	if err != nil {
 		return topicDetails, err
 	}
@@ -34,9 +34,9 @@ func CreateEventStream(topicName string) (persistence.TopicDetails, error) {
 	return topicDetails, nil
 }
 
-func DeleteEventStream(topicName string) error {
+func DeleteEventStream(topicName string, userId int) error {
 	//Check if topic is being used...
-	stickyConnections, err := GetStickyConnections()
+	stickyConnections, err := GetStickyConnections(userId)
 	if err != nil {
 		return err
 	}
@@ -52,9 +52,9 @@ func DeleteEventStream(topicName string) error {
 		return errors.New("topic is being used")
 	}
 
-	return persistence.BROKER.DeleteTopic(topicName)
+	return persistence.BROKER.DeleteTopic(topicName, userId)
 }
 
-func GetEvent(topicName string, offset int) ([]byte, error) {
-	return persistence.BROKER.ConsumeMessage(topicName, offset)
+func GetEvent(topicName string, userId int, offset int) ([]byte, error) {
+	return persistence.BROKER.ConsumeMessage(topicName, userId, offset)
 }
