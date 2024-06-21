@@ -27,7 +27,7 @@ def clean_up_topics():
 
 @pytest.mark.usefixtures("clean_up_topics")
 class TestGlueAPI:
-    # TODO: Setup by deleting all the topics
+    #TODO: Setup by deleting all the topics
     def test_get_all_glue_handlers_empty(self):
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         response = integrand.GetAllGlueHandlers()
@@ -44,7 +44,7 @@ class TestGlueAPI:
 
     def test_create_glue_handler(self):
         id = get_random_string(5)
-        topicName = get_random_string(5)
+        topicName = 'createGlueHandlerTest'
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         response = integrand.CreateGlueHandler(id, topicName)
         assert response['status'] == 'success'
@@ -55,10 +55,10 @@ class TestGlueAPI:
     
     def test_get_all_glue_handlers(self):
         id = get_random_string(5)
+        topicName = 'getAllGlueHandler'
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
-        integrand.CreateGlueHandler(id, '')
+        integrand.CreateGlueHandler(id, topicName)
         response = integrand.GetAllGlueHandlers()
-        print(response)
         assert response['status'] == 'success'
         assert len(response['data']) == 1
         # Clean up
@@ -66,7 +66,7 @@ class TestGlueAPI:
 
     def test_get_glue_handler(self):
         id = get_random_string(5)
-        topicName = get_random_string(5)
+        topicName = 'getGlueHandler'
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         integrand.CreateGlueHandler(id, topicName)
         response = integrand.GetGlueHandler(id)
@@ -78,11 +78,10 @@ class TestGlueAPI:
     
     def test_delete_glue_handler(self):
         id = get_random_string(5)
-        topicName = get_random_string(5)
+        topicName = 'deleteGlueHandler'
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         integrand.CreateGlueHandler(id, topicName)
         response = integrand.DeleteGlueHandler(id)
-        # print(response)
         assert response['status'] == 'success'
 
 class TestTopicAPI:
@@ -136,5 +135,4 @@ class TestTopicAPI:
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         integrand.CreateTopic(topicName)
         response = integrand.DeleteTopic(topicName)
-        # print(response)
         assert response['status'] == 'success'

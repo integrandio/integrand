@@ -33,31 +33,24 @@ func NewNewWebRouter() *http.ServeMux {
 	return mux
 }
 
-func apiBrowserAPIAuthenticate(w http.ResponseWriter, r *http.Request) error {
+func apiBrowserAPIAuthenticate(w http.ResponseWriter, r *http.Request) (int, error) {
 	// First let's try to authenticate with our session
-	sess := services.GetSession(w, r)
-	user, err := sess.Get("email")
+	userID, err := services.AuthenticateCookie(w, r)
 	if err != nil {
-		log.Fatalln(err)
-	}
-	if user == nil {
 		// Enable coors and then check for token
 		enableCors(&w)
 		// This is publicly exposed, we need to protect with a token
-		header := r.Header.Get("Authorization")
-		err := services.AuthorizeToken(header)
-		return err
+		authorizationHeader := r.Header.Get("Authorization")
+		apiKey, err := services.AuthenticateToken(authorizationHeader)
+		return apiKey.UserId, err
 	}
-	return nil
+
+	return userID, nil
 }
 
-func sessionAuthenticate(w http.ResponseWriter, r *http.Request) {
-	sess := services.GetSession(w, r)
-	user, err := sess.Get("email")
+func sessionAuthenticateOrRedirect(w http.ResponseWriter, r *http.Request) {
+	_, err := services.AuthenticateCookie(w, r)
 	if err != nil {
-		log.Fatalln(err)
-	}
-	if user == nil {
 		// Successful login, redirect to a welcome page.
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return

@@ -18,6 +18,7 @@ type Broker struct {
 type Topic struct {
 	TopicName      string
 	TopicDirectory string
+	UserID         int
 	commitlog      *commitlog.Commitlog
 }
 
@@ -36,39 +37,44 @@ func NewBroker(directory string) (*Broker, error) {
 	return &broker, nil
 }
 
-func (broker *Broker) ProduceMessage(topicName string, message []byte) error {
+func (broker *Broker) getTopicFromBrokerForUser(topicName string, UserID int) (*Topic, error) {
 	for _, topic := range broker.Topics {
-		if topic.TopicName == topicName {
-			err := topic.commitlog.Append(message)
-			if err != nil {
-				return err
-			}
-			return nil
+		if topic.TopicName == topicName && topic.UserID == UserID {
+			return &topic, nil
 		}
 	}
-	return errors.New("topic not found")
+	return nil, errors.New("topic not found")
 }
 
-func (broker *Broker) ConsumeMessage(topicName string, offset int) ([]byte, error) {
-	for _, topic := range broker.Topics {
-		if topic.TopicName == topicName {
-			msg, err := topic.commitlog.Read(offset)
-			if err != nil {
-				return []byte{}, err
-			}
-			return msg, nil
-		}
+func (broker *Broker) ProduceMessage(topicName string, UserID int, message []byte) error {
+	topic, err := broker.getTopicFromBrokerForUser(topicName, UserID)
+	if err != nil {
+		return err
 	}
-	return []byte{}, errors.New("topic not found")
+	err = topic.commitlog.Append(message)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (broker *Broker) CreateTopic(topicName string) (Topic, error) {
+func (broker *Broker) ConsumeMessage(topicName string, UserID int, offset int) ([]byte, error) {
+	topic, err := broker.getTopicFromBrokerForUser(topicName, UserID)
+	if err != nil {
+		return []byte{}, err
+	}
+	msg, err := topic.commitlog.Read(offset)
+	if err != nil {
+		return []byte{}, err
+	}
+	return msg, nil
+}
+
+func (broker *Broker) CreateTopic(topicName string, UserID int) (Topic, error) {
 	var topic Topic
-	//Check if the topic name exists
-	for _, topic := range broker.Topics {
-		if topic.TopicName == topicName {
-			return topic, errors.New("topic already exists")
-		}
+	_, err := broker.getTopicFromBrokerForUser(topicName, UserID)
+	if err == nil {
+		return topic, errors.New("topic already exists")
 	}
 	//create our struct, add it to the array
 	topicDirectory := broker.BaseDirectory + "/" + utils.RandomString(5)
@@ -80,6 +86,7 @@ func (broker *Broker) CreateTopic(topicName string) (Topic, error) {
 	topic = Topic{
 		TopicName:      topicName,
 		TopicDirectory: topicDirectory,
+		UserID:         UserID,
 		commitlog:      cl,
 	}
 	broker.Topics = append(broker.Topics, topic)
@@ -90,7 +97,7 @@ func (broker *Broker) CreateTopic(topicName string) (Topic, error) {
 	return topic, nil
 }
 
-func (broker *Broker) DeleteTopic(topicName string) error {
+func (broker *Broker) DeleteTopic(topicName string, UserID int) error {
 	var foundTopicIndex int
 	topicFound := false
 	//Check if the topic name exists
@@ -166,27 +173,25 @@ type TopicDetails struct {
 	RetentionBytes int    `json:"retentionBytes"`
 }
 
-func (broker *Broker) GetTopics() []TopicDetails {
+func (broker *Broker) GetTopics(UserID int) []TopicDetails {
 	topicDetails := []TopicDetails{}
-	for i := range broker.Topics {
-		topicDetails = append(topicDetails, broker.getTopicDetails(i))
+	for _, topic := range broker.Topics {
+		topicDetails = append(topicDetails, topic.getTopicDetails())
 	}
 	return topicDetails
 }
 
-func (broker *Broker) GetTopic(topicName string) (TopicDetails, error) {
+func (broker *Broker) GetTopic(topicName string, UserID int) (TopicDetails, error) {
 	var topicDetails TopicDetails
-	//Check if the topic name exists
-	for i, topic := range broker.Topics {
-		if topic.TopicName == topicName {
-			return broker.getTopicDetails(i), nil
-		}
+	topic, err := broker.getTopicFromBrokerForUser(topicName, UserID)
+	if err != nil {
+		return topicDetails, err
 	}
-	return topicDetails, errors.New("topic does not exist")
+	topicDetails = topic.getTopicDetails()
+	return topicDetails, nil
 }
 
-func (broker *Broker) getTopicDetails(topicIndex int) TopicDetails {
-	topic := broker.Topics[topicIndex]
+func (topic *Topic) getTopicDetails() TopicDetails {
 	details := topic.commitlog.GetCommitlogDetails()
 	return TopicDetails{
 		TopicName:      topic.TopicName,

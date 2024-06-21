@@ -1,41 +1,59 @@
 package persistence
 
-import "errors"
+import (
+	"time"
+)
+
+type ApiKey struct {
+	Id        int       `json:"id,omitempty"`
+	Key       string    `json:"apiKey,omitempty"`
+	CreatedAt time.Time `json:"createdAt,omitempty"`
+	UserId    int       `json:"userId,omitempty"`
+}
+
+func (dstore *Datastore) GetApiKey(key string) (ApiKey, error) {
+	selectQuery := "SELECT id, created_at, user_id FROM api_keys WHERE key=?"
+	dstore.RWMutex.RLock()
+	row := dstore.db.QueryRow(selectQuery, key)
+	dstore.RWMutex.RUnlock()
+
+	var api_key ApiKey
+
+	err := row.Scan(&api_key.Id, &api_key.CreatedAt, &api_key.UserId)
+	if err != nil {
+		return api_key, err
+	}
+	return api_key, nil
+}
 
 // adds a new API key to the store
-func AddAPIKey(key string) error {
-	API_KEYS.Lock()
-	defer API_KEYS.Unlock()
-	for _, k := range API_KEYS.keys {
-		if k == key {
-			return errors.New("API key already exists")
-		}
+func (dstore *Datastore) InsertAPIKey(key string, userID int) (int, error) {
+	insertQuery := "INSERT INTO api_keys(id, key, user_id) VALUES(NULL, ?, ?);"
+	dstore.RWMutex.Lock()
+	res, err := dstore.db.Exec(insertQuery, key, userID)
+	dstore.RWMutex.Unlock()
+	if err != nil {
+		return 0, err
 	}
-	API_KEYS.keys = append(API_KEYS.keys, key)
-	return nil
+	rowsCreated, err := res.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return int(rowsCreated), nil
 }
 
 // removes an API key from the store
-func DeleteAPIKey(key string) error {
-	API_KEYS.Lock()
-	defer API_KEYS.Unlock()
-	for i, k := range API_KEYS.keys {
-		if k == key {
-			API_KEYS.keys = append(API_KEYS.keys[:i], API_KEYS.keys[i+1:]...)
-			return nil
-		}
+func (dstore *Datastore) DeleteAPIKey(key string, userID int) (int, error) {
+	insertQuery := "DELETE FROM api_keys WHERE key=? AND user_id=?"
+	dstore.RWMutex.Lock()
+	res, err := dstore.db.Exec(insertQuery, key, userID)
+	dstore.RWMutex.Unlock()
+	if err != nil {
+		return 0, err
 	}
-	return errors.New("API key not found")
-}
-
-// checks if an API key is valid
-func IsAPIKeyValid(key string) bool {
-	API_KEYS.RLock()
-	defer API_KEYS.RUnlock()
-	for _, k := range API_KEYS.keys {
-		if k == key {
-			return true
-		}
+	rowsDeleted, err := res.RowsAffected()
+	if err != nil {
+		return 0, err
 	}
-	return false
+	return int(rowsDeleted), nil
 }

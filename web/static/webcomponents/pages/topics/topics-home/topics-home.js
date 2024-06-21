@@ -64,7 +64,7 @@ class TopicsHome extends HTMLElement {
 
 
     generateEndpointCard(topic) {
-        const topic_link = `/app/topics/${topic.topicName}`
+        const topic_link = `/topics/${topic.topicName}`
         let topic_markup = `
         <div class="jobCard">
             <h1><span class="titler">Name:</span> ${topic.topicName}</h1>

@@ -12,10 +12,20 @@ var (
 	keySingleApi = regexp.MustCompile(`^\/api\/v1\/apikey\/(.*)$`)
 )
 
-type keyAPI struct{}
+type keyAPI struct {
+	userID int
+}
 
 func (ka *keyAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
+	userID, err := services.AuthenticateCookie(w, r)
+	if err != nil {
+		slog.Error(err.Error())
+		// TODO: replace this with proper not authenticated response
+		notFoundApiError(w)
+		return
+	}
+	ka.userID = userID
 	switch {
 	case r.Method == http.MethodPost && keyAllApi.MatchString(r.URL.Path):
 		ka.createApiKeyHandler(w, r)
@@ -26,8 +36,8 @@ func (ka *keyAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (ka *keyAPI) createApiKeyHandler(w http.ResponseWriter, r *http.Request) {
-	apiKey, err := services.CreateAPIKey()
+func (ka *keyAPI) createApiKeyHandler(w http.ResponseWriter, _ *http.Request) {
+	apiKey, err := services.CreateAPIKey(ka.userID)
 	if err != nil {
 		slog.Error(err.Error())
 		internalServerError(w)
@@ -50,7 +60,7 @@ func (ka *keyAPI) deleteApiKeyHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	apiKey := matches[1]
-	err := services.DeleteAPIKey(apiKey)
+	_, err := services.DeleteAPIKey(apiKey, ka.userID)
 	if err != nil {
 		internalServerError(w)
 		return

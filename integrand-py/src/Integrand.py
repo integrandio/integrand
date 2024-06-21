@@ -7,10 +7,13 @@ class Integrand:
         self.integrand_base_endpoint = integrand_base_endpoint
         self.api_key = integrand_api_key
 
-    def EndpointRequest(self, route: str):
+    def EndpointRequest(self, route: str, security_key: str):
         url = f'{self.integrand_base_endpoint}/api/v1/glue/f/{route}'
         headers = {
             'Content-Type': 'application/json',
+        }
+        params = {
+            "apiKey": security_key
         }
         response = requests.get(url, headers=headers)
         response.raise_for_status()

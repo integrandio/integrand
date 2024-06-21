@@ -23,7 +23,7 @@ class EndpointPage extends HTMLElement {
             // Check response to see if it's bad
             res.json().then((endpointResponseData) => {
                 console.log(endpointResponseData)
-                window.location.replace("/app/connectors");
+                window.location.replace("/connectors");
             });
         })
     }
@@ -39,7 +39,7 @@ class EndpointPage extends HTMLElement {
                 </li>
                 <li>
                     <p class="titler">Connection Key:</p>
-                    <p>${endpoint.connectionKey}</p>
+                    <p>${endpoint.securityKey}</p>
                 </li>
                 <li>
                     <p class="titler">Topic Name:</p>

@@ -5,6 +5,7 @@ import (
 	"integrand/persistence"
 	"integrand/utils"
 	"log"
+	"log/slog"
 	"net/http"
 	"strings"
 	"time"
@@ -12,25 +13,41 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func AuthorizeToken(headerValue string) error {
+func AuthenticateCookie(w http.ResponseWriter, r *http.Request) (int, error) {
+	sess := GetSession(w, r)
+	userInterface, err := sess.Get("userID")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if userInterface == nil {
+		return 0, errors.New("cookie not valid")
+	}
+	userID, ok := userInterface.(float64)
+	if !ok {
+		log.Fatal("Unable to cast user value to float")
+	}
+	return int(userID), nil
+}
+
+func AuthenticateToken(headerValue string) (persistence.ApiKey, error) {
 	splitToken := strings.Split(headerValue, "Bearer")
 	if len(splitToken) != 2 {
 		log.Println(splitToken)
 		// Error: Bearer token not in proper format
-		return errors.New("malformed token")
+		return persistence.ApiKey{}, errors.New("malformed token")
 	}
 	authToken := strings.TrimSpace(splitToken[1])
-	if persistence.IsAPIKeyValid(authToken) {
-		return nil
-	} else {
-		return errors.New("invalid token")
+	apiKey, err := persistence.DATASTORE.GetApiKey(authToken)
+	if err != nil {
+		return persistence.ApiKey{}, err
 	}
+	return apiKey, nil
 }
 
 func EmailAuthenticate(Email string, password string) (persistence.User, error) {
 	user, err := persistence.DATASTORE.GetEmailUser(Email)
 	if err != nil {
-		log.Println(err)
+		slog.Error(err.Error())
 		return persistence.User{}, err
 	}
 	if checkPasswordHash(password, user.Password) {
@@ -69,10 +86,10 @@ func GetSession(w http.ResponseWriter, r *http.Request) persistence.SessionDB {
 	return session
 }
 
-func CreateAPIKey() (string, error) {
+func CreateAPIKey(userId int) (string, error) {
 	for {
 		key := utils.RandomString(20)
-		err := persistence.AddAPIKey(key)
+		_, err := persistence.DATASTORE.InsertAPIKey(key, userId)
 		if err != nil {
 			if err.Error() == "API key already exists" {
 				continue
@@ -83,8 +100,8 @@ func CreateAPIKey() (string, error) {
 	}
 }
 
-func DeleteAPIKey(key string) error {
-	return persistence.DeleteAPIKey(key)
+func DeleteAPIKey(key string, userId int) (int, error) {
+	return persistence.DATASTORE.DeleteAPIKey(key, userId)
 }
 
 func checkPasswordHash(password, hash string) bool {

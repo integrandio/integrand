@@ -19,15 +19,18 @@ var (
 	//topicProduceApi = regexp.MustCompile(`^\/api/v1/topic\/(.*)\/produce$`)
 )
 
-type topicAPI struct{}
+type topicAPI struct {
+	userID int
+}
 
 func (ea *topicAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	err := apiBrowserAPIAuthenticate(w, r)
+	userId, err := apiBrowserAPIAuthenticate(w, r)
 	if err != nil {
 		slog.Error(err.Error())
 		notFoundApiError(w)
 		return
 	}
+	ea.userID = userId
 	switch {
 	//Order matters....(Since this regex is a subset of the other)
 	case r.Method == http.MethodGet && topicConsumeApi.MatchString(r.URL.Path):
@@ -54,15 +57,14 @@ func (ea *topicAPI) eventRestHandler(w http.ResponseWriter, r *http.Request) {
 	case r.Method == http.MethodDelete && topicSingleApi.MatchString(r.URL.Path):
 		ea.deleteTopic(w, r)
 		return
-
 	default:
 		notFoundApiError(w)
 		return
 	}
 }
 
-func (ea *topicAPI) getTopics(w http.ResponseWriter, _ *http.Request) {
-	eventStreams, err := services.GetEventStreams()
+func (ta *topicAPI) getTopics(w http.ResponseWriter, _ *http.Request) {
+	eventStreams, err := services.GetEventStreams(ta.userID)
 	if err != nil {
 		slog.Error(err.Error())
 		internalServerError(w)
@@ -77,13 +79,13 @@ func (ea *topicAPI) getTopics(w http.ResponseWriter, _ *http.Request) {
 	w.Write(resJsonBytes)
 }
 
-func (ea *topicAPI) getTopic(w http.ResponseWriter, r *http.Request) {
+func (ta *topicAPI) getTopic(w http.ResponseWriter, r *http.Request) {
 	matches := topicSingleApi.FindStringSubmatch(r.URL.Path)
 	if len(matches) < 2 {
 		notFoundApiError(w)
 		return
 	}
-	eventStream, err := services.GetEventStream(matches[1])
+	eventStream, err := services.GetEventStream(ta.userID, matches[1])
 	if err != nil {
 		slog.Error(err.Error())
 		internalServerError(w)
@@ -109,7 +111,7 @@ func (ta *topicAPI) createTopic(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w)
 		return
 	}
-	topic, err := services.CreateEventStream(createBody.TopicName)
+	topic, err := services.CreateEventStream(ta.userID, createBody.TopicName)
 	if err != nil {
 		slog.Error(err.Error())
 		internalServerError(w)
@@ -127,7 +129,7 @@ func (ta *topicAPI) deleteTopic(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	topicName := matches[1]
-	err := services.DeleteEventStream(topicName)
+	err := services.DeleteEventStream(topicName, ta.userID)
 	if err != nil {
 		slog.Error(err.Error())
 		internalServerError(w)
@@ -139,7 +141,7 @@ func (ta *topicAPI) deleteTopic(w http.ResponseWriter, r *http.Request) {
 	w.Write(resJsonBytes)
 }
 
-func (ea *topicAPI) getEvents(w http.ResponseWriter, r *http.Request) {
+func (ta *topicAPI) getEvents(w http.ResponseWriter, r *http.Request) {
 	offsetParam := r.URL.Query().Get("offset")
 	limitParam := r.URL.Query().Get("limit")
 	offset := 0
@@ -167,7 +169,7 @@ func (ea *topicAPI) getEvents(w http.ResponseWriter, r *http.Request) {
 	}
 
 	matches := topicEventsApi.FindStringSubmatch(r.URL.Path)
-	eventStream, err := services.GetEventStream(matches[1])
+	eventStream, err := services.GetEventStream(ta.userID, matches[1])
 	if err != nil {
 		slog.Error(err.Error())
 		internalServerError(w)
@@ -177,7 +179,7 @@ func (ea *topicAPI) getEvents(w http.ResponseWriter, r *http.Request) {
 	var dataArray []string
 	for i := 0; i < limit; i++ {
 		//Iterate and loop through this...
-		jsonBytes, err := services.GetEvent(eventStream.TopicName, offset)
+		jsonBytes, err := services.GetEvent(eventStream.TopicName, offset, ta.userID)
 		if err != nil {
 			//TODO: Fix this
 			if err.Error() == "offset out of bounds" {
@@ -197,7 +199,7 @@ func (ea *topicAPI) getEvents(w http.ResponseWriter, r *http.Request) {
 	w.Write(resJsonBytes)
 }
 
-func (ea *topicAPI) streamEvents(w http.ResponseWriter, r *http.Request) {
+func (ta *topicAPI) streamEvents(w http.ResponseWriter, r *http.Request) {
 	acceptType := r.Header.Get("Accept")
 	if acceptType != "text/event-stream" {
 		slog.Error("invalid accept type")
@@ -219,7 +221,7 @@ func (ea *topicAPI) streamEvents(w http.ResponseWriter, r *http.Request) {
 	}
 	matches := topicConsumeApi.FindStringSubmatch(r.URL.Path)
 
-	eventStream, err := services.GetEventStream(matches[1])
+	eventStream, err := services.GetEventStream(ta.userID, matches[1])
 	if err != nil {
 		slog.Error(err.Error())
 		internalServerError(w)
@@ -239,7 +241,7 @@ func (ea *topicAPI) streamEvents(w http.ResponseWriter, r *http.Request) {
 
 	for {
 		//Iterate and loop through this...
-		jsonBytes, err := services.GetEvent(eventStream.TopicName, offset)
+		jsonBytes, err := services.GetEvent(eventStream.TopicName, ta.userID, offset)
 		if err != nil {
 			//TODO: Fix this
 			if err.Error() == "offset out of bounds" {

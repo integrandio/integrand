@@ -67,10 +67,10 @@ class ConnectorsHome extends HTMLElement {
     };
     
     generateEndpointCard(endpoint) {
-        const endpoint_link = `/app/connectors/${endpoint.id}`
+        const endpoint_link = `/connectors/${endpoint.id}`
         let endpoint_markup = `<div class="jobCard">
         <h1><span class="titler">ID:</span> ${endpoint.id}</h1>
-        <h2><span class="titler">Connection Key:</span> ${endpoint.connectionKey}</h2>
+        <h2><span class="titler">Security Key:</span> ${endpoint.securityKey}</h2>
         <p><span class="titler">Topic Name:</span> ${endpoint.topicName}</p>
         <a class="jobLink" href="${endpoint_link}"> View Endpoint Details </a>
         </div>`
