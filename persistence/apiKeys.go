@@ -57,3 +57,25 @@ func (dstore *Datastore) DeleteAPIKey(key string, userID int) (int, error) {
 	}
 	return int(rowsDeleted), nil
 }
+
+func (dstore *Datastore) GetAPIKeysByUserID(userID int) ([]ApiKey, error) {
+	selectQuery := "SELECT id, key, created_at FROM api_keys WHERE user_id=?"
+	dstore.RWMutex.RLock()
+	rows, err := dstore.db.Query(selectQuery, userID)
+	dstore.RWMutex.RUnlock()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var apiKeys []ApiKey
+	for rows.Next() {
+		var apiKey ApiKey
+		err := rows.Scan(&apiKey.Id, &apiKey.Key, &apiKey.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		apiKeys = append(apiKeys, apiKey)
+	}
+	return apiKeys, nil
+}

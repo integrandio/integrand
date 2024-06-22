@@ -10,6 +10,7 @@ import (
 var (
 	keyAllApi    = regexp.MustCompile(`^\/api\/v1\/apikey[\/]*$`)
 	keySingleApi = regexp.MustCompile(`^\/api\/v1\/apikey\/(.*)$`)
+	keyListApi   = regexp.MustCompile(`^\/api\/v1\/apikeys[\/]*$`)
 )
 
 type keyAPI struct {
@@ -31,9 +32,28 @@ func (ka *keyAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ka.createApiKeyHandler(w, r)
 	case r.Method == http.MethodDelete && keySingleApi.MatchString(r.URL.Path):
 		ka.deleteApiKeyHandler(w, r)
+	case r.Method == http.MethodGet && keyListApi.MatchString(r.URL.Path): // Add this case
+		ka.listApiKeysHandler(w, r)
 	default:
 		notFoundApiError(w)
 	}
+}
+
+func (ka *keyAPI) listApiKeysHandler(w http.ResponseWriter, _ *http.Request) {
+	apiKeys, err := services.ListAPIKeys(ka.userID)
+	if err != nil {
+		slog.Error(err.Error())
+		internalServerError(w)
+		return
+	}
+	response := map[string]interface{}{"apiKeys": apiKeys}
+	resJsonBytes, err := generateSuccessMessage(response)
+	if err != nil {
+		internalServerError(w)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(resJsonBytes)
 }
 
 func (ka *keyAPI) createApiKeyHandler(w http.ResponseWriter, _ *http.Request) {
