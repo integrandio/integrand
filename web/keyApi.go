@@ -32,7 +32,7 @@ func (ka *keyAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ka.createApiKeyHandler(w, r)
 	case r.Method == http.MethodDelete && keySingleApi.MatchString(r.URL.Path):
 		ka.deleteApiKeyHandler(w, r)
-	case r.Method == http.MethodGet && keyListApi.MatchString(r.URL.Path): // Add this case
+	case r.Method == http.MethodGet && keyListApi.MatchString(r.URL.Path):
 		ka.listApiKeysHandler(w, r)
 	default:
 		notFoundApiError(w)
