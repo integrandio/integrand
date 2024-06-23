@@ -6,20 +6,20 @@ import (
 
 type ApiKey struct {
 	Id        int       `json:"id,omitempty"`
-	Key       string    `json:"apiKey,omitempty"`
+	Key       string    `json:"key,omitempty"` // Update JSON tag to match the expected field name
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	UserId    int       `json:"userId,omitempty"`
 }
 
 func (dstore *Datastore) GetApiKey(key string) (ApiKey, error) {
-	selectQuery := "SELECT id, created_at, user_id FROM api_keys WHERE key=?"
+	selectQuery := "SELECT id, key, created_at, user_id FROM api_keys WHERE key=?"
 	dstore.RWMutex.RLock()
 	row := dstore.db.QueryRow(selectQuery, key)
 	dstore.RWMutex.RUnlock()
 
 	var api_key ApiKey
 
-	err := row.Scan(&api_key.Id, &api_key.CreatedAt, &api_key.UserId)
+	err := row.Scan(&api_key.Id, &api_key.Key, &api_key.CreatedAt, &api_key.UserId)
 	if err != nil {
 		return api_key, err
 	}

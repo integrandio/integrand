@@ -21,7 +21,7 @@ class ApiKeysHome extends HTMLElement {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
       const data = await response.json();
-      this.apiKeysData = data.data.apiKeys;
+      this.apiKeysData = data.data.apiKeys.reverse(); // Reverse the order of the API keys
       this.updateApiKeysComponent();
     } catch (error) {
       console.error("Error fetching API keys:", error);
@@ -56,7 +56,7 @@ class ApiKeysHome extends HTMLElement {
       }
       const data = await response.json();
       const newApiKey = { key: data.data.apiKey };
-      this.apiKeysData.unshift(newApiKey);
+      this.apiKeysData.unshift(newApiKey); // Add new key to the top of the list
       this.updateApiKeysComponent();
       console.log(`New API key created: ${newApiKey.key}`); // Log creation
       this.showSuccessMessage(newApiKey.key);

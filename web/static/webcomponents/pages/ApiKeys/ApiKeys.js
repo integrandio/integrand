@@ -53,7 +53,7 @@ class ApiKeys extends HTMLElement {
     const modalElement = document.createElement("wc-modal");
     modalElement.innerHTML = `
           <div class="modal-content">
-              <p>Newest API Key: <span id="new-api-key">${apiKey}</span></p>
+              <p>New API Key: <span id="new-api-key">${apiKey}</span></p>
           </div>
       `;
     this.shadow.appendChild(modalElement);
