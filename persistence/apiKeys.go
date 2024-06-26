@@ -6,20 +6,20 @@ import (
 
 type ApiKey struct {
 	Id        int       `json:"id,omitempty"`
-	Key       string    `json:"apiKey,omitempty"`
+	Key       string    `json:"key,omitempty"` // Update JSON tag to match the expected field name
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	UserId    int       `json:"userId,omitempty"`
 }
 
 func (dstore *Datastore) GetApiKey(key string) (ApiKey, error) {
-	selectQuery := "SELECT id, created_at, user_id FROM api_keys WHERE key=?"
+	selectQuery := "SELECT id, key, created_at, user_id FROM api_keys WHERE key=?"
 	dstore.RWMutex.RLock()
 	row := dstore.db.QueryRow(selectQuery, key)
 	dstore.RWMutex.RUnlock()
 
 	var api_key ApiKey
 
-	err := row.Scan(&api_key.Id, &api_key.CreatedAt, &api_key.UserId)
+	err := row.Scan(&api_key.Id, &api_key.Key, &api_key.CreatedAt, &api_key.UserId)
 	if err != nil {
 		return api_key, err
 	}
@@ -56,4 +56,26 @@ func (dstore *Datastore) DeleteAPIKey(key string, userID int) (int, error) {
 		return 0, err
 	}
 	return int(rowsDeleted), nil
+}
+
+func (dstore *Datastore) GetAPIKeysByUserID(userID int) ([]ApiKey, error) {
+	selectQuery := "SELECT id, key, created_at FROM api_keys WHERE user_id=?"
+	dstore.RWMutex.RLock()
+	rows, err := dstore.db.Query(selectQuery, userID)
+	dstore.RWMutex.RUnlock()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var apiKeys []ApiKey
+	for rows.Next() {
+		var apiKey ApiKey
+		err := rows.Scan(&apiKey.Id, &apiKey.Key, &apiKey.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		apiKeys = append(apiKeys, apiKey)
+	}
+	return apiKeys, nil
 }

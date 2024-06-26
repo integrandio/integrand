@@ -14,6 +14,9 @@ class Home extends HTMLElement {
                 <div>
                     <wc-title>Topics</wc-title>
                 </div>
+                <div>
+                    <wc-title>API Keys</wc-title>
+                </div>
             </div>
         </div>
         `

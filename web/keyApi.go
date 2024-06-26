@@ -31,9 +31,27 @@ func (ka *keyAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		ka.createApiKeyHandler(w, r)
 	case r.Method == http.MethodDelete && keySingleApi.MatchString(r.URL.Path):
 		ka.deleteApiKeyHandler(w, r)
+	case r.Method == http.MethodGet && keyAllApi.MatchString(r.URL.Path):
+		ka.listApiKeysHandler(w, r)
 	default:
 		notFoundApiError(w)
 	}
+}
+
+func (ka *keyAPI) listApiKeysHandler(w http.ResponseWriter, _ *http.Request) {
+	apiKeys, err := services.ListAPIKeys(ka.userID)
+	if err != nil {
+		slog.Error(err.Error())
+		internalServerError(w)
+		return
+	}
+	resJsonBytes, err := generateSuccessMessage(apiKeys)
+	if err != nil {
+		internalServerError(w)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(resJsonBytes)
 }
 
 func (ka *keyAPI) createApiKeyHandler(w http.ResponseWriter, _ *http.Request) {
@@ -43,8 +61,7 @@ func (ka *keyAPI) createApiKeyHandler(w http.ResponseWriter, _ *http.Request) {
 		internalServerError(w)
 		return
 	}
-	response := map[string]string{"apiKey": apiKey}
-	resJsonBytes, err := generateSuccessMessage(response)
+	resJsonBytes, err := generateSuccessMessage(apiKey)
 	if err != nil {
 		internalServerError(w)
 		return
