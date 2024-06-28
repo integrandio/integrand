@@ -176,7 +176,9 @@ type TopicDetails struct {
 func (broker *Broker) GetTopics(UserID int) []TopicDetails {
 	topicDetails := []TopicDetails{}
 	for _, topic := range broker.Topics {
-		topicDetails = append(topicDetails, topic.getTopicDetails())
+		if topic.UserID == UserID {
+			topicDetails = append(topicDetails, topic.getTopicDetails())
+		}
 	}
 	return topicDetails
 }

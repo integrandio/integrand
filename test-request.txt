@@ -3,7 +3,7 @@
 curl --header "Content-Type: application/json" \
   --request POST \
   --data '{"username":1,"password":"xyz"}' \
-  http://localhost:8000/api/v1/glue/f/dQhIE
+  'http://localhost:8000/api/v1/glue/f/anota?apikey=RUHknexo'
 
 // Glue API
 // Get all Glue handler
@@ -50,18 +50,17 @@ curl --header "Content-Type: application/json" \
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer 11111" \
   --request GET \
-  http://localhost:8000/api/v1/topic/QXTso
+  http://localhost:8000/api/v1/topic/one
 
 // Fetch events from topic
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer 11111" \
   --request GET \
-  "http://localhost:8000/api/v1/topic/bllms/events?offset=0&limit=5"
-
+  "http://localhost:8000/api/v1/topic/one/events?offset=0&limit=1"
 
 
 //Stream events from topic
 curl --header "Accept:text/event-stream" \
   --header "Authorization: Bearer 11111" \
   --request GET -N  \
-  http://localhost:8000/api/v1/topic/gjPnN/consume
+  http://localhost:8000/api/v1/topic/here/consume

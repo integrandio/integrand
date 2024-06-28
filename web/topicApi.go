@@ -176,10 +176,11 @@ func (ta *topicAPI) getEvents(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var dataArray []string
+	var dataArray []interface{}
+	// TODO: Error handle this loop. RN if anything fails, we will get success with null data
 	for i := 0; i < limit; i++ {
 		//Iterate and loop through this...
-		jsonBytes, err := services.GetEvent(eventStream.TopicName, offset, ta.userID)
+		jsonBytes, err := services.GetEvent(eventStream.TopicName, ta.userID, offset)
 		if err != nil {
 			//TODO: Fix this
 			if err.Error() == "offset out of bounds" {
@@ -189,8 +190,14 @@ func (ta *topicAPI) getEvents(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 		}
+		var i interface{}
+		err = json.Unmarshal(jsonBytes, &i)
+		if err != nil {
+			slog.Error(err.Error())
+			break
+		}
 		//We need to convert the bytes to string
-		dataArray = append(dataArray, string(jsonBytes))
+		dataArray = append(dataArray, i)
 		offset++
 	}
 
@@ -199,6 +206,7 @@ func (ta *topicAPI) getEvents(w http.ResponseWriter, r *http.Request) {
 	w.Write(resJsonBytes)
 }
 
+// TODO: I think something is messed up here. Observed a bug when I was testing and close the client.
 func (ta *topicAPI) streamEvents(w http.ResponseWriter, r *http.Request) {
 	acceptType := r.Header.Get("Accept")
 	if acceptType != "text/event-stream" {
@@ -206,7 +214,6 @@ func (ta *topicAPI) streamEvents(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w)
 		return
 	}
-
 	offset := 0
 	offsetParam := r.URL.Query().Get("offset")
 	if offsetParam != "" {

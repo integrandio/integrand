@@ -21,7 +21,7 @@ func (dstore *Datastore) GetStickeyConnectionBySecurityKey(id string, security_k
 
 	var stickey_connection StickyConnection
 
-	err := row.Scan(&stickey_connection.RouteID, &stickey_connection.Security_key, &stickey_connection.TopicName, &stickey_connection.LastModified)
+	err := row.Scan(&stickey_connection.RouteID, &stickey_connection.Security_key, &stickey_connection.TopicName, &stickey_connection.LastModified, &stickey_connection.UserId)
 	if err != nil {
 		return stickey_connection, err
 	}

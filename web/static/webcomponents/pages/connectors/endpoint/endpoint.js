@@ -29,7 +29,8 @@ class EndpointPage extends HTMLElement {
     }
 
     generateMarkup(endpoint) {
-        const endpoint_link = `/api/v1/glue/f/${endpoint.id}`
+        const endpoint_link = `/api/v1/glue/f/${endpoint.id}`;
+        const topic_link = `/topics/${endpoint.topicName}`
         var date = new Date(endpoint.lastModified);
         let job_markup = `
             <ul class="endpointContainerCard">
@@ -43,7 +44,7 @@ class EndpointPage extends HTMLElement {
                 </li>
                 <li>
                     <p class="titler">Topic Name:</p>
-                    <p>${endpoint.topicName}</p>
+                    <a href=${topic_link}>${endpoint.topicName}</a>
                 </li>
                 <li>
                     <p class="titler">Last Modified:</p>

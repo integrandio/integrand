@@ -14,6 +14,25 @@ class TopicPage extends HTMLElement {
         this.shawdow.append(topicPageTemplate.content.cloneNode(true))
     }
 
+    async getTopicMessage(offset) {
+        const endpoint = `/api/v1/topic/${this.topic_id}/events?offset=${offset}&limit=1`
+        const response = await fetch(endpoint);
+        const jsonData = await response.json();
+        console.log(jsonData)
+        let thingData = JSON.stringify(jsonData.data[0], undefined, 2);
+
+        let markup = `<div><wc-title>Topic Explorer</wc-title><pre><code>${thingData}</code></pre></div>`
+        let divElementContainer = fromHTML(markup)
+        // const divElementContainer = document.createElement("div");
+        // const titleElementContainer = document.createElement("<wc-title>")
+        // const preElement = document.createElement("pre");
+        // const codeElement = document.createElement("code")
+        // codeElement.textContent = thingData;
+        // preElement.appendChild(codeElement)
+        // divElementContainer.appendChild(preElement)
+        this.shawdow.append(divElementContainer)
+    }
+
     deleteTopicAction() {
         const url = `/api/v1/topic/${this.topic_id}`
         fetch(url, {
@@ -66,8 +85,9 @@ class TopicPage extends HTMLElement {
         pageTitleElement.buttonText = 'Delete';
         pageTitleElement.buttonFunction = this.deleteTopicAction.bind(this);
         this.shawdow.append(pageTitleElement)
-
         this.shawdow.append(contentTemplate.content.cloneNode(true))
+
+        await this.getTopicMessage(0)
     }
 }
 
