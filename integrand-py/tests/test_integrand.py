@@ -44,7 +44,7 @@ class TestGlueAPI:
 
     def test_create_glue_handler(self):
         id = get_random_string(5)
-        topicName = 'createGlueHandlerTest'
+        topicName = get_random_string(5)
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         response = integrand.CreateGlueHandler(id, topicName)
         assert response['status'] == 'success'
@@ -55,7 +55,7 @@ class TestGlueAPI:
     
     def test_get_all_glue_handlers(self):
         id = get_random_string(5)
-        topicName = 'getAllGlueHandler'
+        topicName = get_random_string(5)
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         integrand.CreateGlueHandler(id, topicName)
         response = integrand.GetAllGlueHandlers()
@@ -66,7 +66,7 @@ class TestGlueAPI:
 
     def test_get_glue_handler(self):
         id = get_random_string(5)
-        topicName = 'getGlueHandler'
+        topicName = get_random_string(5)
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         integrand.CreateGlueHandler(id, topicName)
         response = integrand.GetGlueHandler(id)
@@ -78,7 +78,7 @@ class TestGlueAPI:
     
     def test_delete_glue_handler(self):
         id = get_random_string(5)
-        topicName = 'deleteGlueHandler'
+        topicName = get_random_string(5)
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         integrand.CreateGlueHandler(id, topicName)
         response = integrand.DeleteGlueHandler(id)
@@ -136,3 +136,19 @@ class TestTopicAPI:
         integrand.CreateTopic(topicName)
         response = integrand.DeleteTopic(topicName)
         assert response['status'] == 'success'
+    
+class TestMessages():
+    def test_send_message(self):
+        id = get_random_string(5)
+        topicName = get_random_string(5)
+        integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
+        createResponse = integrand.CreateGlueHandler(id, topicName)
+        print(createResponse)
+        data = {'hello': 'world'}
+        res = integrand.EndpointRequest(id, createResponse['data']['securityKey'], data)
+        print(res)
+        assert res['status'] == 'success'
+        # Clean up
+        integrand.DeleteGlueHandler(id)
+        integrand.DeleteTopic(topicName)
+
