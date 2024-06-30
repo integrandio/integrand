@@ -28,7 +28,7 @@ func CreateEventStream(userId int, topicName string) (persistence.TopicDetails, 
 	topicDetails = persistence.TopicDetails{
 		TopicName:      topic.TopicName,
 		OldestOffset:   0,
-		LastestOffset:  0,
+		NextOffset:     0,
 		RetentionBytes: 1000,
 	}
 	return topicDetails, nil

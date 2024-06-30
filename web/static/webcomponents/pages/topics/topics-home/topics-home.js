@@ -68,7 +68,7 @@ class TopicsHome extends HTMLElement {
         let topic_markup = `
         <div class="jobCard">
             <h1><span class="titler">Name:</span> ${topic.topicName}</h1>
-            <h2><span class="titler">Latest Offset:</span> ${topic.latestOffset}</h2>
+            <h2><span class="titler">Next Offset:</span> ${topic.nextOffset}</h2>
             <p><span class="titler">Oldest Offset: </span> ${topic.oldestOffset}</p>
             <a class="jobLink" href="${topic_link}"> View Topic Details </a>
         </div>`

@@ -106,7 +106,7 @@ class TestTopicAPI:
         assert response['status'] == 'success'
         assert response['data']['topicName'] == topicName
         assert response['data']['oldestOffset'] == 0
-        assert response['data']['latestOffset'] == 0
+        assert response['data']['nextOffset'] == 0
         # Clean up
         integrand.DeleteTopic(topicName)
 

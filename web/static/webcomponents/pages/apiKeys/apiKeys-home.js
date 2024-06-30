@@ -116,12 +116,12 @@ class ApiKeysHome extends HTMLElement {
 
   connectedCallback() {
     const pageTitleElement = document.createElement("wc-page-heading-button");
-    pageTitleElement.innerText = "All API Keys";
+    pageTitleElement.innerText = "API Keys";
     pageTitleElement.buttonText = "New API Key";
     pageTitleElement.buttonFunction = this.createApiKey.bind(this);
     this.shadow.appendChild(pageTitleElement);
 
-    const keyContainerElement = fromHTML(`<div class="api-keys-container"><ul id="api-keys-list"></ul></div>`)
+    const keyContainerElement = fromHTML(`<ul id="api-keys-list"></ul>`)
     this.shadow.appendChild(keyContainerElement);
 
     this.fetchApiKeys();
