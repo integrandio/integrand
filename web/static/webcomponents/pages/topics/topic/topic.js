@@ -14,14 +14,22 @@ class TopicPage extends HTMLElement {
         this.shawdow.append(topicPageTemplate.content.cloneNode(true))
     }
 
+    createTopicExplorer() {
+        let markup = `<div id="topicExplorer">
+        <wc-title>Topic Explorer</wc-title>
+        <search-bar topic_name=${this.topic_id}></search-bar>
+        </div>`;
+        let divElementContainer = fromHTML(markup)
+        this.shawdow.append(divElementContainer)
+    }
+
     async getTopicMessage(offset) {
         const endpoint = `/api/v1/topic/${this.topic_id}/events?offset=${offset}&limit=1`
         const response = await fetch(endpoint);
         const jsonData = await response.json();
         console.log(jsonData)
         let thingData = JSON.stringify(jsonData.data[0], undefined, 2);
-
-        let markup = `<div><wc-title>Topic Explorer</wc-title><pre><code>${thingData}</code></pre></div>`
+        let markup = `<div class="dataContainer"><pre><code>${thingData}</code></pre></div>`
         let divElementContainer = fromHTML(markup)
         // const divElementContainer = document.createElement("div");
         // const titleElementContainer = document.createElement("<wc-title>")
@@ -86,7 +94,7 @@ class TopicPage extends HTMLElement {
         pageTitleElement.buttonFunction = this.deleteTopicAction.bind(this);
         this.shawdow.append(pageTitleElement)
         this.shawdow.append(contentTemplate.content.cloneNode(true))
-
+        this.createTopicExplorer()
         await this.getTopicMessage(0)
     }
 }

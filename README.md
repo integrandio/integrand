@@ -54,6 +54,7 @@ docker run -d \
       -p 8000:8000 \
       -e ROOT_EMAIL="test@example.com" \
       -e ROOT_PASSWORD="MyPassword" \
+      -e INITIAL_API_KEY="apiKey" \
       registry.vineglue.com/integrand-app:latest
 ```
 
@@ -66,6 +67,7 @@ services:
     environment:
       ROOT_EMAIL: "root@example.com"
       ROOT_PASSWORD: "MyPassword"
+      INITIAL_API_KEY: "apiKey"
     ports:
       - "8000:8000"
     volumes:

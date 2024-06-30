@@ -44,8 +44,7 @@ class Searchbar extends HTMLElement {
         shadow.append(searchCssTemplate.content.cloneNode(true))
         this.expanded = false;
         this.input_content = '';
-        this.database_name = this.getAttribute("database_name")
-        this.table_name = this.getAttribute("table_name")
+        this.topic_name = this.getAttribute("topic_name")
         this.resultsContainer = shadow.querySelector('#resultsDiv')
         this.inputSelector = shadow.querySelector('#search')
     }
@@ -55,17 +54,14 @@ class Searchbar extends HTMLElement {
         if (!isNumber) {
             return "must be an int"
         }
-        let endpont = `/api/v1/explorer/record/${this.database_name}/${this.table_name}/sourceid/${this.input_content}`
-        const response = await fetch(endpont);
+        const endpoint = `/api/v1/topic/${this.topic_name}/events?offset=${this.input_content}&limit=1`
+        const response = await fetch(endpoint);
         if (!response.ok){
             return "not found"
         }
         const jsonData = await response.json();
-        const thing = `<a
-        href="/app/data-explorer/record/${this.database_name}/${this.table_name}/${jsonData.id}"
-        class="item-link"
-        >${this.input_content}</a>`
-        return thing;
+        console.log(jsonData)
+        return 0;
     }
 
     async showResults() {
@@ -80,7 +76,6 @@ class Searchbar extends HTMLElement {
     }
 
     async updateValue(e) {
-        console.log(this.resultsContainer)
         this.input_content = e.target.value;
         // This is janky let's clean this up
         if (this.input_content !== "") {
