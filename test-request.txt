@@ -2,8 +2,8 @@
 //TODO: To fix this one...
 curl --header "Content-Type: application/json" \
   --request POST \
-  --data '{"username":1,"password":"xyz"}' \
-  'http://localhost:8000/api/v1/glue/f/anota?apikey=RUHknexo'
+  --data '{"username":"hello said","password":"lol"}' \
+  'http://localhost:8000/api/v1/glue/f/my?apikey=ctbXnWuO'
 
 // Glue API
 // Get all Glue handler

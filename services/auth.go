@@ -61,6 +61,48 @@ func EmailAuthenticate(Email string, password string) (persistence.User, error) 
 	}
 }
 
+// Get or create a google user
+func GoogleAuthenticate(email string, socialId string) (persistence.User, error) {
+	gottenUser, err := persistence.DATASTORE.GetSocialUser(email)
+	if err != nil {
+		user := persistence.User{
+			Email:    email,
+			SocialID: socialId,
+			AuthType: persistence.GOOGLE,
+		}
+		log.Println(err)
+		userID, err := persistence.DATASTORE.CreateSocialUser(user)
+		if err != nil {
+			log.Println(err)
+			return persistence.User{}, err
+		}
+		user.ID = userID
+		return user, nil
+	}
+	return gottenUser, nil
+}
+
+// Get or create a google user
+func GithubAuthenticate(email string, socialId string) (persistence.User, error) {
+	gottenUser, err := persistence.DATASTORE.GetSocialUser(email)
+	if err != nil {
+		user := persistence.User{
+			Email:    email,
+			SocialID: socialId,
+			AuthType: persistence.GITHUB,
+		}
+		log.Println(err)
+		userID, err := persistence.DATASTORE.CreateSocialUser(user)
+		if err != nil {
+			log.Println(err)
+			return persistence.User{}, err
+		}
+		user.ID = userID
+		return user, nil
+	}
+	return gottenUser, nil
+}
+
 func CreateNewEmailUser(email string, plainPassword string) (persistence.User, error) {
 	var user persistence.User
 	password, err := bcrypt.GenerateFromPassword([]byte(plainPassword), bcrypt.DefaultCost)
@@ -70,7 +112,7 @@ func CreateNewEmailUser(email string, plainPassword string) (persistence.User, e
 	user = persistence.User{
 		Email:        email,
 		Password:     string(password),
-		AuthType:     "email",
+		AuthType:     persistence.EMAIL,
 		CreatedAt:    time.Now(),
 		LastModified: time.Now(),
 	}
