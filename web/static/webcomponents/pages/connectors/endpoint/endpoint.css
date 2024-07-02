@@ -17,6 +17,11 @@
     margin-left: auto;
 }
 
+.link {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
 .endpointContainerCard > li {
     display: flex;
     flex-direction: row;

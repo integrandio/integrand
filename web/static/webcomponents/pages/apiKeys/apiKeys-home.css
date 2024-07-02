@@ -1,9 +1,4 @@
 /* web/static/webcomponents/pages/ApiKeys/ApiKeys.css */
-.api-keys-container {
-    padding: 20px;
-    font-family: Arial, sans-serif;
-    position: relative; /* Ensure positioning context for absolute button */
-}
 
 .api-keys-container h1 {
     font-size: 24px;
@@ -13,21 +8,12 @@
     align-items: center; /* Centers vertically with button */
 }
 
-#create-api-key-button {
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    position: absolute;
-    top: 20px;
-    right: 20px;
-}
-
 #api-keys-list {
+    max-width: 80rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
     list-style-type: none;
-    padding: 0;
+    margin: auto;
 }
 
 #api-keys-list li {

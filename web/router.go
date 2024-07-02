@@ -8,16 +8,23 @@ import (
 )
 
 func NewNewWebRouter() *http.ServeMux {
+	setUpGothSession()
 	mux := http.NewServeMux()
-
+	//Authentication stuff
 	mux.HandleFunc("/login", LoginPage)
+	mux.HandleFunc("/register", RegisterPage)
+	//TODO: Let's combine these urls so it's better
+	mux.HandleFunc("/auth/google", googleAuth)
+	mux.HandleFunc("/auth/google/callback", googleCallback)
+	mux.HandleFunc("/auth/github", githubAuth)
+	mux.HandleFunc("/auth/github/callback", githubCallback)
+
 	// Application UI
 	mux.HandleFunc("/", applicationPage)
 
 	glueApi := &glueAPI{}
-	mux.Handle("/api/v1/glue", glueApi)
-	mux.Handle("/api/v1/glue/", glueApi)
-	mux.Handle("/api/v1/glue/endpoint", glueApi)
+	mux.Handle("/api/v1/connector", glueApi)
+	mux.Handle("/api/v1/connector/", glueApi)
 
 	topicApi := &topicAPI{}
 	mux.Handle("/api/v1/topic", topicApi)

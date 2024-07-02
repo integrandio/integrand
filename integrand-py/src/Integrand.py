@@ -7,22 +7,22 @@ class Integrand:
         self.integrand_base_endpoint = integrand_base_endpoint
         self.api_key = integrand_api_key
 
-    def EndpointRequest(self, route: str, security_key: str):
-        url = f'{self.integrand_base_endpoint}/api/v1/glue/f/{route}'
+    def EndpointRequest(self, route: str, security_key: str, data: Dict):
+        url = f'{self.integrand_base_endpoint}/api/v1/connector/f/{route}'
         headers = {
             'Content-Type': 'application/json',
         }
         params = {
-            "apiKey": security_key
+            "apikey": security_key
         }
-        response = requests.get(url, headers=headers)
+        response = requests.post(url, headers=headers, json=data, params=params)
         response.raise_for_status()
         response_body = response.json()
         return response_body
     
     # Glue API
-    def GetAllGlueHandlers(self):
-        url = f'{self.integrand_base_endpoint}/api/v1/glue'
+    def GetAllConnectors(self):
+        url = f'{self.integrand_base_endpoint}/api/v1/connector'
         headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {self.api_key}',
@@ -32,8 +32,8 @@ class Integrand:
         response_body = response.json()
         return response_body
 
-    def GetGlueHandler(self, glueHandlerId: str):
-        url = f'{self.integrand_base_endpoint}/api/v1/glue/{glueHandlerId}'
+    def GetConnector(self, connector_id: str):
+        url = f'{self.integrand_base_endpoint}/api/v1/connector/{connector_id}'
         token = 'Bearer ' + self.api_key
         headers = {
             'Content-Type': 'application/json',
@@ -44,14 +44,14 @@ class Integrand:
         response_body = response.json()
         return response_body
 
-    def CreateGlueHandler(self, id: str, topicName: str):
-        url = f'{self.integrand_base_endpoint}/api/v1/glue'
+    def CreateConnector(self, connector_id: str, topicName: str):
+        url = f'{self.integrand_base_endpoint}/api/v1/connector'
         headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {self.api_key}',
         }
         body = {
-            'id': id,
+            'id': connector_id,
             'topicName': topicName
         }
         response = requests.post(url, headers=headers, json=body)
@@ -59,8 +59,8 @@ class Integrand:
         response_body = response.json()
         return response_body
 
-    def DeleteGlueHandler(self, glueHandlerId: str):
-        url = f'{self.integrand_base_endpoint}/api/v1/glue/{glueHandlerId}'
+    def DeleteConnector(self, connector_id: str):
+        url = f'{self.integrand_base_endpoint}/api/v1/connector/{connector_id}'
         headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {self.api_key}',

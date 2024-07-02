@@ -10,6 +10,7 @@ type AuthType string
 const (
 	EMAIL  AuthType = "email"
 	GOOGLE AuthType = "google"
+	GITHUB AuthType = "github"
 )
 
 type User struct {

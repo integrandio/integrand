@@ -254,7 +254,7 @@ func (cl *Commitlog) Read(offset int) ([]byte, error) {
 
 type CommitlogDetails struct {
 	OldestOffset   int
-	LastestOffset  int
+	NextOffset     int
 	TotalSegments  int
 	RetentionBytes int
 }
@@ -263,15 +263,15 @@ func (cl *Commitlog) GetCommitlogDetails() CommitlogDetails {
 	cl.mu.Lock()
 	defer cl.mu.Unlock()
 	oldestOffset := 0
-	latestOffset := 0
+	nextOffset := 0
 	currentSeg, err := cl.getCurrentSegment()
 	if err == nil {
-		latestOffset = currentSeg.nextOffset
+		nextOffset = currentSeg.nextOffset
 		oldestOffset = cl.segments[0].startingOffset
 	}
 	return CommitlogDetails{
 		OldestOffset:   oldestOffset,
-		LastestOffset:  latestOffset,
+		NextOffset:     nextOffset,
 		TotalSegments:  len(cl.segments),
 		RetentionBytes: RETENTION_BYTES,
 	}

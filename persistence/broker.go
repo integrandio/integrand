@@ -125,7 +125,6 @@ func (broker *Broker) DeleteTopic(topicName string, UserID int) error {
 
 func (broker *Broker) takeTopicSnapshot() error {
 	snapshotPath := broker.BaseDirectory + "/topics.gob"
-
 	file, err := os.OpenFile(snapshotPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		return err
@@ -169,14 +168,16 @@ func (broker *Broker) loadTopicSnapshot() ([]Topic, error) {
 type TopicDetails struct {
 	TopicName      string `json:"topicName"`
 	OldestOffset   int    `json:"oldestOffset"`
-	LastestOffset  int    `json:"latestOffset"`
+	NextOffset     int    `json:"nextOffset"`
 	RetentionBytes int    `json:"retentionBytes"`
 }
 
 func (broker *Broker) GetTopics(UserID int) []TopicDetails {
 	topicDetails := []TopicDetails{}
 	for _, topic := range broker.Topics {
-		topicDetails = append(topicDetails, topic.getTopicDetails())
+		if topic.UserID == UserID {
+			topicDetails = append(topicDetails, topic.getTopicDetails())
+		}
 	}
 	return topicDetails
 }
@@ -196,7 +197,7 @@ func (topic *Topic) getTopicDetails() TopicDetails {
 	return TopicDetails{
 		TopicName:      topic.TopicName,
 		OldestOffset:   details.OldestOffset,
-		LastestOffset:  details.LastestOffset,
+		NextOffset:     details.NextOffset,
 		RetentionBytes: details.RetentionBytes,
 	}
 }

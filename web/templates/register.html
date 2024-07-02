@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Integrand - Login</title>
+    <title>Integrand - Register</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -21,11 +21,11 @@
               src="/static/images/logos/integrand-icon-logo.svg"
               alt="integrand"
             />
-            <h2 class="title">Sign in to your account</h2>
+            <h2 class="title">Register new account</h2>
           </div>
           <div class="signInContainer">
             <div class="wrapper">
-              <form class="former" action="/login" method="POST">
+              <form class="former" action="/register" method="POST">
                 <div>
                   <label for="email" class="labeler">Email address</label>
                   <div class="input-wrapper">
@@ -50,6 +50,18 @@
                     />
                   </div>
                 </div>
+                <div>
+                  <label for="password" class="labeler">Confirm Password</label>
+                  <div class="input-wrapper">
+                    <input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type="password"
+                      required=""
+                      class="inputter"
+                    />
+                  </div>
+                </div>
                 <!-- <div class="lx yz zf">
                   <div class="lx yz">
                     <input
@@ -67,7 +79,7 @@
                 </div> -->
                 <div>
                   <button type="submit" class="submit-button">
-                    Sign in
+                    Register
                   </button>
                 </div>
               </form>

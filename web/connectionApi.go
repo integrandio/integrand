@@ -9,10 +9,10 @@ import (
 )
 
 var (
-	glueEndpointSingleApi = regexp.MustCompile(`^\/api/v1/glue/f\/(.*)$`)
+	glueEndpointSingleApi = regexp.MustCompile(`^\/api/v1/connector/f\/(.*)$`)
 	//TODO: create a route for the routes....
-	glueAllApi    = regexp.MustCompile(`^\/api/v1/glue[\/]*$`)
-	glueSingleApi = regexp.MustCompile(`^\/api/v1/glue\/(.*)$`)
+	glueAllApi    = regexp.MustCompile(`^\/api/v1/connector[\/]*$`)
+	glueSingleApi = regexp.MustCompile(`^\/api/v1/connector\/(.*)$`)
 )
 
 type glueAPI struct {

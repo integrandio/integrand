@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"integrand/services"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"strings"
@@ -35,6 +36,7 @@ func LoginPage(w http.ResponseWriter, r *http.Request) {
 		user, err := sess.Get("userID")
 		if err != nil {
 			log.Fatal(err)
+			return
 		}
 		if user != nil {
 			// Successful login, redirect to a welcome page.
@@ -53,20 +55,73 @@ func LoginPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func RegisterPage(w http.ResponseWriter, r *http.Request) {
+	sess := services.GetSession(w, r)
+	switch r.Method {
+	case http.MethodPost:
+		email := r.FormValue("email")
+		password := r.FormValue("password")
+		confirmPassword := r.FormValue("confirmPassword")
+		if password != confirmPassword {
+			slog.Error("passwords do not match")
+			fmt.Fprintf(w, "Passwords do not match. Please try again.")
+			return
+		}
+		user, err := services.CreateNewEmailUser(email, password)
+		if err != nil {
+			slog.Error(err.Error())
+			// Invalid credentials, show the login page with an error message.
+			//fmt.Fprintf(w, "Invalid credentials. Please try again.")
+			// Let's send the error message back with the page
+			http.Redirect(w, r, "/register", http.StatusSeeOther)
+			return
+		}
+		err = sess.Set("userID", user.ID)
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+		// Successful login, redirect to a welcome page.
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+
+	case http.MethodGet:
+		user, err := sess.Get("userID")
+		if err != nil {
+			log.Fatal(err)
+			return
+		}
+		if user != nil {
+			// Successful login, redirect to a welcome page.
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+			return
+		}
+		// If not a POST request, serve the login page template.
+		tmpl, err := template.ParseFiles("web/templates/register.html")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		tmpl.Execute(w, nil)
+	default:
+		notFoundApiError(w)
+	}
+}
+
 func applicationPage(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		sessionAuthenticateOrRedirect(w, r)
 		fileContents, err := os.ReadFile("web/templates/baseApp.html")
 		if err != nil {
-			log.Println(err)
+			slog.Error(err.Error())
 			internalServerError(w)
 			return
 		}
 		templateString := strings.Replace(string(fileContents), "#replace_me#", "{{ template \"application.html\" }}", 1)
 		tmpl, err := template.New("myTemplate").Parse(templateString)
 		if err != nil {
-			log.Println(err)
+			slog.Error(err.Error())
 			internalServerError(w)
 			return
 		}
@@ -75,7 +130,7 @@ func applicationPage(w http.ResponseWriter, r *http.Request) {
 			"web/templates/application.html",
 		)
 		if err != nil {
-			log.Println(err)
+			slog.Error(err.Error())
 			internalServerError(w)
 			return
 		}

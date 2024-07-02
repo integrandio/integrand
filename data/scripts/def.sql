@@ -3,7 +3,7 @@ PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER NOT NULL PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
-  auth_type TEXT CHECK( auth_type IN ('email','google') ) NOT NULL,
+  auth_type TEXT CHECK( auth_type IN ('email','google','github') ) NOT NULL,
   password TEXT,
   socialID TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

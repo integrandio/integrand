@@ -15,7 +15,7 @@ class EndpointPage extends HTMLElement {
     }
 
     deleteConnectorAction() {
-        const url = `/api/v1/glue/${this.endpoint_id}`
+        const url = `/api/v1/connector/${this.endpoint_id}`
         fetch(url, {
             method: "Delete",
             headers: {"Content-Type": "application/json",}
@@ -29,25 +29,26 @@ class EndpointPage extends HTMLElement {
     }
 
     generateMarkup(endpoint) {
-        const endpoint_link = `/api/v1/glue/f/${endpoint.id}`
+        const endpoint_link = `/api/v1/connector/f/${endpoint.id}?apikey=${endpoint.securityKey}`;
+        const topic_link = `/topics/${endpoint.topicName}`
         var date = new Date(endpoint.lastModified);
         let job_markup = `
             <ul class="endpointContainerCard">
-                <li>
-                    <p class="titler">Endpoint URL:<p>
-                    <a href=${endpoint_link}>${endpoint_link}</a>
-                </li>
                 <li>
                     <p class="titler">Connection Key:</p>
                     <p>${endpoint.securityKey}</p>
                 </li>
                 <li>
                     <p class="titler">Topic Name:</p>
-                    <p>${endpoint.topicName}</p>
+                    <a class="link" href=${topic_link}>${endpoint.topicName}</a>
                 </li>
                 <li>
                     <p class="titler">Last Modified:</p>
                     <p>${date.toDateString()}</p>
+                </li>
+                <li>
+                    <p class="titler">Endpoint URL:<p>
+                    <a class="link" href=${endpoint_link}>${endpoint_link}</a>
                 </li>
             </ul>`
         const div = fromHTML(job_markup);
@@ -55,7 +56,7 @@ class EndpointPage extends HTMLElement {
     }
 
     async connectedCallback(){
-        const response = await fetch(`/api/v1/glue/${this.endpoint_id}`);
+        const response = await fetch(`/api/v1/connector/${this.endpoint_id}`);
         const jsonData = await response.json();
         let element = this.generateMarkup(jsonData.data)
         const contentTemplate = document.createElement("template")
