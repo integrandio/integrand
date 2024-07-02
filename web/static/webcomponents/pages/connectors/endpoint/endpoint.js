@@ -15,7 +15,7 @@ class EndpointPage extends HTMLElement {
     }
 
     deleteConnectorAction() {
-        const url = `/api/v1/glue/${this.endpoint_id}`
+        const url = `/api/v1/connector/${this.endpoint_id}`
         fetch(url, {
             method: "Delete",
             headers: {"Content-Type": "application/json",}
@@ -29,7 +29,7 @@ class EndpointPage extends HTMLElement {
     }
 
     generateMarkup(endpoint) {
-        const endpoint_link = `/api/v1/glue/f/${endpoint.id}?apikey=${endpoint.securityKey}`;
+        const endpoint_link = `/api/v1/connector/f/${endpoint.id}?apikey=${endpoint.securityKey}`;
         const topic_link = `/topics/${endpoint.topicName}`
         var date = new Date(endpoint.lastModified);
         let job_markup = `
@@ -56,7 +56,7 @@ class EndpointPage extends HTMLElement {
     }
 
     async connectedCallback(){
-        const response = await fetch(`/api/v1/glue/${this.endpoint_id}`);
+        const response = await fetch(`/api/v1/connector/${this.endpoint_id}`);
         const jsonData = await response.json();
         let element = this.generateMarkup(jsonData.data)
         const contentTemplate = document.createElement("template")

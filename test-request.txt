@@ -3,33 +3,33 @@
 curl --header "Content-Type: application/json" \
   --request POST \
   --data '{"username":"hello said","password":"lol"}' \
-  'http://localhost:8000/api/v1/glue/f/my?apikey=ctbXnWuO'
+  'http://localhost:8000/api/v1/connector/f/my?apikey=ctbXnWuO'
 
 // Glue API
 // Get all Glue handler
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer 11111" \
   --request GET \
-  http://localhost:8000/api/v1/glue
+  http://localhost:8000/api/v1/connector
 
 // Create glue handler
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer 11111" \
   --request POST \
   --data '{"id":"myEndpoint","topicName":"myTopic"}' \
-  http://localhost:8000/api/v1/glue
+  http://localhost:8000/api/v1/connector
 
 // Get Glue handler
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer 11111" \
   --request GET \
-  http://localhost:8000/api/v1/glue/id
+  http://localhost:8000/api/v1/connector/id
 
 // Delete Glue handler
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer 11111" \
   --request DELETE \
-  http://localhost:8000/api/v1/glue/id
+  http://localhost:8000/api/v1/connector/id
 
 
 // Event API

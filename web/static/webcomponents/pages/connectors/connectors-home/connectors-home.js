@@ -19,7 +19,7 @@ class ConnectorsHome extends HTMLElement {
         const cardsContainer = this.shawdow.querySelector("#cardContainer");
         const data = new FormData(e.target);
         const value = Object.fromEntries(data.entries());
-        fetch('/api/v1/glue', {
+        fetch('/api/v1/connector', {
             method: "POST",
             mode: 'cors',
             headers: {
@@ -79,7 +79,7 @@ class ConnectorsHome extends HTMLElement {
     }
 
     async generateEndpointsContainer () {
-        const glueResponse = await fetch('/api/v1/glue');
+        const glueResponse = await fetch('/api/v1/connector');
         const glueJsonData = await glueResponse.json();
 
         const endpoint_card_container = document.createElement("data-cards-container")

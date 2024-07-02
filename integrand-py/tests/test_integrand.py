@@ -26,72 +26,72 @@ def clean_up_topics():
         integrand.DeleteTopic(topic['topicName'])
 
 @pytest.mark.usefixtures("clean_up_topics")
-class TestGlueAPI:
+class TestConnectorAPI:
     #TODO: Setup by deleting all the topics
-    def test_get_all_glue_handlers_empty(self):
+    def test_get_all_connectors_empty(self):
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
-        response = integrand.GetAllGlueHandlers()
+        response = integrand.GetAllConnectors()
         assert response['status'] == 'success'
         assert len(response['data']) == 0
 
-    def test_get_all_glue_handler_empty(self):
+    def test_get_connector_empty(self):
         route = get_random_string(5)
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         with pytest.raises(Exception) as httpException:
-            response = integrand.GetGlueHandler(route)
+            response = integrand.GetConnector(route)
         #TODO: Check the error here
         print(httpException)
 
-    def test_create_glue_handler(self):
+    def test_create_connector(self):
         id = get_random_string(5)
         topicName = get_random_string(5)
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
-        response = integrand.CreateGlueHandler(id, topicName)
+        response = integrand.CreateConnector(id, topicName)
         assert response['status'] == 'success'
         assert response['data']['id'] == id
         assert response['data']['topicName'] == topicName
         # Clean up
-        integrand.DeleteGlueHandler(id)
+        integrand.DeleteConnector(id)
     
-    def test_get_all_glue_handlers(self):
+    def test_get_all_connectors(self):
         id = get_random_string(5)
         topicName = get_random_string(5)
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
-        integrand.CreateGlueHandler(id, topicName)
-        response = integrand.GetAllGlueHandlers()
+        integrand.CreateConnector(id, topicName)
+        response = integrand.GetAllConnectors()
         assert response['status'] == 'success'
         assert len(response['data']) == 1
         # Clean up
-        integrand.DeleteGlueHandler(id)
+        integrand.DeleteConnector(id)
 
-    def test_get_glue_handler(self):
+    def test_get_connector(self):
         id = get_random_string(5)
         topicName = get_random_string(5)
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
-        integrand.CreateGlueHandler(id, topicName)
-        response = integrand.GetGlueHandler(id)
+        integrand.CreateConnector(id, topicName)
+        response = integrand.GetConnector(id)
         assert response['status'] == 'success'
         assert response['data']['id'] == id
         assert response['data']['topicName'] == topicName
         # Clean up
-        integrand.DeleteGlueHandler(id)
+        integrand.DeleteConnector(id)
     
-    def test_delete_glue_handler(self):
+    def test_delete_connector(self):
         id = get_random_string(5)
         topicName = get_random_string(5)
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
-        integrand.CreateGlueHandler(id, topicName)
-        response = integrand.DeleteGlueHandler(id)
+        integrand.CreateConnector(id, topicName)
+        response = integrand.DeleteConnector(id)
         assert response['status'] == 'success'
 
 class TestTopicAPI:
-    def test_get_all_empty_topics(self):
+    def test_get_topics_empty(self):
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         response = integrand.GetAllTopics()
         assert response['status'] == 'success'
         assert len(response['data']) == 0
     
-    def test_get_all_glue_handler_empty(self):
+    def test_get_topic_empty(self):
         topicName = get_random_string(5)
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         with pytest.raises(Exception) as httpException:
@@ -110,7 +110,7 @@ class TestTopicAPI:
         # Clean up
         integrand.DeleteTopic(topicName)
 
-    def test_get_all_glue_handlers(self):
+    def test_get_all_topics(self):
         topicName = get_random_string(5)
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         integrand.CreateTopic(topicName)
@@ -120,7 +120,7 @@ class TestTopicAPI:
         # Clean up
         integrand.DeleteTopic(topicName)
 
-    def test_get_glue_handler(self):
+    def test_get_topic(self):
         topicName = get_random_string(5)
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         integrand.CreateTopic(topicName)
@@ -130,7 +130,7 @@ class TestTopicAPI:
         # Clean up
         integrand.DeleteTopic(topicName)
     
-    def test_delete_glue_handler(self):
+    def test_delete_topic(self):
         topicName = get_random_string(5)
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         integrand.CreateTopic(topicName)
@@ -142,13 +142,13 @@ class TestMessages():
         id = get_random_string(5)
         topicName = get_random_string(5)
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
-        createResponse = integrand.CreateGlueHandler(id, topicName)
+        createResponse = integrand.CreateConnector(id, topicName)
         print(createResponse)
         data = {'hello': 'world'}
         res = integrand.EndpointRequest(id, createResponse['data']['securityKey'], data)
         print(res)
         assert res['status'] == 'success'
         # Clean up
-        integrand.DeleteGlueHandler(id)
+        integrand.DeleteConnector(id)
         integrand.DeleteTopic(topicName)
 
