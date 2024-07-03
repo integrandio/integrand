@@ -118,6 +118,23 @@ class Integrand:
         response_body = response.json()
         return response_body
 
+    def GetEventsFromTopic(self, topicName: str, offset: Optional[int] = None, limit: Optional[int] = None):
+        params: Dict[str, Union[str, int]] = dict()
+        url = f'{self.integrand_base_endpoint}/api/v1/topic/{topicName}/events'
+        if offset is not None:
+            params["offset"] = offset
+        if limit is not None:
+            params["limit"] = limit
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {self.api_key}',
+        }
+        response = requests.get(url, stream=True, headers=headers, params=params)
+        response.raise_for_status()
+        response_body = response.json()
+        return response_body
+
+
     def ConsumeTopic(self, topicName: str, offset: Optional[int] = None):
         params: Dict[str, Union[str, int]] = dict()
         url = f'{self.integrand_base_endpoint}/api/v1/topic/{topicName}/consume'

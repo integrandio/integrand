@@ -143,11 +143,13 @@ class TestMessages():
         topicName = get_random_string(5)
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         createResponse = integrand.CreateConnector(id, topicName)
-        print(createResponse)
         data = {'hello': 'world'}
         res = integrand.EndpointRequest(id, createResponse['data']['securityKey'], data)
-        print(res)
         assert res['status'] == 'success'
+        response = integrand.GetEventsFromTopic(topicName, 0, 1)
+        print(response)
+        assert len(response['data']) == 1
+        assert response['data'][0] == data
         # Clean up
         integrand.DeleteConnector(id)
         integrand.DeleteTopic(topicName)
