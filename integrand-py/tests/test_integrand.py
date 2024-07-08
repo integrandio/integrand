@@ -4,6 +4,7 @@ import pytest
 import string
 import os
 import random
+from typing import Dict
 
 INTEGRAND_URL = os.environ.get('INTEGRAND_URL', 'http://localhost:8000')  # The server's hostname or IP address
 INTEGRAND_API_KEY = os.environ.get('INTEGRAND_API_KEY', '11111')
@@ -150,6 +151,26 @@ class TestMessages():
         print(response)
         assert len(response['data']) == 1
         assert response['data'][0] == data
+        # Clean up
+        integrand.DeleteConnector(id)
+        integrand.DeleteTopic(topicName)
+
+    def test_send_multiple_messaged(self):
+        id = get_random_string(5)
+        topicName = get_random_string(5)
+        integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
+        createResponse = integrand.CreateConnector(id, topicName)
+        # Generate Data
+        messages: Dict = []
+        for i in range(5):
+            messages.append({'key'+ str(i): 'value'+ str(i)})
+        for msg in messages:
+            res = integrand.EndpointRequest(id, createResponse['data']['securityKey'], msg)
+            assert res['status'] == 'success'
+        response = integrand.GetEventsFromTopic(topicName, 0, 5)
+        assert len(response['data']) == len(messages)
+        for ind, data in enumerate(messages):
+            assert response['data'][ind] == data
         # Clean up
         integrand.DeleteConnector(id)
         integrand.DeleteTopic(topicName)

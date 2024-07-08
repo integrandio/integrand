@@ -49,7 +49,8 @@ func Initialize() {
 	// Generate and log an initial API key
 	_, err = DATASTORE.InsertAPIKey(apiKey, user.ID)
 	if err != nil {
-		log.Fatal("Error generating initial API key: ", err)
+		// if the API Key already exists, we don't want this program to crash
+		slog.Error(err.Error())
 	}
 	log.Printf("Initial API Key: %s\n", apiKey)
 

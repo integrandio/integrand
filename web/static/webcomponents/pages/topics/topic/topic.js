@@ -113,7 +113,8 @@ class TopicPage extends HTMLElement {
         pageTitleElement.buttonFunction = this.deleteTopicAction.bind(this);
         this.shawdow.append(pageTitleElement)
         this.shawdow.append(contentTemplate.content.cloneNode(true))
-        this.createTopicExplorer(jsonData.data.oldestOffset, jsonData.data.latestOffset)
+        console.log(jsonData.data)
+        this.createTopicExplorer(jsonData.data.oldestOffset, jsonData.data.nextOffset)
         this.shawdow.addEventListener("select-message", (event) => {
             this.getTopicMessage(event.detail)
           }
