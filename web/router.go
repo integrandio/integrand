@@ -8,16 +8,10 @@ import (
 )
 
 func NewNewWebRouter() *http.ServeMux {
-	setUpGothSession()
 	mux := http.NewServeMux()
 	//Authentication stuff
 	mux.HandleFunc("/login", LoginPage)
-	mux.HandleFunc("/register", RegisterPage)
-	//TODO: Let's combine these urls so it's better
-	mux.HandleFunc("/auth/google", googleAuth)
-	mux.HandleFunc("/auth/google/callback", googleCallback)
-	mux.HandleFunc("/auth/github", githubAuth)
-	mux.HandleFunc("/auth/github/callback", githubCallback)
+	// mux.HandleFunc("/register", RegisterPage)
 
 	// Application UI
 	mux.HandleFunc("/", applicationPage)

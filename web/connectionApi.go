@@ -67,7 +67,7 @@ func (ga *glueAPI) endpointHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Check if we hit the rights one....
-	sticky, err := services.GetStickyConnectionBySecurityKey(matches[1], security_key)
+	sticky, err := services.GetEndpointBySecurityKey(matches[1], security_key)
 	if err != nil {
 		slog.Error(err.Error())
 		internalServerError(w)
@@ -101,7 +101,7 @@ func (ga *glueAPI) endpointHandler(w http.ResponseWriter, r *http.Request) {
 func (ga *glueAPI) getAllGlueHandlers(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		stickey_connections, err := services.GetStickyConnections(ga.userID)
+		stickey_connections, err := services.GetEndpoints(ga.userID)
 		if err != nil {
 			slog.Error(err.Error())
 			internalServerError(w)
@@ -126,7 +126,7 @@ func (ga *glueAPI) getGlueHandler(w http.ResponseWriter, r *http.Request) {
 		notFoundApiError(w)
 		return
 	}
-	stickyConnection, err := services.GetStickyConnection(ga.userID, matches[1])
+	stickyConnection, err := services.GetEndpoint(ga.userID, matches[1])
 	if err != nil {
 		slog.Error(err.Error())
 		internalServerError(w)
@@ -153,7 +153,7 @@ func (ga *glueAPI) createGlueHandler(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w)
 		return
 	}
-	stickyConnection, err := services.CreateStickyConnection(ga.userID, createBody.RouteID, createBody.TopicName)
+	stickyConnection, err := services.CreateEndpoint(ga.userID, createBody.RouteID, createBody.TopicName)
 	if err != nil {
 		slog.Error(err.Error())
 		internalServerError(w)
@@ -176,7 +176,7 @@ func (ga *glueAPI) deleteGlueHandler(w http.ResponseWriter, r *http.Request) {
 			notFoundApiError(w)
 			return
 		}
-		_, err := services.RemoveStickyConnection(ga.userID, matches[1])
+		_, err := services.RemoveEndpoint(ga.userID, matches[1])
 		if err != nil {
 			slog.Error(err.Error())
 			internalServerError(w)

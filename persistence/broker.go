@@ -18,7 +18,6 @@ type Broker struct {
 type Topic struct {
 	TopicName      string
 	TopicDirectory string
-	UserID         int
 	commitlog      *commitlog.Commitlog
 }
 
@@ -37,17 +36,17 @@ func NewBroker(directory string) (*Broker, error) {
 	return &broker, nil
 }
 
-func (broker *Broker) getTopicFromBrokerForUser(topicName string, UserID int) (*Topic, error) {
+func (broker *Broker) getTopicFromBroker(topicName string) (*Topic, error) {
 	for _, topic := range broker.Topics {
-		if topic.TopicName == topicName && topic.UserID == UserID {
+		if topic.TopicName == topicName {
 			return &topic, nil
 		}
 	}
 	return nil, errors.New("topic not found")
 }
 
-func (broker *Broker) ProduceMessage(topicName string, UserID int, message []byte) error {
-	topic, err := broker.getTopicFromBrokerForUser(topicName, UserID)
+func (broker *Broker) ProduceMessage(topicName string, message []byte) error {
+	topic, err := broker.getTopicFromBroker(topicName)
 	if err != nil {
 		return err
 	}
@@ -58,8 +57,8 @@ func (broker *Broker) ProduceMessage(topicName string, UserID int, message []byt
 	return nil
 }
 
-func (broker *Broker) ConsumeMessage(topicName string, UserID int, offset int) ([]byte, error) {
-	topic, err := broker.getTopicFromBrokerForUser(topicName, UserID)
+func (broker *Broker) ConsumeMessage(topicName string, offset int) ([]byte, error) {
+	topic, err := broker.getTopicFromBroker(topicName)
 	if err != nil {
 		return []byte{}, err
 	}
@@ -70,9 +69,9 @@ func (broker *Broker) ConsumeMessage(topicName string, UserID int, offset int) (
 	return msg, nil
 }
 
-func (broker *Broker) CreateTopic(topicName string, UserID int) (Topic, error) {
+func (broker *Broker) CreateTopic(topicName string) (Topic, error) {
 	var topic Topic
-	_, err := broker.getTopicFromBrokerForUser(topicName, UserID)
+	_, err := broker.getTopicFromBroker(topicName)
 	if err == nil {
 		return topic, errors.New("topic already exists")
 	}
@@ -86,7 +85,6 @@ func (broker *Broker) CreateTopic(topicName string, UserID int) (Topic, error) {
 	topic = Topic{
 		TopicName:      topicName,
 		TopicDirectory: topicDirectory,
-		UserID:         UserID,
 		commitlog:      cl,
 	}
 	broker.Topics = append(broker.Topics, topic)
@@ -97,7 +95,7 @@ func (broker *Broker) CreateTopic(topicName string, UserID int) (Topic, error) {
 	return topic, nil
 }
 
-func (broker *Broker) DeleteTopic(topicName string, UserID int) error {
+func (broker *Broker) DeleteTopic(topicName string) error {
 	var foundTopicIndex int
 	topicFound := false
 	//Check if the topic name exists
@@ -175,16 +173,14 @@ type TopicDetails struct {
 func (broker *Broker) GetTopics(UserID int) []TopicDetails {
 	topicDetails := []TopicDetails{}
 	for _, topic := range broker.Topics {
-		if topic.UserID == UserID {
-			topicDetails = append(topicDetails, topic.getTopicDetails())
-		}
+		topicDetails = append(topicDetails, topic.getTopicDetails())
 	}
 	return topicDetails
 }
 
-func (broker *Broker) GetTopic(topicName string, UserID int) (TopicDetails, error) {
+func (broker *Broker) GetTopic(topicName string) (TopicDetails, error) {
 	var topicDetails TopicDetails
-	topic, err := broker.getTopicFromBrokerForUser(topicName, UserID)
+	topic, err := broker.getTopicFromBroker(topicName)
 	if err != nil {
 		return topicDetails, err
 	}

@@ -45,6 +45,10 @@
     margin-left: auto;
 }
 
+.dataContainer code {
+    text-wrap: wrap;
+}
+
 .messageList {
     max-width: 80rem;
     padding-left: 2rem;
@@ -64,7 +68,7 @@
 }
 
 .select-button{
-    background-color: #ff4d4d;
+    background-color: var(--primary-color);
     color: white;
     border: none;
     padding: 5px 10px;

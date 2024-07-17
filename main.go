@@ -17,14 +17,6 @@ func main() {
 	utils.GetEnvrionmentVariableString("ROOT_PASSWORD", "admin")
 	utils.GetEnvrionmentVariableString("INITIAL_API_KEY", "11111")
 
-	// We need to generate new keys....
-	utils.GetEnvrionmentVariableString("GOOGLE_CALLBACK_URL", "")
-	utils.GetEnvrionmentVariableString("GOOGLE_CLIENT_KEY", "")
-	utils.GetEnvrionmentVariableString("GOOGLE_CLIENT_SECRET", "")
-
-	utils.GetEnvrionmentVariableString("GITHUB_CALLBACK_URL", "")
-	utils.GetEnvrionmentVariableString("GITHUB_CLIENT_ID", "")
-	utils.GetEnvrionmentVariableString("GITHUB_CLIENT_SECRET", "")
 	// to change the flags on the default logger
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	persistence.Initialize()

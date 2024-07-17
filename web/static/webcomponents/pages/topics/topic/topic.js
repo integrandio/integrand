@@ -15,6 +15,7 @@ class TopicPage extends HTMLElement {
     }
 
     createTopicExplorer(oldestOffset, latestOffset) {
+        //TODO, paginate this somehow....
         var list_items = ''
         for (let i = oldestOffset; i < latestOffset; i++) {
             list_items= list_items.concat(`<li class="messageItem">

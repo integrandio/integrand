@@ -72,15 +72,15 @@ func initialize_broker() error {
 		return err
 	}
 	for _, user := range users {
-		all_sticky_connections, err := DATASTORE.GetAllStickyConnections(user.ID)
+		endpoints, err := DATASTORE.GetAllEndpoints(user.ID)
 		if err != nil {
 			slog.Error(err.Error())
 			return err
 		}
-		for _, stickyConnection := range all_sticky_connections {
-			_, err := BROKER.GetTopic(stickyConnection.TopicName, user.ID)
+		for _, endpoint := range endpoints {
+			_, err := BROKER.GetTopic(endpoint.TopicName)
 			if err != nil {
-				_, err = BROKER.CreateTopic(stickyConnection.TopicName, user.ID)
+				_, err = BROKER.CreateTopic(endpoint.TopicName)
 				if err != nil {
 					slog.Error(err.Error())
 					return err

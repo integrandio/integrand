@@ -85,7 +85,7 @@ func (ta *topicAPI) getTopic(w http.ResponseWriter, r *http.Request) {
 		notFoundApiError(w)
 		return
 	}
-	eventStream, err := services.GetEventStream(ta.userID, matches[1])
+	eventStream, err := services.GetEventStream(matches[1])
 	if err != nil {
 		slog.Error(err.Error())
 		internalServerError(w)
@@ -111,7 +111,7 @@ func (ta *topicAPI) createTopic(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w)
 		return
 	}
-	topic, err := services.CreateEventStream(ta.userID, createBody.TopicName)
+	topic, err := services.CreateEventStream(createBody.TopicName)
 	if err != nil {
 		slog.Error(err.Error())
 		internalServerError(w)
@@ -169,7 +169,7 @@ func (ta *topicAPI) getEvents(w http.ResponseWriter, r *http.Request) {
 	}
 
 	matches := topicEventsApi.FindStringSubmatch(r.URL.Path)
-	eventStream, err := services.GetEventStream(ta.userID, matches[1])
+	eventStream, err := services.GetEventStream(matches[1])
 	if err != nil {
 		slog.Error(err.Error())
 		internalServerError(w)
@@ -180,7 +180,7 @@ func (ta *topicAPI) getEvents(w http.ResponseWriter, r *http.Request) {
 	// TODO: Error handle this loop. RN if anything fails, we will get success with null data
 	for i := 0; i < limit; i++ {
 		//Iterate and loop through this...
-		jsonBytes, err := services.GetEvent(eventStream.TopicName, ta.userID, offset)
+		jsonBytes, err := services.GetEvent(eventStream.TopicName, offset)
 		if err != nil {
 			//TODO: Fix this
 			if err.Error() == "offset out of bounds" {
@@ -228,7 +228,7 @@ func (ta *topicAPI) streamEvents(w http.ResponseWriter, r *http.Request) {
 	}
 	matches := topicConsumeApi.FindStringSubmatch(r.URL.Path)
 
-	eventStream, err := services.GetEventStream(ta.userID, matches[1])
+	eventStream, err := services.GetEventStream(matches[1])
 	if err != nil {
 		slog.Error(err.Error())
 		internalServerError(w)
@@ -248,7 +248,7 @@ func (ta *topicAPI) streamEvents(w http.ResponseWriter, r *http.Request) {
 
 	for {
 		//Iterate and loop through this...
-		jsonBytes, err := services.GetEvent(eventStream.TopicName, ta.userID, offset)
+		jsonBytes, err := services.GetEvent(eventStream.TopicName, offset)
 		if err != nil {
 			//TODO: Fix this
 			if err.Error() == "offset out of bounds" {

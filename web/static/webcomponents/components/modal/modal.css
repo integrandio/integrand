@@ -33,11 +33,13 @@
 
 #modal > .modal-content {
 	/* Position visible dialog near the top of the window */
-	margin-top:10vh;
+	margin-top: 5vh;
+	max-height: 90vh;
+	overflow-y: auto;
 
 	/* Sizing for visible dialog */
 	width:80%;
-	max-width:750px;
+	max-width: 90rem;
 
 	/* Display properties for visible dialog*/
 	border:solid 1px #999;
@@ -50,6 +52,8 @@
 	animation-name:zoomIn;
 	animation-duration:150ms;
 	animation-timing-function: ease;
+
+	text-wrap: wrap;
 }
 
 #modal.closing {
