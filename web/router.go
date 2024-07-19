@@ -32,6 +32,8 @@ func NewNewWebRouter() *http.ServeMux {
 
 	// Serve static files from the "static" directory.
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("web/static"))))
+
+	go services.Workflower()
 	return mux
 }
 
