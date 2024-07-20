@@ -7,6 +7,7 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
+	"os"
 	"reflect"
 )
 
@@ -61,12 +62,15 @@ func ld_ld_sync(bytes []byte) error {
 		return err
 	}
 
-	if jsonBody["LeadStatus"] == "Referred Out" && jsonBody["LeadSubstatus"] == "Pending Review" && jsonBody["LeadReferredTo"] == "The Capital Law Firm" {
-		// There should be more error handling so that when an error is raised we should try to send the request later, right now
-		// these messages are also offset
-		sendLeadToClf(jsonBody)
+	if jsonBody["LeadStatus"] == "Referred Out" &&
+		jsonBody["LeadSubstatus"] == "Pending Review" &&
+		jsonBody["LeadReferredTo"] == "The Capital Law Firm" {
+		err := sendLeadToClf(jsonBody)
+		if err != nil {
+			slog.Error("Error occurred while sending lead to CLF", "error", err)
+			return err
+		}
 	}
-
 	return nil
 }
 
@@ -90,7 +94,7 @@ func GetOrDefaultInt(m map[string]int, key string, defaultInt int) int {
 
 func sendLeadToClf(jsonBody map[string]interface{}) error {
 	defaultStr := ""
-	sinkUrl := "http://localhost:5000"
+	sinkUrl := os.Getenv("SINK_URL")
 	// sinkUrl := configuration.SINK_URL
 
 	leadCaseTypeStr := GetOrDefaultString(jsonBody, "LeadCaseType", "")
