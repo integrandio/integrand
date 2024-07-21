@@ -3,7 +3,7 @@
 curl --header "Content-Type: application/json" \
   --request POST \
   --data '{"username":"hello said","password":"this is a super long string where another thing is going to happen"}' \
-  'http://localhost:8000/api/v1/connector/f/myEndpoint?apikey=rZHLiUMb
+  'http://localhost:8000/api/v1/connector/f/my?apikey=ByAXhsNb
 
 // Connector API
 // Get all Glue handler
