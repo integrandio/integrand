@@ -10,6 +10,7 @@ type Workflow struct {
 	TopicName    string
 	Offset       int
 	FunctionName string
+	Enabled      bool
 }
 
 type funcMap map[string]interface{}
@@ -33,7 +34,6 @@ func (workflow Workflow) Call(params ...interface{}) (result interface{}, err er
 	for k, param := range params {
 		in[k] = reflect.ValueOf(param)
 	}
-	// var res []reflect.Value
 	res := f.Call(in)
 	result = res[0].Interface()
 	return
