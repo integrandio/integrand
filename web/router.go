@@ -59,22 +59,20 @@ func sessionAuthenticateOrRedirect(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func internalServerError(w http.ResponseWriter) {
-	resBytes, _ := generateErrorMessage("internal server error")
-	w.WriteHeader(http.StatusInternalServerError)
-	w.Write(resBytes)
-}
-
-func notFoundApiError(w http.ResponseWriter) {
-	c := map[string]interface{}{"api": "not found"}
-	resBytes, _ := generateFailMessage(c)
-	w.WriteHeader(http.StatusNotFound)
-	w.Write(resBytes)
-}
-
 func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 	(*w).Header().Set("Access-Control-Expose-Headers", "Content-Type")
+}
+
+func apiMessageResponse(w http.ResponseWriter, errorCode int, message string) {
+	body := map[string]string{
+		"message": message,
+	}
+	// This should never error...
+	bodyBytes, _ := json.Marshal(body)
+
+	w.WriteHeader(errorCode)
+	w.Write(bodyBytes)
 }
 
 // Apis will be formatted using the "jsend" spec
@@ -89,32 +87,6 @@ func generateSuccessMessage(data interface{}) ([]byte, error) {
 	res := apiResponse{
 		Status: "success",
 		Data:   data,
-	}
-	resBytes, err := json.Marshal(res)
-	if err != nil {
-		log.Println(err)
-		return resBytes, err
-	}
-	return resBytes, nil
-}
-
-func generateFailMessage(data interface{}) ([]byte, error) {
-	res := apiResponse{
-		Status: "fail",
-		Data:   data,
-	}
-	resBytes, err := json.Marshal(res)
-	if err != nil {
-		log.Println(err)
-		return resBytes, err
-	}
-	return resBytes, nil
-}
-
-func generateErrorMessage(message string) ([]byte, error) {
-	res := apiResponse{
-		Status:  "error",
-		Message: message,
 	}
 	resBytes, err := json.Marshal(res)
 	if err != nil {

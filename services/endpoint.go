@@ -26,7 +26,7 @@ func GetEndpoints(userId int) ([]persistence.Endpoint, error) {
 	return persistence.DATASTORE.GetAllEndpoints(userId)
 }
 
-func GetEndpoint(userId int, EndpointID string) (persistence.Endpoint, error) {
+func GetEndpoint(EndpointID string, userId int) (persistence.Endpoint, error) {
 	return persistence.DATASTORE.GetEndpointByUser(EndpointID, userId)
 }
 

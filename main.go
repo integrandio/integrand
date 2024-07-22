@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"integrand/persistence"
-	"integrand/services"
 	"integrand/utils"
 	"integrand/web"
 	"log"
@@ -24,7 +23,7 @@ func main() {
 	persistence.Initialize()
 
 	// Enable our Workflower
-	go services.Workflower()
+	//go services.Workflower()
 
 	router := web.NewNewWebRouter()
 	port := ":8000"

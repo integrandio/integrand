@@ -16,7 +16,6 @@ var (
 	topicSingleApi  = regexp.MustCompile(`^\/api/v1/topic\/(.*)$`)
 	topicEventsApi  = regexp.MustCompile(`^\/api/v1/topic\/(.*)\/events$`)
 	topicConsumeApi = regexp.MustCompile(`^\/api/v1/topic\/(.*)\/consume$`)
-	//topicProduceApi = regexp.MustCompile(`^\/api/v1/topic\/(.*)\/produce$`)
 )
 
 type topicAPI struct {
@@ -27,7 +26,7 @@ func (ea *topicAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	userId, err := apiBrowserAPIAuthenticate(w, r)
 	if err != nil {
 		slog.Error(err.Error())
-		notFoundApiError(w)
+		apiMessageResponse(w, http.StatusUnauthorized, "Authentication needed")
 		return
 	}
 	ea.userID = userId
@@ -35,8 +34,10 @@ func (ea *topicAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	//Order matters....(Since this regex is a subset of the other)
 	case r.Method == http.MethodGet && topicConsumeApi.MatchString(r.URL.Path):
 		ea.streamEvents(w, r)
+		return
 	default:
 		ea.eventRestHandler(w, r)
+		return
 	}
 }
 
@@ -58,7 +59,7 @@ func (ea *topicAPI) eventRestHandler(w http.ResponseWriter, r *http.Request) {
 		ea.deleteTopic(w, r)
 		return
 	default:
-		notFoundApiError(w)
+		apiMessageResponse(w, http.StatusNotFound, "not found")
 		return
 	}
 }
@@ -67,12 +68,12 @@ func (ta *topicAPI) getTopics(w http.ResponseWriter, _ *http.Request) {
 	eventStreams, err := services.GetEventStreams(ta.userID)
 	if err != nil {
 		slog.Error(err.Error())
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	resJsonBytes, err := generateSuccessMessage(eventStreams)
 	if err != nil {
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -82,18 +83,18 @@ func (ta *topicAPI) getTopics(w http.ResponseWriter, _ *http.Request) {
 func (ta *topicAPI) getTopic(w http.ResponseWriter, r *http.Request) {
 	matches := topicSingleApi.FindStringSubmatch(r.URL.Path)
 	if len(matches) < 2 {
-		notFoundApiError(w)
+		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
 	eventStream, err := services.GetEventStream(matches[1])
 	if err != nil {
 		slog.Error(err.Error())
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	resJsonBytes, err := generateSuccessMessage(eventStream)
 	if err != nil {
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -108,13 +109,13 @@ func (ta *topicAPI) createTopic(w http.ResponseWriter, r *http.Request) {
 	var createBody CreateTopicBody
 	if err := json.NewDecoder(r.Body).Decode(&createBody); err != nil {
 		slog.Error(err.Error())
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	topic, err := services.CreateEventStream(createBody.TopicName)
 	if err != nil {
 		slog.Error(err.Error())
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -125,14 +126,14 @@ func (ta *topicAPI) createTopic(w http.ResponseWriter, r *http.Request) {
 func (ta *topicAPI) deleteTopic(w http.ResponseWriter, r *http.Request) {
 	matches := topicSingleApi.FindStringSubmatch(r.URL.Path)
 	if len(matches) < 2 {
-		notFoundApiError(w)
+		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
 	topicName := matches[1]
 	err := services.DeleteEventStream(topicName, ta.userID)
 	if err != nil {
 		slog.Error(err.Error())
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -172,7 +173,7 @@ func (ta *topicAPI) getEvents(w http.ResponseWriter, r *http.Request) {
 	eventStream, err := services.GetEventStream(matches[1])
 	if err != nil {
 		slog.Error(err.Error())
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 
@@ -211,7 +212,7 @@ func (ta *topicAPI) streamEvents(w http.ResponseWriter, r *http.Request) {
 	acceptType := r.Header.Get("Accept")
 	if acceptType != "text/event-stream" {
 		slog.Error("invalid accept type")
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusBadRequest, "internal server error")
 		return
 	}
 	offset := 0
@@ -231,14 +232,14 @@ func (ta *topicAPI) streamEvents(w http.ResponseWriter, r *http.Request) {
 	eventStream, err := services.GetEventStream(matches[1])
 	if err != nil {
 		slog.Error(err.Error())
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 
 	flusher, ok := w.(http.Flusher)
 	if !ok {
 		slog.Error("SSE is not avaliable....")
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	w.Header().Set("Content-Type", "text/event-stream")

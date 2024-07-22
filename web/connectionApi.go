@@ -33,7 +33,7 @@ func (ga *glueAPI) apier(w http.ResponseWriter, r *http.Request) {
 	userId, err := apiBrowserAPIAuthenticate(w, r)
 	if err != nil {
 		slog.Error(err.Error())
-		notFoundApiError(w)
+		apiMessageResponse(w, http.StatusUnauthorized, "Authentication needed")
 		return
 	}
 	ga.userID = userId
@@ -53,7 +53,7 @@ func (ga *glueAPI) apier(w http.ResponseWriter, r *http.Request) {
 		ga.deleteGlueHandler(w, r)
 		return
 	default:
-		notFoundApiError(w)
+		apiMessageResponse(w, http.StatusNotFound, "not found")
 		return
 	}
 }
@@ -63,14 +63,14 @@ func (ga *glueAPI) endpointHandler(w http.ResponseWriter, r *http.Request) {
 	// Check the content type header and parse appropriately
 	matches := glueEndpointSingleApi.FindStringSubmatch(r.URL.Path)
 	if len(matches) < 2 {
-		notFoundApiError(w)
+		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
 	// Check if we hit the rights one....
 	sticky, err := services.GetEndpointBySecurityKey(matches[1], security_key)
 	if err != nil {
 		slog.Error(err.Error())
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
 	var i interface{}
@@ -79,62 +79,50 @@ func (ga *glueAPI) endpointHandler(w http.ResponseWriter, r *http.Request) {
 	err = json.NewDecoder(r.Body).Decode(&i)
 	if err != nil {
 		slog.Error(err.Error())
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	err = services.MessageToSink(sticky.TopicName, sticky.UserId, i)
 	if err != nil {
 		slog.Error(err.Error())
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
-	c := map[string]interface{}{"msg": "message sent successfully"}
-	resJsonBytes, err := generateSuccessMessage(c)
+	apiMessageResponse(w, http.StatusOK, "message sent successfully")
+}
+
+func (ga *glueAPI) getAllGlueHandlers(w http.ResponseWriter, _ *http.Request) {
+	endpoints, err := services.GetEndpoints(ga.userID)
 	if err != nil {
-		internalServerError(w)
+		slog.Error(err.Error())
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
+		return
+	}
+	resJsonBytes, err := generateSuccessMessage(endpoints)
+	if err != nil {
+		slog.Error(err.Error())
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Write(resJsonBytes)
 }
 
-func (ga *glueAPI) getAllGlueHandlers(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodGet:
-		stickey_connections, err := services.GetEndpoints(ga.userID)
-		if err != nil {
-			slog.Error(err.Error())
-			internalServerError(w)
-			return
-		}
-		resJsonBytes, err := generateSuccessMessage(stickey_connections)
-		if err != nil {
-			slog.Error(err.Error())
-			internalServerError(w)
-			return
-		}
-		w.WriteHeader(http.StatusOK)
-		w.Write(resJsonBytes)
-	default:
-		notFoundApiError(w)
-	}
-}
-
 func (ga *glueAPI) getGlueHandler(w http.ResponseWriter, r *http.Request) {
 	matches := glueSingleApi.FindStringSubmatch(r.URL.Path)
 	if len(matches) < 2 {
-		notFoundApiError(w)
+		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	stickyConnection, err := services.GetEndpoint(ga.userID, matches[1])
+	stickyConnection, err := services.GetEndpoint(matches[1], ga.userID)
 	if err != nil {
 		slog.Error(err.Error())
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	resJsonBytes, err := generateSuccessMessage(stickyConnection)
 	if err != nil {
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -150,18 +138,18 @@ func (ga *glueAPI) createGlueHandler(w http.ResponseWriter, r *http.Request) {
 	var createBody CreateGlueBody
 	if err := json.NewDecoder(r.Body).Decode(&createBody); err != nil {
 		slog.Error(err.Error())
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	stickyConnection, err := services.CreateEndpoint(ga.userID, createBody.RouteID, createBody.TopicName)
 	if err != nil {
 		slog.Error(err.Error())
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	resJsonBytes, err := generateSuccessMessage(stickyConnection)
 	if err != nil {
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -169,28 +157,23 @@ func (ga *glueAPI) createGlueHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ga *glueAPI) deleteGlueHandler(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodDelete:
-		matches := glueSingleApi.FindStringSubmatch(r.URL.Path)
-		if len(matches) < 2 {
-			notFoundApiError(w)
-			return
-		}
-		_, err := services.RemoveEndpoint(ga.userID, matches[1])
-		if err != nil {
-			slog.Error(err.Error())
-			internalServerError(w)
-			return
-		}
-		c := map[string]interface{}{"msg": "successfully deleted glue handler"}
-		resJsonBytes, err := generateSuccessMessage(c)
-		if err != nil {
-			internalServerError(w)
-			return
-		}
-		w.WriteHeader(http.StatusOK)
-		w.Write(resJsonBytes)
-	default:
-		notFoundApiError(w)
+	matches := glueSingleApi.FindStringSubmatch(r.URL.Path)
+	if len(matches) < 2 {
+		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
+		return
 	}
+	_, err := services.RemoveEndpoint(ga.userID, matches[1])
+	if err != nil {
+		slog.Error(err.Error())
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
+		return
+	}
+	c := map[string]interface{}{"msg": "successfully deleted glue handler"}
+	resJsonBytes, err := generateSuccessMessage(c)
+	if err != nil {
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(resJsonBytes)
 }

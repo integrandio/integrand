@@ -146,7 +146,7 @@ class TestMessages():
         createResponse = integrand.CreateConnector(id, topicName)
         data = {'hello': 'world'}
         res = integrand.EndpointRequest(id, createResponse['data']['securityKey'], data)
-        assert res['status'] == 'success'
+        assert res['message'] == 'message sent successfully'
         response = integrand.GetEventsFromTopic(topicName, 0, 1)
         print(response)
         assert len(response['data']) == 1
@@ -166,7 +166,7 @@ class TestMessages():
             messages.append({'key'+ str(i): 'value'+ str(i)})
         for msg in messages:
             res = integrand.EndpointRequest(id, createResponse['data']['securityKey'], msg)
-            assert res['status'] == 'success'
+            assert res['message'] == 'message sent successfully'
         response = integrand.GetEventsFromTopic(topicName, 0, 5)
         assert len(response['data']) == len(messages)
         for ind, data in enumerate(messages):
