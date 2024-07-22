@@ -51,7 +51,7 @@ func LoginPage(w http.ResponseWriter, r *http.Request) {
 		}
 		tmpl.Execute(w, nil)
 	default:
-		notFoundApiError(w)
+		apiMessageResponse(w, http.StatusNotFound, "not found")
 	}
 }
 
@@ -62,14 +62,14 @@ func applicationPage(w http.ResponseWriter, r *http.Request) {
 		fileContents, err := os.ReadFile("web/templates/baseApp.html")
 		if err != nil {
 			slog.Error(err.Error())
-			internalServerError(w)
+			apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 			return
 		}
 		templateString := strings.Replace(string(fileContents), "#replace_me#", "{{ template \"application.html\" }}", 1)
 		tmpl, err := template.New("myTemplate").Parse(templateString)
 		if err != nil {
 			slog.Error(err.Error())
-			internalServerError(w)
+			apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 			return
 		}
 		_, err = tmpl.ParseFiles(
@@ -78,16 +78,16 @@ func applicationPage(w http.ResponseWriter, r *http.Request) {
 		)
 		if err != nil {
 			slog.Error(err.Error())
-			internalServerError(w)
+			apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 			return
 		}
 		err = tmpl.Execute(w, nil)
 		if err != nil {
 			log.Println(err)
-			internalServerError(w)
+			apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 			return
 		}
 	default:
-		notFoundApiError(w)
+		apiMessageResponse(w, http.StatusNotFound, "not found")
 	}
 }

@@ -146,7 +146,7 @@ class TestMessages():
         createResponse = integrand.CreateConnector(id, topicName)
         data = {'hello': 'world'}
         res = integrand.EndpointRequest(id, createResponse['data']['securityKey'], data)
-        assert res['status'] == 'success'
+        assert res['message'] == 'message sent successfully'
         response = integrand.GetEventsFromTopic(topicName, 0, 1)
         print(response)
         assert len(response['data']) == 1
@@ -155,7 +155,7 @@ class TestMessages():
         integrand.DeleteConnector(id)
         integrand.DeleteTopic(topicName)
 
-    def test_send_multiple_messaged(self):
+    def test_send_multiple_messages(self):
         id = get_random_string(5)
         topicName = get_random_string(5)
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
@@ -166,7 +166,7 @@ class TestMessages():
             messages.append({'key'+ str(i): 'value'+ str(i)})
         for msg in messages:
             res = integrand.EndpointRequest(id, createResponse['data']['securityKey'], msg)
-            assert res['status'] == 'success'
+            assert res['message'] == 'message sent successfully'
         response = integrand.GetEventsFromTopic(topicName, 0, 5)
         assert len(response['data']) == len(messages)
         for ind, data in enumerate(messages):

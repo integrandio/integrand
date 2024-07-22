@@ -21,6 +21,10 @@ func main() {
 	// to change the flags on the default logger
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	persistence.Initialize()
+
+	// Enable our Workflower
+	//go services.Workflower()
+
 	router := web.NewNewWebRouter()
 	port := ":8000"
 	slog.Info(fmt.Sprintf("Server started on http//:localhost%s\n", port))

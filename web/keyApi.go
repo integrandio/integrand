@@ -22,19 +22,23 @@ func (ka *keyAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		slog.Error(err.Error())
 		// TODO: replace this with proper not authenticated response
-		notFoundApiError(w)
+		apiMessageResponse(w, http.StatusUnauthorized, "Authentication needed")
 		return
 	}
 	ka.userID = userID
 	switch {
 	case r.Method == http.MethodPost && keyAllApi.MatchString(r.URL.Path):
 		ka.createApiKeyHandler(w, r)
+		return
 	case r.Method == http.MethodDelete && keySingleApi.MatchString(r.URL.Path):
 		ka.deleteApiKeyHandler(w, r)
+		return
 	case r.Method == http.MethodGet && keyAllApi.MatchString(r.URL.Path):
 		ka.listApiKeysHandler(w, r)
+		return
 	default:
-		notFoundApiError(w)
+		apiMessageResponse(w, http.StatusNotFound, "not found")
+		return
 	}
 }
 
@@ -42,12 +46,12 @@ func (ka *keyAPI) listApiKeysHandler(w http.ResponseWriter, _ *http.Request) {
 	apiKeys, err := services.ListAPIKeys(ka.userID)
 	if err != nil {
 		slog.Error(err.Error())
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	resJsonBytes, err := generateSuccessMessage(apiKeys)
 	if err != nil {
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -58,12 +62,12 @@ func (ka *keyAPI) createApiKeyHandler(w http.ResponseWriter, _ *http.Request) {
 	apiKey, err := services.CreateAPIKey(ka.userID)
 	if err != nil {
 		slog.Error(err.Error())
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	resJsonBytes, err := generateSuccessMessage(apiKey)
 	if err != nil {
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -73,16 +77,14 @@ func (ka *keyAPI) createApiKeyHandler(w http.ResponseWriter, _ *http.Request) {
 func (ka *keyAPI) deleteApiKeyHandler(w http.ResponseWriter, r *http.Request) {
 	matches := keySingleApi.FindStringSubmatch(r.URL.Path)
 	if len(matches) < 2 {
-		notFoundApiError(w)
+		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
 	apiKey := matches[1]
 	_, err := services.DeleteAPIKey(apiKey, ka.userID)
 	if err != nil {
-		internalServerError(w)
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
-	w.WriteHeader(http.StatusOK)
-	resJsonBytes, _ := generateSuccessMessage(map[string]string{"message": "API key deleted"})
-	w.Write(resJsonBytes)
+	apiMessageResponse(w, http.StatusOK, "API key deleted")
 }

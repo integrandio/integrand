@@ -11,10 +11,14 @@ const MULTIPLYER int = 2
 const MAX_BACKOFF int = 10
 
 func Workflower() error {
+	// Wait 5 seconds so we don't run into any race conditions
+	time.Sleep(5 * time.Second)
+
 	workflow := Workflow{
 		TopicName:    "test",
 		Offset:       0,
 		FunctionName: "ld_ld_sync",
+		Enabled:      true,
 	}
 
 	sleep_time := SLEEP_TIME
