@@ -155,7 +155,7 @@ class TestMessages():
         integrand.DeleteConnector(id)
         integrand.DeleteTopic(topicName)
 
-    def test_send_multiple_messaged(self):
+    def test_send_multiple_messages(self):
         id = get_random_string(5)
         topicName = get_random_string(5)
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)

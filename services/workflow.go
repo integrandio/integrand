@@ -95,7 +95,6 @@ func GetOrDefaultInt(m map[string]int, key string, defaultInt int) int {
 func sendLeadToClf(jsonBody map[string]interface{}) error {
 	defaultStr := ""
 	sinkUrl := os.Getenv("SINK_URL")
-	// sinkUrl := configuration.SINK_URL
 
 	leadCaseTypeStr := GetOrDefaultString(jsonBody, "LeadCaseType", "")
 
