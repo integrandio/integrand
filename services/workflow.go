@@ -18,6 +18,8 @@ var caseTypeMapping = map[string]int{
 	"Other":                        2,
 }
 
+var Workflows []Workflow
+
 type Workflow struct {
 	TopicName    string
 	Offset       int
@@ -33,6 +35,15 @@ func init() {
 	// Register all of our functions
 	FUNC_MAP = map[string]interface{}{
 		"ld_ld_sync": ld_ld_sync,
+	}
+
+	Workflows = []Workflow{
+		{
+			TopicName:    "test",
+			Offset:       0,
+			FunctionName: "ld_ld_sync",
+			Enabled:      true,
+		},
 	}
 }
 
