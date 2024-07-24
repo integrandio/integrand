@@ -18,6 +18,8 @@ var caseTypeMapping = map[string]int{
 	"Other":                        2,
 }
 
+var Workflows []Workflow
+
 type Workflow struct {
 	TopicName    string
 	Offset       int
