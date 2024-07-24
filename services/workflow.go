@@ -36,15 +36,6 @@ func init() {
 	FUNC_MAP = map[string]interface{}{
 		"ld_ld_sync": ld_ld_sync,
 	}
-
-	Workflows = []Workflow{
-		{
-			TopicName:    "test",
-			Offset:       0,
-			FunctionName: "ld_ld_sync",
-			Enabled:      true,
-		},
-	}
 }
 
 func (workflow Workflow) Call(params ...interface{}) (result interface{}, err error) {
