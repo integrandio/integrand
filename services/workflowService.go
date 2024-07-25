@@ -11,39 +11,30 @@ const SLEEP_TIME int = 1
 const MULTIPLYER int = 2
 const MAX_BACKOFF int = 10
 
-func init() {
-	// Creating first workflow through function
-	_, err := CreateWorkflow("test", "ld_ld_sync")
-	if err != nil {
-		slog.Error("Failed to create the first workflow", "error", err)
-		return
-	}
-}
-
 func Workflower() error {
 	// Wait 5 seconds so we don't run into any race conditions
 	time.Sleep(5 * time.Second)
 
-	workflow := Workflows[0]
-
 	sleep_time := SLEEP_TIME
 	for {
-		bytes, err := persistence.BROKER.ConsumeMessage(workflow.TopicName, workflow.Offset)
-		if err != nil {
-			if err.Error() == "offset out of bounds" {
-				slog.Warn(err.Error())
-				time.Sleep(time.Duration(sleep_time) * time.Second)
-				if sleep_time < MAX_BACKOFF {
-					sleep_time = sleep_time * MULTIPLYER
+		for _, workflow := range Workflows {
+			bytes, err := persistence.BROKER.ConsumeMessage(workflow.TopicName, workflow.Offset)
+			if err != nil {
+				if err.Error() == "offset out of bounds" {
+					slog.Warn(err.Error())
+					time.Sleep(time.Duration(sleep_time) * time.Second)
+					if sleep_time < MAX_BACKOFF {
+						sleep_time = sleep_time * MULTIPLYER
+					}
+					continue
+				} else {
+					return err
 				}
-				continue
-			} else {
-				return err
 			}
+			workflow.Call(bytes)
+			workflow.Offset++
+			sleep_time = 1
 		}
-		workflow.Call(bytes)
-		workflow.Offset++
-		sleep_time = 1
 	}
 }
 
