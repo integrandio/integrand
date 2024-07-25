@@ -61,14 +61,14 @@ func DeleteWorkflow(topicName string) error {
 	return errors.New("workflow not found")
 }
 
-func UpdateWorkflow(topicName string) error {
+func UpdateWorkflow(topicName string) (*Workflow, error) {
 	for i, workflow := range Workflows {
 		if workflow.TopicName == topicName {
 			Workflows[i].Enabled = !Workflows[i].Enabled
-			return nil
+			return &Workflows[i], nil
 		}
 	}
-	return errors.New("workflow not found")
+	return nil, errors.New("workflow not found")
 }
 
 func GetWorkflow(topicName string) (*Workflow, error) {
@@ -81,6 +81,13 @@ func GetWorkflow(topicName string) (*Workflow, error) {
 }
 
 func CreateWorkflow(topicName string, functionName string) (*Workflow, error) {
+	// We also should check if function exists in our function map
+	_, ok := FUNC_MAP[functionName]
+	if !ok {
+		slog.Error("function not found")
+		return nil, errors.New("workflow with this functionName: " + functionName + " cannot be created")
+	}
+
 	for _, workflow := range Workflows {
 		if workflow.TopicName == topicName {
 			return nil, errors.New("workflow with this topicName already exists")
