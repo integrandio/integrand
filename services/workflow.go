@@ -54,8 +54,6 @@ func (workflow Workflow) Call(params ...interface{}) (result interface{}, err er
 }
 
 func ld_ld_sync(bytes []byte) error {
-	log.Println("Executing")
-
 	// Unmarshal the JSON byte array into the map
 	var jsonBody map[string]interface{}
 	err := json.Unmarshal(bytes, &jsonBody)
