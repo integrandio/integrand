@@ -7,7 +7,6 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
-	"os"
 	"reflect"
 )
 
@@ -21,10 +20,12 @@ var caseTypeMapping = map[string]int{
 var Workflows []Workflow
 
 type Workflow struct {
-	TopicName    string
-	Offset       int
-	FunctionName string
-	Enabled      bool
+	Id           uint32 `json:"id"`
+	TopicName    string `json:"topicName"`
+	Offset       int    `json:"offset"`
+	FunctionName string `json:"functionName"`
+	Enabled      bool   `json:"enabled"`
+	SinkURL      string `json:"sinkURL"`
 }
 
 type funcMap map[string]interface{}
@@ -53,7 +54,7 @@ func (workflow Workflow) Call(params ...interface{}) (result interface{}, err er
 	return
 }
 
-func ld_ld_sync(bytes []byte) error {
+func ld_ld_sync(bytes []byte, sinkURL string) error {
 	// Unmarshal the JSON byte array into the map
 	var jsonBody map[string]interface{}
 	err := json.Unmarshal(bytes, &jsonBody)
@@ -65,7 +66,7 @@ func ld_ld_sync(bytes []byte) error {
 	if jsonBody["LeadStatus"] == "Referred Out" &&
 		jsonBody["LeadSubstatus"] == "Pending Review" &&
 		jsonBody["LeadReferredTo"] == "The Capital Law Firm" {
-		err := sendLeadToClf(jsonBody)
+		err := sendLeadToClf(jsonBody, sinkURL)
 		if err != nil {
 			slog.Error("Error occurred while sending lead to CLF", "error", err)
 			return err
@@ -92,9 +93,8 @@ func GetOrDefaultInt(m map[string]int, key string, defaultInt int) int {
 	return defaultInt
 }
 
-func sendLeadToClf(jsonBody map[string]interface{}) error {
+func sendLeadToClf(jsonBody map[string]interface{}, sinkURL string) error {
 	defaultStr := ""
-	sinkUrl := os.Getenv("SINK_URL")
 
 	leadCaseTypeStr := GetOrDefaultString(jsonBody, "LeadCaseType", "")
 
@@ -114,7 +114,7 @@ func sendLeadToClf(jsonBody map[string]interface{}) error {
 		return err
 	}
 
-	resp, err := http.Post(sinkUrl, "application/json", bytes.NewBuffer(jsonBodyBytes))
+	resp, err := http.Post(sinkURL, "application/json", bytes.NewBuffer(jsonBodyBytes))
 	if err != nil {
 		slog.Error(err.Error())
 		return err

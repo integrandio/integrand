@@ -5,7 +5,9 @@ import (
 	"integrand/services"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"regexp"
+	"strconv"
 )
 
 var (
@@ -14,7 +16,7 @@ var (
 )
 
 type workflowAPI struct {
-	topic string
+	id uint32
 }
 
 func (wf *workflowAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +70,12 @@ func (wf *workflowAPI) getWorkflow(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	workflow, err := services.GetWorkflow(matches[1])
+	id, err := strconv.ParseUint(matches[1], 10, 32)
+	if err != nil {
+		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
+		return
+	}
+	workflow, err := services.GetWorkflow(uint32(id))
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -86,6 +93,7 @@ func (wf *workflowAPI) getWorkflow(w http.ResponseWriter, r *http.Request) {
 type CreateWorkflowBody struct {
 	TopicName    string `json:"topicName"`
 	FunctionName string `json:"functionName"`
+	SinkURL      string `json:"sinkURL"`
 }
 
 func (wf *workflowAPI) createWorkflow(w http.ResponseWriter, r *http.Request) {
@@ -95,7 +103,13 @@ func (wf *workflowAPI) createWorkflow(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
-	workflow, err := services.CreateWorkflow(createBody.TopicName, createBody.FunctionName)
+	parsedURL, err := url.ParseRequestURI(createBody.SinkURL)
+	if err != nil || parsedURL.Scheme == "" || parsedURL.Host == "" {
+		slog.Error("invalid url")
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
+		return
+	}
+	workflow, err := services.CreateWorkflow(createBody.TopicName, createBody.FunctionName, createBody.SinkURL)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -116,7 +130,12 @@ func (wf *workflowAPI) updateWorkflow(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	workflow, err := services.UpdateWorkflow(matches[1])
+	id, err := strconv.ParseUint(matches[1], 10, 32)
+	if err != nil {
+		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
+		return
+	}
+	workflow, err := services.UpdateWorkflow(uint32(id))
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -137,7 +156,12 @@ func (wf *workflowAPI) deleteWorkflow(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	err := services.DeleteWorkflow(matches[1])
+	id, err := strconv.ParseUint(matches[1], 10, 32)
+	if err != nil {
+		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
+		return
+	}
+	err = services.DeleteWorkflow(uint32(id))
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")

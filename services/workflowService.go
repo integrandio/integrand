@@ -4,6 +4,7 @@ import (
 	"errors"
 	"integrand/persistence"
 	"log/slog"
+	"math/rand"
 	"time"
 )
 
@@ -17,7 +18,7 @@ func Workflower() error {
 
 	sleep_time := SLEEP_TIME
 	for {
-		for _, workflow := range Workflows {
+		for i, workflow := range Workflows {
 			bytes, err := persistence.BROKER.ConsumeMessage(workflow.TopicName, workflow.Offset)
 			if err != nil {
 				if err.Error() == "offset out of bounds" {
@@ -28,11 +29,12 @@ func Workflower() error {
 					}
 					continue
 				} else {
+					slog.Warn("Why")
 					return err
 				}
 			}
-			workflow.Call(bytes)
-			workflow.Offset++
+			workflow.Call(bytes, workflow.SinkURL)
+			Workflows[i].Offset++
 			sleep_time = 1
 		}
 	}
@@ -42,9 +44,9 @@ func GetWorkflows() ([]Workflow, error) {
 	return Workflows, nil
 }
 
-func DeleteWorkflow(topicName string) error {
+func DeleteWorkflow(id uint32) error {
 	for i, workflow := range Workflows {
-		if workflow.TopicName == topicName {
+		if workflow.Id == id {
 			Workflows = append(Workflows[:i], Workflows[i+1:]...)
 			return nil
 		}
@@ -52,9 +54,9 @@ func DeleteWorkflow(topicName string) error {
 	return errors.New("workflow not found")
 }
 
-func UpdateWorkflow(topicName string) (*Workflow, error) {
+func UpdateWorkflow(id uint32) (*Workflow, error) {
 	for i, workflow := range Workflows {
-		if workflow.TopicName == topicName {
+		if workflow.Id == id {
 			Workflows[i].Enabled = !Workflows[i].Enabled
 			return &Workflows[i], nil
 		}
@@ -62,34 +64,29 @@ func UpdateWorkflow(topicName string) (*Workflow, error) {
 	return nil, errors.New("workflow not found")
 }
 
-func GetWorkflow(topicName string) (*Workflow, error) {
+func GetWorkflow(id uint32) (*Workflow, error) {
 	for _, workflow := range Workflows {
-		if workflow.TopicName == topicName {
+		if workflow.Id == id {
 			return &workflow, nil
 		}
 	}
 	return nil, errors.New("workflow not found")
 }
 
-func CreateWorkflow(topicName string, functionName string) (*Workflow, error) {
-	// We also should check if function exists in our function map
+func CreateWorkflow(topicName string, functionName string, sinkURL string) (*Workflow, error) {
 	_, ok := FUNC_MAP[functionName]
 	if !ok {
 		slog.Error("function not found")
 		return nil, errors.New("workflow with this functionName: " + functionName + " cannot be created")
 	}
 
-	for _, workflow := range Workflows {
-		if workflow.TopicName == topicName {
-			return nil, errors.New("workflow with this topicName already exists")
-		}
-	}
-
 	newWorkflow := Workflow{
+		Id:           rand.Uint32(),
 		TopicName:    topicName,
 		Offset:       0,
 		FunctionName: functionName,
 		Enabled:      true,
+		SinkURL:      sinkURL,
 	}
 
 	Workflows = append(Workflows, newWorkflow)
