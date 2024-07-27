@@ -20,7 +20,7 @@ var caseTypeMapping = map[string]int{
 var Workflows []Workflow
 
 type Workflow struct {
-	Id           uint32 `json:"id"`
+	Id           int    `json:"id"`
 	TopicName    string `json:"topicName"`
 	Offset       int    `json:"offset"`
 	FunctionName string `json:"functionName"`

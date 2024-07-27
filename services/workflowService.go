@@ -29,7 +29,6 @@ func Workflower() error {
 					}
 					continue
 				} else {
-					slog.Warn("Why")
 					return err
 				}
 			}
@@ -44,7 +43,7 @@ func GetWorkflows() ([]Workflow, error) {
 	return Workflows, nil
 }
 
-func DeleteWorkflow(id uint32) error {
+func DeleteWorkflow(id int) error {
 	for i, workflow := range Workflows {
 		if workflow.Id == id {
 			Workflows = append(Workflows[:i], Workflows[i+1:]...)
@@ -54,7 +53,7 @@ func DeleteWorkflow(id uint32) error {
 	return errors.New("workflow not found")
 }
 
-func UpdateWorkflow(id uint32) (*Workflow, error) {
+func UpdateWorkflow(id int) (*Workflow, error) {
 	for i, workflow := range Workflows {
 		if workflow.Id == id {
 			Workflows[i].Enabled = !Workflows[i].Enabled
@@ -64,7 +63,7 @@ func UpdateWorkflow(id uint32) (*Workflow, error) {
 	return nil, errors.New("workflow not found")
 }
 
-func GetWorkflow(id uint32) (*Workflow, error) {
+func GetWorkflow(id int) (*Workflow, error) {
 	for _, workflow := range Workflows {
 		if workflow.Id == id {
 			return &workflow, nil
@@ -79,11 +78,17 @@ func CreateWorkflow(topicName string, functionName string, sinkURL string) (*Wor
 		slog.Error("function not found")
 		return nil, errors.New("workflow with this functionName: " + functionName + " cannot be created")
 	}
+	// Get topic to use its offset for workflow creation
+	topic, err := persistence.BROKER.GetTopic(topicName)
+	if err != nil {
+		slog.Error("topic with topicName " + topicName + " not found")
+		return nil, errors.New("workflow with this functionName: " + functionName + " cannot be created")
+	}
 
 	newWorkflow := Workflow{
-		Id:           rand.Uint32(),
+		Id:           rand.Int(),
 		TopicName:    topicName,
-		Offset:       0,
+		Offset:       topic.OldestOffset,
 		FunctionName: functionName,
 		Enabled:      true,
 		SinkURL:      sinkURL,

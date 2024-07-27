@@ -16,7 +16,6 @@ var (
 )
 
 type workflowAPI struct {
-	id uint32
 }
 
 func (wf *workflowAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -70,12 +69,12 @@ func (wf *workflowAPI) getWorkflow(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	id, err := strconv.ParseUint(matches[1], 10, 32)
+	id, err := strconv.Atoi(matches[1])
 	if err != nil {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	workflow, err := services.GetWorkflow(uint32(id))
+	workflow, err := services.GetWorkflow(id)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -103,8 +102,8 @@ func (wf *workflowAPI) createWorkflow(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
-	parsedURL, err := url.ParseRequestURI(createBody.SinkURL)
-	if err != nil || parsedURL.Scheme == "" || parsedURL.Host == "" {
+	_, err := url.ParseRequestURI(createBody.SinkURL)
+	if err != nil {
 		slog.Error("invalid url")
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
@@ -130,12 +129,12 @@ func (wf *workflowAPI) updateWorkflow(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	id, err := strconv.ParseUint(matches[1], 10, 32)
+	id, err := strconv.Atoi(matches[1])
 	if err != nil {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	workflow, err := services.UpdateWorkflow(uint32(id))
+	workflow, err := services.UpdateWorkflow(id)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -156,12 +155,12 @@ func (wf *workflowAPI) deleteWorkflow(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	id, err := strconv.ParseUint(matches[1], 10, 32)
+	id, err := strconv.Atoi(matches[1])
 	if err != nil {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	err = services.DeleteWorkflow(uint32(id))
+	err = services.DeleteWorkflow(id)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
