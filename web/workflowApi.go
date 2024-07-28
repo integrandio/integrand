@@ -13,9 +13,7 @@ var (
 	workflowSingleApi = regexp.MustCompile(`^\/api/v1/workflow\/(.*)$`)
 )
 
-type workflowAPI struct {
-	topic string
-}
+type workflowAPI struct{}
 
 func (wf *workflowAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	_, err := apiBrowserAPIAuthenticate(w, r)
