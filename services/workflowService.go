@@ -5,6 +5,7 @@ import (
 	"integrand/persistence"
 	"log/slog"
 	"math/rand"
+	"sync"
 	"time"
 )
 
@@ -12,38 +13,65 @@ const SLEEP_TIME int = 1
 const MULTIPLYER int = 2
 const MAX_BACKOFF int = 10
 
-func Workflower() error {
-	// Wait 5 seconds so we don't run into any race conditions
-	time.Sleep(5 * time.Second)
+var (
+	workflowMu sync.Mutex
+)
 
+func Workflower() error {
+	for {
+		workflowMu.Lock()
+		currentWorkflows := append([]Workflow(nil), Workflows...)
+		workflowMu.Unlock()
+
+		var wg sync.WaitGroup
+		for _, workflow := range currentWorkflows {
+			wg.Add(1)
+			go processWorkflow(&wg, workflow)
+		}
+		wg.Wait()
+
+	}
+}
+
+func processWorkflow(wg *sync.WaitGroup, workflow Workflow) {
+	defer wg.Done()
 	sleep_time := SLEEP_TIME
 	for {
-		for i, workflow := range Workflows {
-			bytes, err := persistence.BROKER.ConsumeMessage(workflow.TopicName, workflow.Offset)
-			if err != nil {
-				if err.Error() == "offset out of bounds" {
-					slog.Warn(err.Error())
-					time.Sleep(time.Duration(sleep_time) * time.Second)
-					if sleep_time < MAX_BACKOFF {
-						sleep_time = sleep_time * MULTIPLYER
-					}
-					continue
-				} else {
-					return err
-				}
-			}
-			workflow.Call(bytes, workflow.SinkURL)
-			Workflows[i].Offset++
-			sleep_time = 1
+		if !workflow.Enabled {
+			return
 		}
+
+		bytes, err := persistence.BROKER.ConsumeMessage(workflow.TopicName, workflow.Offset)
+		if err != nil {
+			if err.Error() == "offset out of bounds" {
+				slog.Warn(err.Error())
+				time.Sleep(time.Duration(sleep_time) * time.Second)
+				return // Exit the function, to be re-checked in the next cycle
+			} else if err.Error() == "offset does not exist" {
+				// I think this means no message in given topic?
+				slog.Warn(err.Error())
+				time.Sleep(time.Duration(sleep_time) * time.Second)
+				return // Exit the function, to be re-checked in the next cycle
+			} else {
+				slog.Warn(err.Error())
+				return // Something's wrong
+			}
+		}
+		workflow.Call(bytes, workflow.SinkURL)
+		workflow.Offset++
+		sleep_time = SLEEP_TIME
 	}
 }
 
 func GetWorkflows() ([]Workflow, error) {
+	workflowMu.Lock()
+	defer workflowMu.Unlock()
 	return Workflows, nil
 }
 
 func DeleteWorkflow(id int) error {
+	workflowMu.Lock()
+	defer workflowMu.Unlock()
 	for i, workflow := range Workflows {
 		if workflow.Id == id {
 			Workflows = append(Workflows[:i], Workflows[i+1:]...)
@@ -54,6 +82,8 @@ func DeleteWorkflow(id int) error {
 }
 
 func UpdateWorkflow(id int) (*Workflow, error) {
+	workflowMu.Lock()
+	defer workflowMu.Unlock()
 	for i, workflow := range Workflows {
 		if workflow.Id == id {
 			Workflows[i].Enabled = !Workflows[i].Enabled
@@ -64,6 +94,8 @@ func UpdateWorkflow(id int) (*Workflow, error) {
 }
 
 func GetWorkflow(id int) (*Workflow, error) {
+	workflowMu.Lock()
+	defer workflowMu.Unlock()
 	for _, workflow := range Workflows {
 		if workflow.Id == id {
 			return &workflow, nil
@@ -94,6 +126,8 @@ func CreateWorkflow(topicName string, functionName string, sinkURL string) (*Wor
 		SinkURL:      sinkURL,
 	}
 
+	workflowMu.Lock()
 	Workflows = append(Workflows, newWorkflow)
+	workflowMu.Unlock()
 	return &newWorkflow, nil
 }
