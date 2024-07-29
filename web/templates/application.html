@@ -1,30 +1,42 @@
 <wc-router>
   <wc-route path="/" title="App Home" component="wc-home"></wc-route>
   <wc-route
-      path="/connectors"
-      title="All Connectors"
-      component="connectors-home"
+    path="/endpoints"
+    title="All Endpoints"
+    component="endpoints-home"
   ></wc-route>
   <wc-route
-      path="/connectors/:endpoint_id"
-      title="Endpoint"
-      component="wc-endpoint"
+    path="/endpoints/:endpoint_id"
+    title="Endpoint"
+    component="wc-endpoint"
   ></wc-route>
 
   <wc-route
-      path="/topics"
-      title="All Topics"
-      component="topics-home"
+    path="/topics"
+    title="All Topics"
+    component="topics-home"
   ></wc-route>
   <wc-route
-      path="/topics/:topic_id"
-      title="Topic"
-      component="wc-topic"
+    path="/topics/:topic_id"
+    title="Topic"
+    component="wc-topic"
+  ></wc-route>
+
+  <wc-route
+    path="/workflows"
+    title="All Workflows"
+    component="workflows-home"
   ></wc-route>
   <wc-route
-      path="/api-keys"
-      title="All API Keys"
-      component="apikeys-home"
+    path="/workflows/:workflow_id"
+    title="Workflow"
+    component="wc-workflow"
+  ></wc-route>
+
+  <wc-route
+    path="/api-keys"
+    title="All API Keys"
+    component="apikeys-home"
   ></wc-route>
 
   <wc-route path="*" title="404" component="wc-notfound"></wc-route>
