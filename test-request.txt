@@ -64,3 +64,36 @@ curl --header "Accept:text/event-stream" \
   --header "Authorization: Bearer 11111" \
   --request GET -N  \
   http://localhost:8000/api/v1/topic/here/consume
+
+
+// Workflow API
+// Get all workflows
+curl --header "Content-Type: application/json" \
+  --header "Authorization: Bearer 11111" \
+  --request GET \
+  http://localhost:8000/api/v1/workflow
+
+// Create workflow
+curl --header "Content-Type: application/json" \
+  --header "Authorization: Bearer 11111" \
+  --request POST \
+  --data '{"topicName": "topicName", "functionName": "ld_ld_sync", "sinkURL": "http://localhost:8000/api/v1/connector/f/endpoint?apikey=key"}' \
+  http://localhost:8000/api/v1/workflow
+
+// Get a workflow
+curl --header "Content-Type: application/json" \
+  --header "Authorization: Bearer 11111" \
+  --request GET \
+  http://localhost:8000/api/v1/workflow/id
+
+// Update a workflow
+curl --header "Content-Type: application/json" \
+  --header "Authorization: Bearer 11111" \
+  --request PUT \
+  http://localhost:8000/api/v1/workflow/id
+
+// Delete a workflow
+curl --header "Content-Type: application/json" \
+  --header "Authorization: Bearer 11111" \
+  --request DELETE \
+  http://localhost:8000/api/v1/workflow/id
