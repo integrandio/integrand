@@ -3,7 +3,7 @@ import { fromHTML } from '../../../utils.js'
 const jobTemplate = document.createElement("template")
 jobTemplate.innerHTML = `
 <link rel="stylesheet" type="text/css" href="/static/reset.css">
-<link rel="stylesheet" type="text/css" href="/static/webcomponents/pages/connectors/endpoint/endpoint.css">
+<link rel="stylesheet" type="text/css" href="/static/webcomponents/pages/endpoints/endpoint/endpoint.css">
 `
 
 class EndpointPage extends HTMLElement {

@@ -10,12 +10,12 @@ class WorkflowPage extends HTMLElement {
     constructor(){
         super()
         this.shawdow = this.attachShadow({mode: "open"})
-        this.endpoint_id = this.getAttribute("endpoint_id")
+        this.workflow_id = this.getAttribute("workflow_id")
         this.shawdow.append(jobTemplate.content.cloneNode(true))
     }
 
-    deleteConnectorAction() {
-        const url = `/api/v1/connector/${this.endpoint_id}`
+    deleteWorkflowAction() {
+        const url = `/api/v1/workflow/${this.workflow_id}`
         fetch(url, {
             method: "Delete",
             headers: {"Content-Type": "application/json",}
@@ -23,40 +23,42 @@ class WorkflowPage extends HTMLElement {
             // Check response to see if it's bad
             res.json().then((endpointResponseData) => {
                 console.log(endpointResponseData)
-                window.location.replace("/connectors");
+                window.location.replace("/workflows");
             });
         })
     }
 
-    generateMarkup(endpoint) {
-        const endpoint_link = `/api/v1/connector/f/${endpoint.id}?apikey=${endpoint.securityKey}`;
-        const topic_link = `/topics/${endpoint.topicName}`
-        var date = new Date(endpoint.lastModified);
-        let job_markup = `
+    generateMarkup(workflow) {
+        const topic_link = `/topics/${workflow.topicName}`
+        let workflow_markup = `
             <ul class="endpointContainerCard">
                 <li>
-                    <p class="titler">Connection Key:</p>
-                    <p>${endpoint.securityKey}</p>
+                    <p class="titler">Function Name:</p>
+                    <p>${workflow.functionName}</p>
+                </li>
+                <li>
+                    <p class="titler">Offset:</p>
+                    <p>${workflow.Offset}</p>
                 </li>
                 <li>
                     <p class="titler">Topic Name:</p>
                     <a class="link" href=${topic_link}>${endpoint.topicName}</a>
                 </li>
                 <li>
-                    <p class="titler">Last Modified:</p>
-                    <p>${date.toDateString()}</p>
+                    <p class="titler">Sink URL:</p>
+                    <p>${workflow.SinkURL}</p>
                 </li>
                 <li>
-                    <p class="titler">Endpoint URL:<p>
-                    <a class="link" href=${endpoint_link}>${endpoint_link}</a>
+                    <p class="titler">Enabled:</p>
+                    <p>${workflow.Enabled}</p>
                 </li>
             </ul>`
-        const div = fromHTML(job_markup);
+        const div = fromHTML(workflow_markup);
         return div;
     }
 
     async connectedCallback(){
-        const response = await fetch(`/api/v1/connector/${this.endpoint_id}`);
+        const response = await fetch(`/api/v1/workflow/${this.workflow_id}`);
         const jsonData = await response.json();
         let element = this.generateMarkup(jsonData.data)
         const contentTemplate = document.createElement("template")
@@ -64,9 +66,9 @@ class WorkflowPage extends HTMLElement {
 
         // Create the title and the delete button
         const pageTitleElement = document.createElement("wc-page-heading-button")
-        pageTitleElement.innerText = `Workflow ${this.endpoint_id}`;
+        pageTitleElement.innerText = `Workflow ${this.workflow_id}`;
         pageTitleElement.buttonText = 'Delete';
-        pageTitleElement.buttonFunction = this.deleteConnectorAction.bind(this);
+        pageTitleElement.buttonFunction = this.deleteWorkflowAction.bind(this);
         this.shawdow.append(pageTitleElement)
 
         this.shawdow.append(contentTemplate.content.cloneNode(true))

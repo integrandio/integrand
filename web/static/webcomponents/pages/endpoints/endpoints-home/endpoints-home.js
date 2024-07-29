@@ -3,10 +3,10 @@ import { fromHTML } from '../../../utils.js'
 const jobsHomeTemplate = document.createElement("template")
 jobsHomeTemplate.innerHTML = `
 <link rel="stylesheet" type="text/css" href="/static/reset.css">
-<link rel="stylesheet" type="text/css" href="/static/webcomponents/pages/connectors/connectors-home/connectors-home.css">
+<link rel="stylesheet" type="text/css" href="/static/webcomponents/pages/endpoints/endpoints-home/endpoints-home.css">
 `
 
-class ConnectorsHome extends HTMLElement {
+class EndpointsHome extends HTMLElement {
     constructor(){
         super()
         this.shawdow = this.attachShadow({mode: "open"})
@@ -67,7 +67,7 @@ class ConnectorsHome extends HTMLElement {
     };
     
     generateEndpointCard(endpoint) {
-        const endpoint_link = `/connectors/${endpoint.id}`
+        const endpoint_link = `/endpoints/${endpoint.id}`
         let endpoint_markup = `<div class="jobCard">
         <h1><span class="titler">ID:</span> ${endpoint.id}</h1>
         <h2><span class="titler">Security Key:</span> ${endpoint.securityKey}</h2>
@@ -93,8 +93,8 @@ class ConnectorsHome extends HTMLElement {
 
     async connectedCallback(){
         const pageTitleElement = document.createElement("wc-page-heading-button")
-        pageTitleElement.innerText = "All Connectors";
-        pageTitleElement.buttonText = 'New Connector';
+        pageTitleElement.innerText = "All Endpoints";
+        pageTitleElement.buttonText = 'New Endpoint';
         pageTitleElement.buttonFunction = this.newConnectionAction.bind(this);
         this.shawdow.appendChild(pageTitleElement)
 
@@ -103,4 +103,4 @@ class ConnectorsHome extends HTMLElement {
     }
 }
 
-customElements.define("connectors-home", ConnectorsHome)
+customElements.define("endpoints-home", EndpointsHome)

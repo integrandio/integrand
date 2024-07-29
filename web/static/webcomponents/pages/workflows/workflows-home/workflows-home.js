@@ -35,12 +35,12 @@ class WorkflowsHome extends HTMLElement {
         }).then(glueResponseData => {
             const element = this.generateEndpointCard(glueResponseData.data)
             cardsContainer.prepend(element)
-            const successMessage = `<h1>Connector Successfully Created</h1>`
+            const successMessage = `<h1>Workflow Successfully Created</h1>`
             const modal_element = fromHTML(successMessage);
             modal.innerHTML = '';
             modal.appendChild(modal_element)
         }).catch((error) => {
-            const errorMessage = `<h1>Unable to Create Connector</h1>`
+            const errorMessage = `<h1>Unable to Create Workflow</h1>`
             const modal_element = fromHTML(errorMessage);
             modal.innerHTML = '';
             modal.appendChild(modal_element)
@@ -52,10 +52,12 @@ class WorkflowsHome extends HTMLElement {
             <wc-modal id="modalThing">
                 <wc-title>Create New Workflow</wc-title>
                 <form id="myForm">
-                  <label for="id">Topic Name:</label><br>
+                  <label for="topicName">Topic Name:</label><br>
                   <input type="text" id="topicName" name="topicName" value=""><br>
-                  <label for="topicName">Function Name:</label><br>
-                  <input type="text" id="functionName" name="functionName" value="">
+                  <label for="functionName">Function Name:</label><br>
+                  <input type="text" id="functionName" name="functionName" value=""><br>
+                  <label for="sinkURL">Sink Url:</label><br>
+                  <input type="text" id="sinkURL" name="sinkURL" value=""><br>
                   <br>
                   <input type="submit" value="Create">
                 </form>
@@ -67,20 +69,20 @@ class WorkflowsHome extends HTMLElement {
     };
     
     generateWorkflowCard(workflow) {
-        const endpoint_link = `/workflows/${endpoint.id}`
-        let endpoint_markup = `<div class="jobCard">
-        <h1><span class="titler">ID:</span> ${endpoint.id}</h1>
-        <h2><span class="titler">Security Key:</span> ${endpoint.securityKey}</h2>
-        <p><span class="titler">Topic Name:</span> ${endpoint.topicName}</p>
+        const workflow_link = `/workflows/${workflow.id}`
+        let workflow_markup = `<div class="jobCard">
+        <h1><span class="titler">ID:</span> ${workflow.id}</h1>
+        <p><span class="titler">Topic Name:</span> ${workflow.topicName}</p>
+        <h2><span class="titler">Function Name:</span> ${workflow.functionName}</h2>
         <a class="jobLink" href="${endpoint_link}"> View Endpoint Details </a>
         </div>`
-        const card_element = fromHTML(endpoint_markup);
+        const card_element = fromHTML(workflow_link);
         return card_element;
     }
 
     async generateEndpointsContainer () {
         const workflowResponse = await fetch('/api/v1/workflow');
-        const workflowResponseData = await glueResponse.json();
+        const workflowResponseData = await workflowResponse.json();
 
         const workflow_card_container = document.createElement("data-cards-container")
         workflow_card_container.id = "cardContainer"
