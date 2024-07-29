@@ -148,3 +148,59 @@ class Integrand:
         response.raise_for_status()
         sseClient = SSE.SSEClient(response)
         return sseClient.events()
+    
+    def CreateWorkflow(self, topicName: str, functionName: str, sinkURL: str):
+        url = f'{self.integrand_base_endpoint}/api/v1/workflow'
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {self.api_key}',
+        }
+        body = {
+            "topicName": topicName ,
+            "functionName": functionName ,
+            "sinkURL": sinkURL 
+        }
+        response = requests.post(url, headers=headers, json=body)
+        response.raise_for_status()
+        response_body = response.json()
+        return response_body
+    
+    def DeleteWorkflow(self, id: str):
+        url = f'{self.integrand_base_endpoint}/api/v1/workflow/{id}'
+        headers = {
+            'Authorization': f'Bearer {self.api_key}',
+        }
+        response = requests.delete(url, headers=headers)
+        response.raise_for_status()
+        response_body = response.json()
+        return response_body
+    
+    def UpdateWorkflow(self, id: str):
+        url = f'{self.integrand_base_endpoint}/api/v1/workflow/{id}'
+        headers = {
+            'Authorization': f'Bearer {self.api_key}',
+        }
+        response = requests.put(url, headers=headers)
+        response.raise_for_status()
+        response_body = response.json()
+        return response_body
+    
+    def GetWorkflow(self, id: str):
+        url = f'{self.integrand_base_endpoint}/api/v1/workflow/{id}'
+        headers = {
+            'Authorization': f'Bearer {self.api_key}',
+        }
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        response_body = response.json()
+        return response_body
+    
+    def GetWorkflows(self):
+        url = f'{self.integrand_base_endpoint}/api/v1/workflow/'
+        headers = {
+            'Authorization': f'Bearer {self.api_key}',
+        }
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        response_body = response.json()
+        return response_body
