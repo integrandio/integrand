@@ -32,8 +32,8 @@ class WorkflowsHome extends HTMLElement {
                 return res.json();
               }
             throw new Error('Something went wrong');
-        }).then(glueResponseData => {
-            const element = this.generateEndpointCard(glueResponseData.data)
+        }).then(workflowResponse => {
+            const element = this.generateWorkflowCard(workflowResponse.data)
             cardsContainer.prepend(element)
             const successMessage = `<h1>Workflow Successfully Created</h1>`
             const modal_element = fromHTML(successMessage);
@@ -65,7 +65,7 @@ class WorkflowsHome extends HTMLElement {
         const modal_element = fromHTML(modalMarkup);
         this.shawdow.append(modal_element)
         const formComponent = this.shawdow.querySelector('#myForm');
-        formComponent.addEventListener('submit', this.newConnector.bind(this));
+        formComponent.addEventListener('submit', this.newWorkflow.bind(this));
     };
     
     generateWorkflowCard(workflow) {
@@ -74,13 +74,13 @@ class WorkflowsHome extends HTMLElement {
         <h1><span class="titler">ID:</span> ${workflow.id}</h1>
         <p><span class="titler">Topic Name:</span> ${workflow.topicName}</p>
         <h2><span class="titler">Function Name:</span> ${workflow.functionName}</h2>
-        <a class="jobLink" href="${endpoint_link}"> View Endpoint Details </a>
+        <a class="jobLink" href="${workflow_link}"> View Workflow Details </a>
         </div>`
-        const card_element = fromHTML(workflow_link);
+        const card_element = fromHTML(workflow_markup);
         return card_element;
     }
 
-    async generateEndpointsContainer () {
+    async generateWorkflowsContainer () {
         const workflowResponse = await fetch('/api/v1/workflow');
         const workflowResponseData = await workflowResponse.json();
 
@@ -100,8 +100,8 @@ class WorkflowsHome extends HTMLElement {
         pageTitleElement.buttonFunction = this.newWorkflowAction.bind(this);
         this.shawdow.appendChild(pageTitleElement)
 
-        const endpoint_card_container = await this.generateEndpointsContainer()
-        this.shawdow.appendChild(endpoint_card_container)
+        const workflow_card_container = await this.generateWorkflowsContainer()
+        this.shawdow.appendChild(workflow_card_container)
     }
 }
 

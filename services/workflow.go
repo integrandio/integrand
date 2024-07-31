@@ -17,7 +17,7 @@ var caseTypeMapping = map[string]int{
 	"Other":                        2,
 }
 
-var Workflows []Workflow
+var WORKFLOWS = make([]Workflow, 0)
 
 type Workflow struct {
 	Id           int    `json:"id"`

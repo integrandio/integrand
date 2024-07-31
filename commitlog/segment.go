@@ -147,7 +147,7 @@ func (seg *segment) readAt(offset int) (returnBuff []byte, err error) {
 	var buff []byte
 	//Do we want to do this with the base offset??
 	if offset >= seg.nextOffset-seg.startingOffset {
-		slog.Error(fmt.Sprintf("offset given: %d, max offset: %d", offset, seg.nextOffset-seg.startingOffset))
+		slog.Debug(fmt.Sprintf("offset given: %d, max offset: %d", offset, seg.nextOffset-seg.startingOffset))
 		return nil, errors.New("offset out of bounds")
 	} else {
 		ent := seg.index.entries[offset]

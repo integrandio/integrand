@@ -21,8 +21,7 @@ class WorkflowPage extends HTMLElement {
             headers: {"Content-Type": "application/json",}
         }).then(res => {
             // Check response to see if it's bad
-            res.json().then((endpointResponseData) => {
-                console.log(endpointResponseData)
+            res.json().then((workflowResponseData) => {
                 window.location.replace("/workflows");
             });
         })
@@ -38,19 +37,19 @@ class WorkflowPage extends HTMLElement {
                 </li>
                 <li>
                     <p class="titler">Offset:</p>
-                    <p>${workflow.Offset}</p>
+                    <p>${workflow.offset}</p>
                 </li>
                 <li>
                     <p class="titler">Topic Name:</p>
-                    <a class="link" href=${topic_link}>${endpoint.topicName}</a>
+                    <a class="link" href=${topic_link}>${workflow.topicName}</a>
                 </li>
                 <li>
                     <p class="titler">Sink URL:</p>
-                    <p>${workflow.SinkURL}</p>
+                    <p>${workflow.sinkURL}</p>
                 </li>
                 <li>
                     <p class="titler">Enabled:</p>
-                    <p>${workflow.Enabled}</p>
+                    <p>${workflow.enabled}</p>
                 </li>
             </ul>`
         const div = fromHTML(workflow_markup);
