@@ -20,7 +20,7 @@ var (
 func Workflower() error {
 	for {
 		workflowMu.Lock()
-		currentWorkflows := append([]Workflow(nil), Workflows...)
+		currentWorkflows := append([]Workflow(nil), WORKFLOWS...)
 		workflowMu.Unlock()
 
 		var wg sync.WaitGroup
@@ -44,16 +44,17 @@ func processWorkflow(wg *sync.WaitGroup, workflow Workflow) {
 		bytes, err := persistence.BROKER.ConsumeMessage(workflow.TopicName, workflow.Offset)
 		if err != nil {
 			if err.Error() == "offset out of bounds" {
-				slog.Warn(err.Error())
+				// This error is returned when we're given an offset thats ahead of the commitlog
+				slog.Debug(err.Error())
 				time.Sleep(time.Duration(sleep_time) * time.Second)
-				return // Exit the function, to be re-checked in the next cycle
+				continue
 			} else if err.Error() == "offset does not exist" {
-				// I think this means no message in given topic?
+				// This error is returned when we look for an offset and it does not exist becuase it can't be avaliable in the commitlog
 				slog.Warn(err.Error())
 				time.Sleep(time.Duration(sleep_time) * time.Second)
 				return // Exit the function, to be re-checked in the next cycle
 			} else {
-				slog.Warn(err.Error())
+				slog.Error(err.Error())
 				return // Something's wrong
 			}
 		}
@@ -66,15 +67,15 @@ func processWorkflow(wg *sync.WaitGroup, workflow Workflow) {
 func GetWorkflows() ([]Workflow, error) {
 	workflowMu.Lock()
 	defer workflowMu.Unlock()
-	return Workflows, nil
+	return WORKFLOWS, nil
 }
 
 func DeleteWorkflow(id int) error {
 	workflowMu.Lock()
 	defer workflowMu.Unlock()
-	for i, workflow := range Workflows {
+	for i, workflow := range WORKFLOWS {
 		if workflow.Id == id {
-			Workflows = append(Workflows[:i], Workflows[i+1:]...)
+			WORKFLOWS = append(WORKFLOWS[:i], WORKFLOWS[i+1:]...)
 			return nil
 		}
 	}
@@ -84,10 +85,10 @@ func DeleteWorkflow(id int) error {
 func UpdateWorkflow(id int) (*Workflow, error) {
 	workflowMu.Lock()
 	defer workflowMu.Unlock()
-	for i, workflow := range Workflows {
+	for i, workflow := range WORKFLOWS {
 		if workflow.Id == id {
-			Workflows[i].Enabled = !Workflows[i].Enabled
-			return &Workflows[i], nil
+			WORKFLOWS[i].Enabled = !WORKFLOWS[i].Enabled
+			return &WORKFLOWS[i], nil
 		}
 	}
 	return nil, errors.New("workflow not found")
@@ -96,7 +97,7 @@ func UpdateWorkflow(id int) (*Workflow, error) {
 func GetWorkflow(id int) (*Workflow, error) {
 	workflowMu.Lock()
 	defer workflowMu.Unlock()
-	for _, workflow := range Workflows {
+	for _, workflow := range WORKFLOWS {
 		if workflow.Id == id {
 			return &workflow, nil
 		}
@@ -118,7 +119,7 @@ func CreateWorkflow(topicName string, functionName string, sinkURL string) (*Wor
 	}
 
 	newWorkflow := Workflow{
-		Id:           rand.Int(),
+		Id:           rangeIn(0, 100),
 		TopicName:    topicName,
 		Offset:       topic.OldestOffset,
 		FunctionName: functionName,
@@ -127,7 +128,11 @@ func CreateWorkflow(topicName string, functionName string, sinkURL string) (*Wor
 	}
 
 	workflowMu.Lock()
-	Workflows = append(Workflows, newWorkflow)
+	WORKFLOWS = append(WORKFLOWS, newWorkflow)
 	workflowMu.Unlock()
 	return &newWorkflow, nil
+}
+
+func rangeIn(low, hi int) int {
+	return low + rand.Intn(hi-low)
 }

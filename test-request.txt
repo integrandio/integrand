@@ -1,38 +1,38 @@
 
-//TODO: To fix this one...
+//Example of sending a message to an endpoint
 curl --header "Content-Type: application/json" \
   --request POST \
   --data '{"username":"hello said","password":"this is a super long string where another thing is going to happen"}' \
-  'http://localhost:8000/api/v1/connector/f/my?apikey=ByAXhsNb
+  'http://localhost:8000/api/v1/connector/f/test?apikey=RcdouYvy'
 
-// Connector API
-// Get all Glue handler
+//---------------- Endpoint API -------------------------
+// Get all Endpoints
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer 11111" \
   --request GET \
   http://localhost:8000/api/v1/connector
 
-// Create glue handler
+// Create an endpoint
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer 11111" \
   --request POST \
   --data '{"id":"myEndpoint","topicName":"myTopic"}' \
   http://localhost:8000/api/v1/connector
 
-// Get Glue handler
+// Get a single endpoint
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer 11111" \
   --request GET \
   http://localhost:8000/api/v1/connector/id
 
-// Delete Glue handler
+// Delete an endpoint handler
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer 11111" \
   --request DELETE \
   http://localhost:8000/api/v1/connector/id
 
 
-// Event API
+//---------------- Event API -------------------------
 // Get all topics
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer 11111" \
@@ -65,8 +65,7 @@ curl --header "Accept:text/event-stream" \
   --request GET -N  \
   http://localhost:8000/api/v1/topic/here/consume
 
-
-// Workflow API
+//---------------- Workflow API -------------------------
 // Get all workflows
 curl --header "Content-Type: application/json" \
   --header "Authorization: Bearer 11111" \

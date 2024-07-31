@@ -77,7 +77,7 @@ func (wf *workflowAPI) getWorkflow(w http.ResponseWriter, r *http.Request) {
 	workflow, err := services.GetWorkflow(id)
 	if err != nil {
 		slog.Error(err.Error())
-		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
+		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
 	resJsonBytes, err := generateSuccessMessage(workflow)
@@ -99,13 +99,13 @@ func (wf *workflowAPI) createWorkflow(w http.ResponseWriter, r *http.Request) {
 	var createBody CreateWorkflowBody
 	if err := json.NewDecoder(r.Body).Decode(&createBody); err != nil {
 		slog.Error(err.Error())
-		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
+		apiMessageResponse(w, http.StatusBadRequest, "invalid body sent")
 		return
 	}
 	_, err := url.ParseRequestURI(createBody.SinkURL)
 	if err != nil {
 		slog.Error("invalid url")
-		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
+		apiMessageResponse(w, http.StatusBadRequest, "invalid sink url sent")
 		return
 	}
 	workflow, err := services.CreateWorkflow(createBody.TopicName, createBody.FunctionName, createBody.SinkURL)
@@ -163,7 +163,7 @@ func (wf *workflowAPI) deleteWorkflow(w http.ResponseWriter, r *http.Request) {
 	err = services.DeleteWorkflow(id)
 	if err != nil {
 		slog.Error(err.Error())
-		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
+		apiMessageResponse(w, http.StatusBadRequest, "internal server error")
 		return
 	}
 	c := map[string]interface{}{"success": "successfully deleted workflow"}
