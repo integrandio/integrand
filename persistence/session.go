@@ -216,10 +216,10 @@ func (dstore *Datastore) GcSessions(maxlifetime int64) error {
 	deleteQuery := "DELETE FROM sessions ID=?;"
 	dstore.RWMutex.Lock()
 	rows, err := dstore.db.Query(selectQuery)
+	dstore.RWMutex.Unlock()
 	if err != nil {
 		return err
 	}
-	defer rows.Close()
 	for rows.Next() {
 		var sdb SessionDB
 		err = rows.Scan(&sdb.ID, &sdb.TimeAccessed)
@@ -233,7 +233,7 @@ func (dstore *Datastore) GcSessions(maxlifetime int64) error {
 			}
 		}
 	}
-	dstore.RWMutex.Unlock()
+	rows.Close()
 	err = rows.Err()
 	if err != nil {
 		return err

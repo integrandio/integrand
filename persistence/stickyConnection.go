@@ -52,8 +52,6 @@ func (dstore *Datastore) GetAllEndpoints(userId int) ([]Endpoint, error) {
 	if err != nil {
 		return stickey_connections, err
 	}
-	defer rows.Close()
-
 	for rows.Next() {
 		var stickey_connection Endpoint
 		err := rows.Scan(&stickey_connection.RouteID, &stickey_connection.Security_key, &stickey_connection.TopicName, &stickey_connection.LastModified)
@@ -62,6 +60,7 @@ func (dstore *Datastore) GetAllEndpoints(userId int) ([]Endpoint, error) {
 		}
 		stickey_connections = append(stickey_connections, stickey_connection)
 	}
+	rows.Close()
 	return stickey_connections, nil
 }
 

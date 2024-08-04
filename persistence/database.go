@@ -54,7 +54,7 @@ func setupConnection(isDevMode bool) (*Datastore, error) {
 	var db_file string
 
 	if isDevMode {
-		db_file = ":memory:"
+		db_file = "file::memory:?cache=shared"
 	} else {
 		db_file = os.Getenv("DB_FILE_LOCATION")
 	}
