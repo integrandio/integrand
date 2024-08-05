@@ -224,6 +224,7 @@ func (dstore *Datastore) GcSessions(maxlifetime int64) error {
 		var sdb SessionDB
 		err = rows.Scan(&sdb.ID, &sdb.TimeAccessed)
 		if err != nil {
+			rows.Close()
 			return err
 		}
 		if (sdb.TimeAccessed.Unix() + maxlifetime) < time.Now().Unix() {

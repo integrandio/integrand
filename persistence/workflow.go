@@ -55,20 +55,20 @@ func (dstore *Datastore) GetWorkflows() ([]Workflow, error) {
 	selectQuery := "SELECT id, topic_name, offset, function_name, enabled, sink_url, last_modified FROM workflows;"
 	dstore.RWMutex.RLock()
 	rows, err := dstore.db.Query(selectQuery)
+	dstore.RWMutex.RUnlock()
 	if err != nil {
 		return workflows, err
 	}
-
-	defer rows.Close()
 	for rows.Next() {
 		var workflow Workflow
 		err := rows.Scan(&workflow.Id, &workflow.TopicName, &workflow.Offset, &workflow.FunctionName, &workflow.Enabled, &workflow.SinkURL, &workflow.LastModified)
 		if err != nil {
+			rows.Close()
 			return workflows, err
 		}
 		workflows = append(workflows, workflow)
 	}
-	dstore.RWMutex.RUnlock()
+	rows.Close()
 	err = rows.Err()
 	if err != nil {
 		return workflows, err
@@ -81,20 +81,20 @@ func (dstore *Datastore) GetEnabledWorkflows() ([]Workflow, error) {
 	selectQuery := "SELECT id, topic_name, offset, function_name, enabled, sink_url, last_modified FROM workflows WHERE enabled=true;"
 	dstore.RWMutex.RLock()
 	rows, err := dstore.db.Query(selectQuery)
-
+	dstore.RWMutex.RUnlock()
 	if err != nil {
 		return workflows, err
 	}
-	defer rows.Close()
 	for rows.Next() {
 		var workflow Workflow
 		err := rows.Scan(&workflow.Id, &workflow.TopicName, &workflow.Offset, &workflow.FunctionName, &workflow.Enabled, &workflow.SinkURL, &workflow.LastModified)
 		if err != nil {
+			rows.Close()
 			return workflows, err
 		}
 		workflows = append(workflows, workflow)
 	}
-	dstore.RWMutex.RUnlock()
+	rows.Close()
 	return workflows, nil
 }
 
