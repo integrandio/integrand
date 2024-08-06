@@ -160,7 +160,7 @@ func (wf *workflowAPI) deleteWorkflow(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	err = services.DeleteWorkflow(id)
+	_, err = services.DeleteWorkflow(id)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusBadRequest, "internal server error")

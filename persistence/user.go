@@ -32,15 +32,16 @@ func (dstore *Datastore) getAllUsers() ([]User, error) {
 	if err != nil {
 		return users, err
 	}
-	defer rows.Close()
 	for rows.Next() {
 		var user User
 		err := rows.Scan(&user.ID, &user.Email, &user.AuthType, &user.CreatedAt, &user.LastModified)
 		if err != nil {
+			rows.Close()
 			return users, err
 		}
 		users = append(users, user)
 	}
+	rows.Close()
 	return users, nil
 }
 

@@ -66,16 +66,16 @@ func (dstore *Datastore) GetAPIKeysByUserID(userID int) ([]ApiKey, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
 	var apiKeys []ApiKey
 	for rows.Next() {
 		var apiKey ApiKey
 		err := rows.Scan(&apiKey.Id, &apiKey.Key, &apiKey.CreatedAt)
 		if err != nil {
+			rows.Close()
 			return nil, err
 		}
 		apiKeys = append(apiKeys, apiKey)
 	}
+	rows.Close()
 	return apiKeys, nil
 }
