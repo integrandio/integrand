@@ -8,7 +8,7 @@
 **Simple-Ops Webhook Streaming. Build your real time integrations without the headache of infrastructure.**
 
 <a href="https://integrand.io">Website</a> •
-<a href="https://integrand.io/docs/">Documentation</a> 
+<a href="https://integrand.io/docs">Documentation</a> 
     
 ![CI](https://github.com/integrandio/integrand-app/actions/workflows/.github/workflows/integrand-app.yml/badge.svg)
 ![Last Commit](https://img.shields.io/github/last-commit/integrandio/integrand-app)
@@ -92,4 +92,4 @@ Manage endpoints, topics and access via a clean, easy to use Web UI. Built using
 ### Programactic Access
 Manage your Integrand instance via the provided REST API if you prefer to not to leave your commandline. Regular REST and SSE enpoints are exposed to allow for building of different types of applications and integrations.
 
-The requests are all documented in the `test-request.txt` file as curl requests.
+The requests are all documented in the docs on the website as well as the  `test-request.txt` file as curl requests.

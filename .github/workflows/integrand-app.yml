@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Docker Compose Build and Run
-        run: docker-compose -f docker-compose-python-integration.yml up --build --exit-code-from test-runner
+        run: docker compose -f docker-compose-python-integration.yml up --build --exit-code-from test-runner
   build-and-push:
     runs-on: ubuntu-latest
     steps:

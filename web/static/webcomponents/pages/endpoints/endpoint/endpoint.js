@@ -23,7 +23,7 @@ class EndpointPage extends HTMLElement {
             // Check response to see if it's bad
             res.json().then((endpointResponseData) => {
                 console.log(endpointResponseData)
-                window.location.replace("/connectors");
+                window.location.replace("/endpoints");
             });
         })
     }
