@@ -179,7 +179,7 @@ class TestMessages():
 
 
 class TestsWorkflow():
-    @pytest.fixture(params=["ld_ld_sync"])
+    @pytest.fixture(params=["ld_ld_sync", "calendly_sync"])
     def functionName(self, request):
         return request.param
     
