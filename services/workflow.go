@@ -42,28 +42,33 @@ func Workflower() error {
 
 func processWorkflow(wg *sync.WaitGroup, workflow persistence.Workflow) {
 	defer wg.Done()
-	sleep_time := SLEEP_TIME
+	currentOffset := workflow.Offset
 	for {
-		bytes, err := persistence.BROKER.ConsumeMessage(workflow.TopicName, workflow.Offset)
+		bytes, err := persistence.BROKER.ConsumeMessage(workflow.TopicName, currentOffset)
 		if err != nil {
 			if err.Error() == "offset out of bounds" {
 				// This error is returned when we're given an offset thats ahead of the commitlog, so we can return for next cycle to begin
 				slog.Debug(err.Error())
-				time.Sleep(time.Duration(sleep_time) * time.Second)
-				return
+				break
 			} else if err.Error() == "offset does not exist" {
 				// This error is returned when we look for an offset and it does not exist becuase it can't be avaliable in the commitlog
 				slog.Warn(err.Error())
-				time.Sleep(time.Duration(sleep_time) * time.Second)
-				return // Exit the function, to be re-checked in the next cycle
+				break // Exit the function, to be re-checked in the next cycle
 			} else {
 				slog.Error(err.Error())
-				return // Something's wrong
+				break // Something's wrong
 			}
 		}
 		workflow.Call(bytes, workflow.SinkURL)
-		workflow.Offset++
-		sleep_time = SLEEP_TIME
+		currentOffset++
+	}
+	// We set offset here in case we create a new workflow with lots of messages in topic which would send redundant requests to update the offset
+	if currentOffset != workflow.Offset {
+		_, err := persistence.DATASTORE.SetOffsetOfWorkflow(workflow.Id, currentOffset)
+		if err != nil {
+			// This is a critical error. If we cannot set workflow's offset properly, our workflows will be out of sync forever
+			slog.Error(err.Error())
+		}
 	}
 }
 
@@ -200,6 +205,8 @@ func sendCalendlyAppointment(calendlyJson CalendlyEventBody, sinkURL string) err
 		request.First = nameParts[0]
 		if len(nameParts) > 1 {
 			request.Last = nameParts[1]
+		} else {
+			request.Last = ""
 		}
 	}
 
