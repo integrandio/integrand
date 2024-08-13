@@ -9,10 +9,13 @@ class Home extends HTMLElement {
             </wc-page-heading>
             <div>
                 <div>
-                    <wc-title>Connectors</wc-title>
+                    <wc-title>Topics</wc-title>
                 </div>
                 <div>
-                    <wc-title>Topics</wc-title>
+                    <wc-title>Endpoints</wc-title>
+                </div>
+                <div>
+                    <wc-title>Workflows</wc-title>
                 </div>
                 <div>
                     <wc-title>API Keys</wc-title>

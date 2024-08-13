@@ -73,22 +73,32 @@ func (ga *glueAPI) endpointHandler(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	var i interface{}
-	// Try to decode the request body into the struct. If there is an error,
-	// respond to the client with the error message and a 400 status code.
-	err = json.NewDecoder(r.Body).Decode(&i)
-	if err != nil {
-		slog.Error(err.Error())
-		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
-		return
+
+	if r.Method == http.MethodGet {
+		// TODO: Write a nice page to present to the user
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Valid endpoint"))
+	} else if r.Method == http.MethodPost {
+		var i interface{}
+		// Try to decode the request body into the struct. If there is an error,
+		// respond to the client with the error message and a 400 status code.
+		err = json.NewDecoder(r.Body).Decode(&i)
+		if err != nil {
+			slog.Error(err.Error())
+			apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
+			return
+		}
+		err = services.MessageToSink(sticky.TopicName, sticky.UserId, i)
+		if err != nil {
+			slog.Error(err.Error())
+			apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
+			return
+		}
+		apiMessageResponse(w, http.StatusOK, "message sent successfully")
+	} else {
+		apiMessageResponse(w, http.StatusBadRequest, "incorrect request type sent")
 	}
-	err = services.MessageToSink(sticky.TopicName, sticky.UserId, i)
-	if err != nil {
-		slog.Error(err.Error())
-		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
-		return
-	}
-	apiMessageResponse(w, http.StatusOK, "message sent successfully")
+
 }
 
 func (ga *glueAPI) getAllGlueHandlers(w http.ResponseWriter, _ *http.Request) {

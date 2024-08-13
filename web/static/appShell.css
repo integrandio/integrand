@@ -268,6 +268,7 @@
     }
 
     .svger {
+      color: rgb(55 65 81 / var(--opacity));
       /* oc  */
       height: 1.5rem;
       /* se */

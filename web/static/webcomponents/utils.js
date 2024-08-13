@@ -1,5 +1,12 @@
 /** This is  just helper functions*/
 
+function createStylesheet(path) {
+  const styleLinkElem = document.createElement('link');
+  styleLinkElem.setAttribute('rel', 'stylesheet');
+  styleLinkElem.setAttribute('href', path);
+  return linkElem;
+}
+
 /**
  * @param {String} HTML representing a single element.
  * @param {Boolean} flag representing whether or not to trim input whitespace, defaults to true.

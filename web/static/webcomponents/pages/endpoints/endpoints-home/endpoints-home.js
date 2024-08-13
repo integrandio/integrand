@@ -57,7 +57,7 @@ class EndpointsHome extends HTMLElement {
                   <label for="topicName">Topic Name:</label><br>
                   <input type="text" id="topicName" name="topicName" value="">
                   <br>
-                  <input type="submit" value="Create">
+                  <input class="submit-button" type="submit" value="Create">
                 </form>
             </wc-modal>`
         const modal_element = fromHTML(modalMarkup);
