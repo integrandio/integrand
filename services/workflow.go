@@ -165,7 +165,7 @@ type Payload struct {
 	} `json:"scheduled_event"`
 }
 
-type CalendlyRequest struct {
+type LeadDocketRequestBody struct {
 	First   string `json:"First"`
 	Last    string `json:"Last"`
 	Phone   string `json:"Phone"`
@@ -195,7 +195,7 @@ func calendly_sync(bytes []byte, sinkURL string) error {
 
 func sendCalendlyAppointment(calendlyJson CalendlyEventBody, sinkURL string) error {
 	payload := calendlyJson.Payload
-	var request CalendlyRequest
+	var request LeadDocketRequestBody
 
 	if payload.FirstName != nil {
 		request.First = *payload.FirstName
