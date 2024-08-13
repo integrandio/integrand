@@ -59,3 +59,15 @@ func CreateWorkflow(topicName string, functionName string, sinkURL string) (pers
 	newWorkflow.LastModified = last_modified
 	return newWorkflow, nil
 }
+
+func GetAvaliableWorkflowFunctions() []string {
+	keys := make([]string, len(persistence.FUNC_MAP))
+
+	i := 0
+	for f := range persistence.FUNC_MAP {
+		keys[i] = f
+		i++
+	}
+
+	return keys
+}
