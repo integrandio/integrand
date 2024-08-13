@@ -1,4 +1,5 @@
 # This is the integration test suite for LucidMQ
+from requests import HTTPError
 from Integrand import Integrand
 import pytest
 import string
@@ -27,6 +28,10 @@ def clean_up_topics():
     topics = response['data']
     for topic in topics:
         integrand.DeleteTopic(topic['topicName'])
+        
+@pytest.fixture(params=["ld_ld_sync", "calendly_sync"])
+def workflow_function_name(request):
+    return request.param
 
 @pytest.mark.usefixtures("clean_up_topics")
 class TestConnectorAPI:
@@ -139,6 +144,39 @@ class TestTopicAPI:
         integrand.CreateTopic(topicName)
         response = integrand.DeleteTopic(topicName)
         assert response['status'] == 'success'
+        
+    def test_delete_topic_used_by_workflow_raises_exception(self, workflow_function_name):
+        topicName = get_random_string(5)
+        integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
+        connectorId = get_random_string(5)
+        integrand.CreateTopic(topicName)
+        integrand.CreateConnector(connectorId, topicName)
+        response = integrand.CreateWorkflow(topicName, workflow_function_name, "http://example.com")
+        workflowId = response['data']['id']
+        try:
+            integrand.DeleteTopic(topicName)
+        except HTTPError as e:
+            print(e.response.status_code)
+            assert e.response.status_code == 500
+        # Cleanup
+        integrand.DeleteConnector(connectorId)
+        integrand.DeleteWorkflow(workflowId)
+        integrand.DeleteTopic(topicName)
+        
+    def test_delete_topic_used_by_connector_raises_exception(self):
+        topicName = get_random_string(5)
+        integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
+        integrand.CreateTopic(topicName)
+        connectorId = get_random_string(5)
+        integrand.CreateConnector(connectorId, topicName)
+        try:
+            integrand.DeleteTopic(topicName)
+        except HTTPError as e:
+            print(e.response.status_code)
+            assert e.response.status_code == 500
+        # Cleanup
+        integrand.DeleteConnector(connectorId)
+        integrand.DeleteTopic(topicName)
     
 class TestMessages():
     def test_send_message(self):
@@ -177,13 +215,8 @@ class TestMessages():
         integrand.DeleteConnector(id)
         integrand.DeleteTopic(topicName)
 
-
-class TestsWorkflow():
-    @pytest.fixture(params=["ld_ld_sync"])
-    def functionName(self, request):
-        return request.param
-    
-    def test_create_workflow(self, functionName):
+class TestsWorkflow():   
+    def test_create_workflow(self, workflow_function_name):
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         connectorId = get_random_string(5)
         topicName = get_random_string(5)
@@ -192,18 +225,18 @@ class TestsWorkflow():
         connectorAPIKey = response['data']['securityKey']
         sinkURL = rf"{INTEGRAND_URL}/api/v1/connector/f/{connectorId}?apikey={connectorAPIKey}"
         
-        response = integrand.CreateWorkflow(topicName, functionName, sinkURL)
+        response = integrand.CreateWorkflow(topicName, workflow_function_name, sinkURL)
         assert response['status'] == 'success'
         assert response['data']['topicName'] == topicName
-        assert response['data']['functionName'] == functionName
+        assert response['data']['functionName'] == workflow_function_name
         assert response['data']['enabled'] == True
         id = response['data']['id']
         # Cleanup
         integrand.DeleteConnector(connectorId)
-        integrand.DeleteTopic(topicName)
         integrand.DeleteWorkflow(id)
+        integrand.DeleteTopic(topicName)
         
-    def test_delete_workflow(self, functionName):
+    def test_delete_workflow(self, workflow_function_name):
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         connectorId = get_random_string(5)
         topicName = get_random_string(5)
@@ -212,7 +245,7 @@ class TestsWorkflow():
         connectorAPIKey = response['data']['securityKey']
         sinkURL = rf"{INTEGRAND_URL}/api/v1/connector/f/{connectorId}?apikey={connectorAPIKey}"
         
-        response = integrand.CreateWorkflow(topicName, functionName, sinkURL)
+        response = integrand.CreateWorkflow(topicName, workflow_function_name, sinkURL)
         id = response['data']['id']
        
         response = integrand.DeleteWorkflow(id)
@@ -221,7 +254,7 @@ class TestsWorkflow():
         integrand.DeleteConnector(connectorId)
         integrand.DeleteTopic(topicName)
         
-    def test_update_workflow(self, functionName):
+    def test_update_workflow(self, workflow_function_name):
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         connectorId = get_random_string(5)
         topicName = get_random_string(5)
@@ -230,17 +263,17 @@ class TestsWorkflow():
         connectorAPIKey = response['data']['securityKey']
         sinkURL = rf"{INTEGRAND_URL}/api/v1/connector/f/{connectorId}?apikey={connectorAPIKey}"
         
-        response = integrand.CreateWorkflow(topicName, functionName, sinkURL)
+        response = integrand.CreateWorkflow(topicName, workflow_function_name, sinkURL)
         id = response['data']['id']
         integrand.UpdateWorkflow(response['data']['id'])
         
         assert response['status'] == 'success'
         # Cleanup
         integrand.DeleteConnector(connectorId)
-        integrand.DeleteTopic(topicName)
         integrand.DeleteWorkflow(id)
+        integrand.DeleteTopic(topicName)
 
-    def test_get_workflow(self, functionName):
+    def test_get_workflow(self, workflow_function_name):
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         connectorId = get_random_string(5)
         topicName = get_random_string(5)
@@ -249,20 +282,20 @@ class TestsWorkflow():
         connectorAPIKey = response['data']['securityKey']
         sinkURL = rf"{INTEGRAND_URL}/api/v1/connector/f/{connectorId}?apikey={connectorAPIKey}"
         
-        response = integrand.CreateWorkflow(topicName, functionName, sinkURL)
+        response = integrand.CreateWorkflow(topicName, workflow_function_name, sinkURL)
         id = response['data']['id']
         
         response = integrand.GetWorkflow(response['data']['id'])
         assert response['status'] == 'success'
         assert response['data']['topicName'] == topicName
-        assert response['data']['functionName'] == functionName
+        assert response['data']['functionName'] == workflow_function_name
         assert response['data']['enabled'] == True
         # Cleanup
         integrand.DeleteConnector(connectorId)
-        integrand.DeleteTopic(topicName)
         integrand.DeleteWorkflow(id)
+        integrand.DeleteTopic(topicName)
         
-    def test_get_workflows(self, functionName):
+    def test_get_workflows(self, workflow_function_name):
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         connectorId = get_random_string(5)
         topicName = get_random_string(5)
@@ -275,20 +308,20 @@ class TestsWorkflow():
         assert response['status'] == 'success'
         assert response['data'] == []
         
-        response = integrand.CreateWorkflow(topicName, functionName, sinkURL)
+        response = integrand.CreateWorkflow(topicName, workflow_function_name, sinkURL)
         id = response['data']['id']
         
         response = integrand.GetWorkflows()
         assert response['status'] == 'success'
         assert response['data'][0]['topicName'] == topicName
-        assert response['data'][0]['functionName'] == functionName
+        assert response['data'][0]['functionName'] == workflow_function_name
         assert response['data'][0]['enabled'] == True
         # Cleanup
         integrand.DeleteConnector(connectorId)
-        integrand.DeleteTopic(topicName)
         integrand.DeleteWorkflow(id)
+        integrand.DeleteTopic(topicName)
         
-    def test_workflow_send_message_one_end_to_another(self, functionName):
+    def test_workflow_send_message_one_end_to_another(self, workflow_function_name):
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         sourceConnectorId = get_random_string(5)
         sinkConnectorId = get_random_string(5)
@@ -301,14 +334,14 @@ class TestsWorkflow():
         sinkConnectorAPIKey = response['data']['securityKey']
         sinkURL = rf"{INTEGRAND_URL}/api/v1/connector/f/{sinkConnectorId}?apikey={sinkConnectorAPIKey}"
         
-        response = integrand.CreateWorkflow(sourceTopicName, functionName, sinkURL)
+        response = integrand.CreateWorkflow(sourceTopicName, workflow_function_name, sinkURL)
         assert response['status'] == 'success'
         assert response['data']['topicName'] == sourceTopicName
-        assert response['data']['functionName'] == functionName
+        assert response['data']['functionName'] == workflow_function_name
         assert response['data']['enabled'] == True
         id = response['data']['id']
         
-        with open(rf'tests/workflow_functions/{functionName}/message.json', 'r') as file:
+        with open(rf'tests/workflow_functions/{workflow_function_name}/message.json', 'r') as file:
             data = json.load(file)
             
         integrand.EndpointRequest(sourceConnectorId, sourceConnectorAPIKey, data)
@@ -323,7 +356,7 @@ class TestsWorkflow():
             limit = 1
             sinkTopicEvents = integrand.GetEventsFromTopic(sinkTopicName, offset, limit)
             if sinkTopicEvents['data'] != None:
-                with open(rf'tests/workflow_functions/{functionName}/message_output.json', 'r') as file:
+                with open(rf'tests/workflow_functions/{workflow_function_name}/message_output.json', 'r') as file:
                     data = json.load(file)
                 assert sinkTopicEvents['data'][offset] == data
                 break

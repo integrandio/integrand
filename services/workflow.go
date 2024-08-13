@@ -8,6 +8,7 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 )
@@ -19,7 +20,8 @@ const MAX_BACKOFF int = 10
 func init() {
 	// Register all of our functions
 	persistence.FUNC_MAP = map[string]interface{}{
-		"ld_ld_sync": ld_ld_sync,
+		"ld_ld_sync":    ld_ld_sync,
+		"calendly_sync": calendly_sync,
 	}
 }
 
@@ -40,28 +42,33 @@ func Workflower() error {
 
 func processWorkflow(wg *sync.WaitGroup, workflow persistence.Workflow) {
 	defer wg.Done()
-	sleep_time := SLEEP_TIME
+	currentOffset := workflow.Offset
 	for {
-		bytes, err := persistence.BROKER.ConsumeMessage(workflow.TopicName, workflow.Offset)
+		bytes, err := persistence.BROKER.ConsumeMessage(workflow.TopicName, currentOffset)
 		if err != nil {
 			if err.Error() == "offset out of bounds" {
-				// This error is returned when we're given an offset thats ahead of the commitlog
+				// This error is returned when we're given an offset thats ahead of the commitlog, so we can return for next cycle to begin
 				slog.Debug(err.Error())
-				time.Sleep(time.Duration(sleep_time) * time.Second)
-				continue
+				break
 			} else if err.Error() == "offset does not exist" {
 				// This error is returned when we look for an offset and it does not exist becuase it can't be avaliable in the commitlog
 				slog.Warn(err.Error())
-				time.Sleep(time.Duration(sleep_time) * time.Second)
-				return // Exit the function, to be re-checked in the next cycle
+				break // Exit the function, to be re-checked in the next cycle
 			} else {
 				slog.Error(err.Error())
-				return // Something's wrong
+				break // Something's wrong
 			}
 		}
 		workflow.Call(bytes, workflow.SinkURL)
-		workflow.Offset++
-		sleep_time = SLEEP_TIME
+		currentOffset++
+	}
+	// We set offset here in case we create a new workflow with lots of messages in topic which would send redundant requests to update the offset
+	if currentOffset != workflow.Offset {
+		_, err := persistence.DATASTORE.SetOffsetOfWorkflow(workflow.Id, currentOffset)
+		if err != nil {
+			// This is a critical error. If we cannot set workflow's offset properly, our workflows will be out of sync forever
+			slog.Error(err.Error())
+		}
 	}
 }
 
@@ -109,6 +116,107 @@ func sendLeadToClf(jsonBody map[string]interface{}, sinkURL string) error {
 	}
 
 	jsonBodyBytes, err := json.Marshal(requestBody)
+	if err != nil {
+		slog.Error(err.Error())
+		return err
+	}
+
+	resp, err := http.Post(sinkURL, "application/json", bytes.NewBuffer(jsonBodyBytes))
+	if err != nil {
+		slog.Error(err.Error())
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		slog.Error("HTTP request failed",
+			"status_code", resp.StatusCode,
+			"status_text", http.StatusText(resp.StatusCode),
+		)
+		return errors.New("HTTP request failed with status code: " + http.StatusText(resp.StatusCode))
+	}
+
+	var responseBody map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&responseBody); err != nil {
+		slog.Error(err.Error())
+		return err
+	}
+
+	log.Printf("Status Code: %d", resp.StatusCode)
+	log.Printf("Response Body: %v", responseBody)
+	return nil
+}
+
+type CalendlyEventBody struct {
+	Event   string  `json:"event"`
+	Payload Payload `json:"payload"`
+}
+
+type Payload struct {
+	FirstName      *string `json:"first_name"`
+	LastName       *string `json:"last_name"`
+	Name           string  `json:"name"`
+	Email          string  `json:"email"`
+	ScheduledEvent struct {
+		Location struct {
+			Location *string `json:"location"`
+			Type     *string `json:"type"`
+		} `json:"location"`
+	} `json:"scheduled_event"`
+}
+
+type LeadDocketRequestBody struct {
+	First   string `json:"First"`
+	Last    string `json:"Last"`
+	Phone   string `json:"Phone"`
+	Email   string `json:"Email"`
+	Summary string `json:"Summary"`
+}
+
+func calendly_sync(bytes []byte, sinkURL string) error {
+	// Unmarshal the JSON byte array into the map
+	var calendlyJson CalendlyEventBody
+	err := json.Unmarshal(bytes, &calendlyJson)
+	if err != nil {
+		slog.Error(err.Error())
+		return err
+	}
+
+	if calendlyJson.Event == "invitee.created" {
+		err := sendCalendlyAppointment(calendlyJson, sinkURL)
+		if err != nil {
+			slog.Error("Error occurred while sending calendly appointment to CLF", "error", err)
+			return err
+		}
+	}
+
+	return nil
+}
+
+func sendCalendlyAppointment(calendlyJson CalendlyEventBody, sinkURL string) error {
+	payload := calendlyJson.Payload
+	var request LeadDocketRequestBody
+
+	if payload.FirstName != nil {
+		request.First = *payload.FirstName
+		request.Last = *payload.LastName
+	} else {
+		nameParts := strings.Split(strings.TrimSpace(payload.Name), " ")
+		request.First = nameParts[0]
+		if len(nameParts) > 1 {
+			request.Last = nameParts[1]
+		} else {
+			request.Last = ""
+		}
+	}
+
+	if *payload.ScheduledEvent.Location.Type == "outbound_call" {
+		request.Phone = *payload.ScheduledEvent.Location.Location
+	}
+
+	request.Email = payload.Email
+
+	jsonBodyBytes, err := json.Marshal(request)
 	if err != nil {
 		slog.Error(err.Error())
 		return err
