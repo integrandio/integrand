@@ -4,7 +4,6 @@ import (
 	"errors"
 	"integrand/persistence"
 	"log/slog"
-	"math/rand"
 )
 
 func GetWorkflows() ([]persistence.Workflow, error) {
@@ -45,7 +44,6 @@ func CreateWorkflow(topicName string, functionName string, sinkURL string) (pers
 	}
 
 	newWorkflow := persistence.Workflow{
-		Id:           rangeIn(0, 100),
 		TopicName:    topicName,
 		Offset:       topic.OldestOffset,
 		FunctionName: functionName,
@@ -53,14 +51,11 @@ func CreateWorkflow(topicName string, functionName string, sinkURL string) (pers
 		SinkURL:      sinkURL,
 	}
 
-	last_modified, err := persistence.DATASTORE.InsertWorkflow(newWorkflow)
+	id, last_modified, err := persistence.DATASTORE.InsertWorkflow(newWorkflow)
 	if err != nil {
 		return newWorkflow, err
 	}
+	newWorkflow.Id = id
 	newWorkflow.LastModified = last_modified
 	return newWorkflow, nil
-}
-
-func rangeIn(low, hi int) int {
-	return low + rand.Intn(hi-low)
 }

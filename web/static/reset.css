@@ -16,7 +16,7 @@ html {
   -moz-tab-size: 4;
   -o-tab-size: 4;
   tab-size: 4;
-  font-family: 'Inter';
+  font-family: Geneva, Verdana, sans-serif;
   font-feature-settings: normal;
   font-variation-settings: normal;
 }

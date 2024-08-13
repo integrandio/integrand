@@ -32,8 +32,13 @@ class Modal extends HTMLElement {
     connectedCallback(){
         this.modal.addEventListener('click', this.removeButton.bind(this))
         this.contentContainer.addEventListener('click', this.stopClose)
-        console.log("loaded in the modal")
     }
+
+    disconnectedCallback() {
+        // TODO unregister event listener
+        // Send message back to the parent component so it can be unmounted properly
+    } 
+
 }
 
 customElements.define("wc-modal", Modal)

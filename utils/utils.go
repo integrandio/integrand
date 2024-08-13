@@ -31,6 +31,24 @@ func GetEnvrionmentVariableInt(env string, substitueValue int) int {
 	return substitueValue
 }
 
+// Given a key value map of strings, get the value of the given key and return the string
+func GetOrDefaultString(m map[string]interface{}, key string, defaultStr string) string {
+	if value, ok := m[key]; ok {
+		if str, ok := value.(string); ok {
+			return str
+		}
+	}
+	return defaultStr
+}
+
+// Given a key value map of ints, get the value of the given key and return the int
+func GetOrDefaultInt(m map[string]int, key string, defaultInt int) int {
+	if num, ok := m[key]; ok {
+		return num
+	}
+	return defaultInt
+}
+
 // Random String Generator stuf.....
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 const (

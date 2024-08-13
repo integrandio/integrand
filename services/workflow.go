@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"integrand/persistence"
+	"integrand/utils"
 	"log"
 	"log/slog"
 	"net/http"
@@ -26,7 +27,7 @@ func init() {
 }
 
 func Workflower() error {
-	log.Println("Workflower started")
+	log.Println("Starting all workflows")
 	for {
 		time.Sleep(100 * time.Millisecond)
 		currentWorkflows, _ := GetEnabledWorkflows()
@@ -103,16 +104,16 @@ func ld_ld_sync(bytes []byte, sinkURL string) error {
 func sendLeadToClf(jsonBody map[string]interface{}, sinkURL string) error {
 	defaultStr := ""
 
-	leadCaseTypeStr := GetOrDefaultString(jsonBody, "LeadCaseType", "")
+	leadCaseTypeStr := utils.GetOrDefaultString(jsonBody, "LeadCaseType", "")
 
 	requestBody := map[string]interface{}{
-		"First":         GetOrDefaultString(jsonBody, "ContactFirstName", defaultStr),
-		"Last":          GetOrDefaultString(jsonBody, "ContactLastName", defaultStr),
-		"Phone":         GetOrDefaultString(jsonBody, "ContactMobilePhone", defaultStr),
-		"Email":         GetOrDefaultString(jsonBody, "ContactEmail", defaultStr),
-		"Summary":       GetOrDefaultString(jsonBody, "LeadSummary", defaultStr),
-		"Case_Type":     GetOrDefaultInt(caseTypeMapping, leadCaseTypeStr, 2),
-		"Incident_Date": GetOrDefaultString(jsonBody, "LeadIncidentDate", defaultStr),
+		"First":         utils.GetOrDefaultString(jsonBody, "ContactFirstName", defaultStr),
+		"Last":          utils.GetOrDefaultString(jsonBody, "ContactLastName", defaultStr),
+		"Phone":         utils.GetOrDefaultString(jsonBody, "ContactMobilePhone", defaultStr),
+		"Email":         utils.GetOrDefaultString(jsonBody, "ContactEmail", defaultStr),
+		"Summary":       utils.GetOrDefaultString(jsonBody, "LeadSummary", defaultStr),
+		"Case_Type":     utils.GetOrDefaultInt(caseTypeMapping, leadCaseTypeStr, 2),
+		"Incident_Date": utils.GetOrDefaultString(jsonBody, "LeadIncidentDate", defaultStr),
 	}
 
 	jsonBodyBytes, err := json.Marshal(requestBody)
@@ -246,22 +247,4 @@ func sendCalendlyAppointment(calendlyJson CalendlyEventBody, sinkURL string) err
 	log.Printf("Status Code: %d", resp.StatusCode)
 	log.Printf("Response Body: %v", responseBody)
 	return nil
-}
-
-// Should move to utils later
-
-func GetOrDefaultString(m map[string]interface{}, key string, defaultStr string) string {
-	if value, ok := m[key]; ok {
-		if str, ok := value.(string); ok {
-			return str
-		}
-	}
-	return defaultStr
-}
-
-func GetOrDefaultInt(m map[string]int, key string, defaultInt int) int {
-	if num, ok := m[key]; ok {
-		return num
-	}
-	return defaultInt
 }

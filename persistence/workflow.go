@@ -98,15 +98,15 @@ func (dstore *Datastore) GetEnabledWorkflows() ([]Workflow, error) {
 	return workflows, nil
 }
 
-func (dstore *Datastore) InsertWorkflow(workflow Workflow) (time.Time, error) {
+func (dstore *Datastore) InsertWorkflow(workflow Workflow) (int, time.Time, error) {
 	insertQuery := `
 		INSERT INTO workflows(id, topic_name, offset, function_name, sink_url, last_modified)
-		VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+		VALUES (NULL, ?, ?, ?, ?, CURRENT_TIMESTAMP)
 		RETURNING id, last_modified;
 	`
 
 	dstore.RWMutex.Lock()
-	row := dstore.db.QueryRow(insertQuery, workflow.Id, workflow.TopicName, workflow.Offset, workflow.FunctionName, workflow.SinkURL)
+	row := dstore.db.QueryRow(insertQuery, workflow.TopicName, workflow.Offset, workflow.FunctionName, workflow.SinkURL)
 	dstore.RWMutex.Unlock()
 
 	var insertedID int
@@ -114,10 +114,10 @@ func (dstore *Datastore) InsertWorkflow(workflow Workflow) (time.Time, error) {
 
 	err := row.Scan(&insertedID, &lastModified)
 	if err != nil {
-		return time.Time{}, err
+		return 0, time.Time{}, err
 	}
 
-	return lastModified, nil
+	return insertedID, lastModified, nil
 }
 
 func (dstore *Datastore) DeleteWorkflow(id int) (int, error) {
