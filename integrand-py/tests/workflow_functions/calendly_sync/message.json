@@ -1,0 +1,67 @@
+{
+  "created_at": "2024-08-05T21:58:18.000000Z",
+  "created_by": "https://api.calendly.com/users/test",
+  "event": "invitee.created",
+  "payload": {
+    "cancel_url": "https://calendly.com/cancellations/another-test",
+    "created_at": "2024-08-05T21:58:17.901807Z",
+    "email": "client_email@gmail.com",
+    "event": "https://api.calendly.com/scheduled_events/test-event",
+    "first_name": null,
+    "invitee_scheduled_by": null,
+    "last_name": null,
+    "name": "Client Name",
+    "new_invitee": null,
+    "no_show": null,
+    "old_invitee": null,
+    "payment": null,
+    "questions_and_answers": [],
+    "reconfirmation": null,
+    "reschedule_url": "https://calendly.com/reschedulings/another-test",
+    "rescheduled": false,
+    "routing_form_submission": null,
+    "scheduled_event": {
+      "created_at": "2024-08-05T21:58:17.881846Z",
+      "end_time": "2024-08-16T15:45:00.000000Z",
+      "event_guests": [],
+      "event_memberships": [
+        {
+          "user": "https://api.calendly.com/users/test",
+          "user_email": "info@testcompany.com",
+          "user_name": "Test Company"
+        }
+      ],
+      "event_type": "https://api.calendly.com/event_types/test-type",
+      "invitees_counter": {
+        "active": 1,
+        "limit": 1,
+        "total": 1
+      },
+      "location": {
+        "location": "+1 322-999-1323",
+        "type": "outbound_call"
+      },
+      "meeting_notes_html": null,
+      "meeting_notes_plain": null,
+      "name": "15 Minute Consultation",
+      "start_time": "2024-08-16T15:30:00.000000Z",
+      "status": "active",
+      "updated_at": "2024-08-05T21:58:17.881846Z",
+      "uri": "https://api.calendly.com/scheduled_events/test-event"
+    },
+    "scheduling_method": null,
+    "status": "active",
+    "text_reminder_number": null,
+    "timezone": "America/Los_Angeles",
+    "tracking": {
+      "salesforce_uuid": null,
+      "utm_campaign": null,
+      "utm_content": null,
+      "utm_medium": null,
+      "utm_source": null,
+      "utm_term": null
+    },
+    "updated_at": "2024-08-05T21:58:17.901807Z",
+    "uri": "https://api.calendly.com/scheduled_events/test-event/invitees/another-test"
+  }
+}

@@ -35,23 +35,27 @@ func CreateEventStream(topicName string) (persistence.TopicDetails, error) {
 }
 
 func DeleteEventStream(topicName string, userId int) error {
-	//Check if topic is being used...
+	// Check if the topic is being used by any endpoint
 	endpoints, err := GetEndpoints(userId)
 	if err != nil {
 		return err
 	}
-	topicIsBeingUsed := false
 	for _, endpoint := range endpoints {
 		if endpoint.TopicName == topicName {
-			topicIsBeingUsed = true
-			break
+			return errors.New("topic is being used by an endpoint")
 		}
 	}
-
-	if topicIsBeingUsed {
-		return errors.New("topic is being used")
+	// Check if the topic is being used by any workflow
+	workflows, err := GetWorkflows()
+	if err != nil {
+		return err
 	}
-
+	for _, workflow := range workflows {
+		if workflow.TopicName == topicName {
+			return errors.New("topic is being used by a workflow")
+		}
+	}
+	// Delete the topic if it is not being used
 	return persistence.BROKER.DeleteTopic(topicName)
 }
 

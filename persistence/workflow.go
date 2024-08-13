@@ -151,5 +151,24 @@ func (dstore *Datastore) UpdateWorkflow(id int) (Workflow, error) {
 	if err != nil {
 		return workflow, err
 	}
-	return workflow, err
+	return workflow, nil
+}
+
+func (dstore *Datastore) SetOffsetOfWorkflow(id int, offset int) (Workflow, error) {
+	updateQuery := `
+		UPDATE workflows
+		SET offset = ?, last_modified = CURRENT_TIMESTAMP
+		WHERE id = ?
+		RETURNING id, topic_name, offset, function_name, enabled, sink_url, last_modified;
+	`
+
+	dstore.RWMutex.Lock()
+	row := dstore.db.QueryRow(updateQuery, offset, id)
+	dstore.RWMutex.Unlock()
+	var workflow Workflow
+	err := row.Scan(&workflow.Id, &workflow.TopicName, &workflow.Offset, &workflow.FunctionName, &workflow.Enabled, &workflow.SinkURL, &workflow.LastModified)
+	if err != nil {
+		return workflow, err
+	}
+	return workflow, nil
 }
