@@ -11,8 +11,9 @@ import (
 )
 
 var (
-	workflowsAllApi   = regexp.MustCompile(`^\/api/v1/workflow[\/]*$`)
-	workflowSingleApi = regexp.MustCompile(`^\/api/v1/workflow\/(.*)$`)
+	workflowFunctionApi = regexp.MustCompile(`^\/api/v1/workflow/functions[\/]*$`)
+	workflowsAllApi     = regexp.MustCompile(`^\/api/v1/workflow[\/]*$`)
+	workflowSingleApi   = regexp.MustCompile(`^\/api/v1/workflow\/(.*)$`)
 )
 
 type workflowAPI struct {
@@ -26,6 +27,8 @@ func (wf *workflowAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	switch {
+	case r.Method == http.MethodGet && workflowFunctionApi.MatchString(r.URL.Path):
+		wf.getWorkflowFunctions(w, r)
 	case r.Method == http.MethodGet && workflowsAllApi.MatchString(r.URL.Path):
 		wf.getWorkflows(w, r)
 		return
@@ -168,6 +171,17 @@ func (wf *workflowAPI) deleteWorkflow(w http.ResponseWriter, r *http.Request) {
 	}
 	c := map[string]interface{}{"success": "successfully deleted workflow"}
 	resJsonBytes, err := generateSuccessMessage(c)
+	if err != nil {
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(resJsonBytes)
+}
+
+func (wf *workflowAPI) getWorkflowFunctions(w http.ResponseWriter, _ *http.Request) {
+	workflowFunctions := services.GetAvaliableWorkflowFunctions()
+	resJsonBytes, err := generateSuccessMessage(workflowFunctions)
 	if err != nil {
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return

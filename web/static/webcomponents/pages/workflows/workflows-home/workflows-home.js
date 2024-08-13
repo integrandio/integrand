@@ -11,6 +11,8 @@ class WorkflowsHome extends HTMLElement {
         super()
         this.shawdow = this.attachShadow({mode: "open"})
         this.shawdow.append(jobsHomeTemplate.content.cloneNode(true))
+        this.workflowfunctions = []
+        this.topicNames = []
     }
 
     newWorkflow(e) {
@@ -48,14 +50,17 @@ class WorkflowsHome extends HTMLElement {
     }
 
     newWorkflowAction() {
+        const functionOptions = this.workflowfunctions.map((func) => {return `<option value="${func}">${func}</option>`})
+        const topicOptions = this.topicNames.map((topic) => {return `<option value="${topic}">${topic}</option>`})
+
         const modalMarkup = `
             <wc-modal id="modalThing">
                 <wc-title>Create New Workflow</wc-title>
                 <form id="myForm">
                   <label for="topicName">Topic Name:</label><br>
-                  <input type="text" id="topicName" name="topicName" value=""><br>
+                  <select id="topicName" name="topicName">${topicOptions.join()}</select><br>
                   <label for="functionName">Function Name:</label><br>
-                  <input type="text" id="functionName" name="functionName" value=""><br>
+                  <select id="functionName" name="functionName">${functionOptions.join()}</select><br>
                   <label for="sinkURL">Sink Url:</label><br>
                   <input type="text" id="sinkURL" name="sinkURL" value=""><br>
                   <br>
@@ -93,7 +98,23 @@ class WorkflowsHome extends HTMLElement {
         return workflow_card_container
     }
 
+    async getWorkflowFunctions() {
+        const workflowFunctionsResponse = await fetch('/api/v1/workflow/functions');
+        const workflowFunctionsResponseData = await workflowFunctionsResponse.json();
+        this.workflowfunctions = workflowFunctionsResponseData.data
+    }
+
+    async getTopicNames() {
+        const topicsResponse = await fetch('/api/v1/topic');
+        const topicsResponseData = await topicsResponse.json();
+        const topicNames = topicsResponseData.data.map((topic) => {return topic.topicName})
+        this.topicNames = topicNames
+    }
+
     async connectedCallback(){
+        // Async process workflow functions and topics
+        this.getWorkflowFunctions()
+        this.getTopicNames()
         const pageTitleElement = document.createElement("wc-page-heading-button")
         pageTitleElement.innerText = "All Workflows";
         pageTitleElement.buttonText = 'New Workflow';
