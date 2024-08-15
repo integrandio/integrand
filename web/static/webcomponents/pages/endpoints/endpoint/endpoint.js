@@ -14,19 +14,31 @@ class EndpointPage extends HTMLElement {
         this.shawdow.append(jobTemplate.content.cloneNode(true))
     }
 
-    deleteConnectorAction() {
-        const url = `/api/v1/connector/${this.endpoint_id}`
-        fetch(url, {
+    async deleteConnectorAction(evt) {
+        const endpoint_id = evt.currentTarget.endpoint_param_id
+        const url = `/api/v1/connector/${endpoint_id}`
+        const res = await fetch(url, {
             method: "Delete",
             headers: {"Content-Type": "application/json",}
-        }).then(res => {
-            // Check response to see if it's bad
-            res.json().then((endpointResponseData) => {
-                console.log(endpointResponseData)
-                window.location.replace("/endpoints");
-            });
         })
+        window.location.replace("/endpoints");
     }
+
+    newDeleteAction() {
+        const modalMarkup = `
+            <wc-modal id="modalThing">
+                <wc-title>Confirm Deletion</wc-title>
+                <p>Are you sure you want to delete endpoint ${this.endpoint_id}<p>
+                <form id="myForm">
+                  <input class="submit-button" type="submit" value="Confirm">
+                </form>
+            </wc-modal>`
+        const modal_element = fromHTML(modalMarkup);
+        this.shawdow.append(modal_element)
+        const formComponent = this.shawdow.querySelector('#myForm');
+        formComponent.addEventListener('submit', this.deleteConnectorAction);
+        formComponent.endpoint_param_id = this.endpoint_id
+    };
 
     generateMarkup(endpoint) {
         const endpoint_link = `/api/v1/connector/f/${endpoint.id}?apikey=${endpoint.securityKey}`;
@@ -66,7 +78,7 @@ class EndpointPage extends HTMLElement {
         const pageTitleElement = document.createElement("wc-page-heading-button")
         pageTitleElement.innerText = `Endpoint ${this.endpoint_id}`;
         pageTitleElement.buttonText = 'Delete';
-        pageTitleElement.buttonFunction = this.deleteConnectorAction.bind(this);
+        pageTitleElement.buttonFunction = this.newDeleteAction.bind(this);
         this.shawdow.append(pageTitleElement)
 
         this.shawdow.append(contentTemplate.content.cloneNode(true))

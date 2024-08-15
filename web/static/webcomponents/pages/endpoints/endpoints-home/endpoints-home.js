@@ -1,7 +1,7 @@
 import { fromHTML } from '../../../utils.js'
 
-const jobsHomeTemplate = document.createElement("template")
-jobsHomeTemplate.innerHTML = `
+const endpointssHomeTemplate = document.createElement("template")
+endpointssHomeTemplate.innerHTML = `
 <link rel="stylesheet" type="text/css" href="/static/reset.css">
 <link rel="stylesheet" type="text/css" href="/static/webcomponents/pages/endpoints/endpoints-home/endpoints-home.css">
 `
@@ -10,11 +10,19 @@ class EndpointsHome extends HTMLElement {
     constructor(){
         super()
         this.shawdow = this.attachShadow({mode: "open"})
-        this.shawdow.append(jobsHomeTemplate.content.cloneNode(true))
+        this.shawdow.append(endpointssHomeTemplate.content.cloneNode(true))
+        this.pendingRequest = false
     }
 
     newConnector(e) {
         e.preventDefault()
+        // Check if a request is being processed by this same client
+        if (this.pendingRequest) {
+            return
+        } else {
+            this.pendingRequest = true
+        }
+        
         const modal = this.shawdow.querySelector('#modalThing');
         const cardsContainer = this.shawdow.querySelector("#cardContainer");
         const data = new FormData(e.target);
@@ -30,7 +38,8 @@ class EndpointsHome extends HTMLElement {
         }).then(res => {
             if (res.ok) {
                 return res.json();
-              }
+            }
+            this.pendingRequest = false
             throw new Error('Something went wrong');
         }).then(glueResponseData => {
             const element = this.generateEndpointCard(glueResponseData.data)
@@ -39,11 +48,13 @@ class EndpointsHome extends HTMLElement {
             const modal_element = fromHTML(successMessage);
             modal.innerHTML = '';
             modal.appendChild(modal_element)
+            this.pendingRequest = false
         }).catch((error) => {
             const errorMessage = `<h1>Unable to Create Connector</h1>`
             const modal_element = fromHTML(errorMessage);
             modal.innerHTML = '';
             modal.appendChild(modal_element)
+            this.pendingRequest = false
         });
     }
 
