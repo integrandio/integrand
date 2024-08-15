@@ -9,12 +9,19 @@ topicsHomeTemplate.innerHTML = `
 class TopicsHome extends HTMLElement {
     constructor(){
         super()
+        this.pendingRequest = false;
         this.shawdow = this.attachShadow({mode: "open"})
         this.shawdow.append(topicsHomeTemplate.content.cloneNode(true))
     }
 
     newTopic(e) {
         e.preventDefault()
+        // Check if a request is being processed by this same client
+        if (this.pendingRequest) {
+            return
+        } else {
+            this.pendingRequest = true
+        }
         const modal = this.shawdow.querySelector('#modalThing');
         const cardsContainer = this.shawdow.querySelector("#cardContainer");
         const data = new FormData(e.target);
@@ -27,7 +34,8 @@ class TopicsHome extends HTMLElement {
         }).then(res => {
             if (res.ok) {
                 return res.json();
-              }
+            }
+            this.pendingRequest = false
             throw new Error('Something went wrong');
         }).then(topicResponseData => {
             const card_element = this.generateEndpointCard(topicResponseData.data)
@@ -36,11 +44,13 @@ class TopicsHome extends HTMLElement {
             const modal_element = fromHTML(successMessage);
             modal.innerHTML = '';
             modal.appendChild(modal_element)
+            this.pendingRequest = false
         }).catch((error) => {
             const errorMessage = `<h1>Unable to Create Topic</h1>`
             const modal_element = fromHTML(errorMessage);
             modal.innerHTML = '';
             modal.appendChild(modal_element)
+            this.pendingRequest = false
         });
     }
 

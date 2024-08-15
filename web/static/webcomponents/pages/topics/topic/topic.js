@@ -58,19 +58,31 @@ class TopicPage extends HTMLElement {
         this.shawdow.append(divElementContainer)
     }
 
-    deleteTopicAction() {
-        const url = `/api/v1/topic/${this.topic_id}`
-        fetch(url, {
+    async deleteTopicAction(evt) {
+        const topic_id = evt.currentTarget.topic_param_id
+        const url = `/api/v1/topic/${topic_id}`
+        await fetch(url, {
             method: "Delete",
             headers: {"Content-Type": "application/json",}
-        }).then(res => {
-            // Check response to see if it's bad
-            res.json().then((topicResponseData) => {
-                console.log(topicResponseData)
-                window.location.replace("/topics");
-            });
         })
+        window.location.replace("/topics");
     }
+
+    newDeleteModal() {
+        const modalMarkup = `
+            <wc-modal id="modalThing">
+                <wc-title>Confirm Deletion</wc-title>
+                <p>Are you sure you want to delete topic ${this.topic_id}?<p>
+                <form id="myForm">
+                  <input class="submit-button" type="submit" value="Confirm">
+                </form>
+            </wc-modal>`
+        const modal_element = fromHTML(modalMarkup);
+        this.shawdow.append(modal_element)
+        const formComponent = this.shawdow.querySelector('#myForm');
+        formComponent.addEventListener('submit', this.deleteTopicAction);
+        formComponent.topic_param_id = this.topic_id
+    };
 
     generateMarkup(topic) {
         let job_markup = `
@@ -111,7 +123,7 @@ class TopicPage extends HTMLElement {
         const pageTitleElement = document.createElement("wc-page-heading-button")
         pageTitleElement.innerText = `Topic ${this.topic_id}`;
         pageTitleElement.buttonText = 'Delete';
-        pageTitleElement.buttonFunction = this.deleteTopicAction.bind(this);
+        pageTitleElement.buttonFunction = this.newDeleteModal.bind(this);
         this.shawdow.append(pageTitleElement)
         this.shawdow.append(contentTemplate.content.cloneNode(true))
         console.log(jsonData.data)

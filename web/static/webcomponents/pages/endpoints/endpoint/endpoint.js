@@ -17,18 +17,18 @@ class EndpointPage extends HTMLElement {
     async deleteConnectorAction(evt) {
         const endpoint_id = evt.currentTarget.endpoint_param_id
         const url = `/api/v1/connector/${endpoint_id}`
-        const res = await fetch(url, {
+        await fetch(url, {
             method: "Delete",
             headers: {"Content-Type": "application/json",}
         })
         window.location.replace("/endpoints");
     }
 
-    newDeleteAction() {
+    newDeleteModal() {
         const modalMarkup = `
             <wc-modal id="modalThing">
                 <wc-title>Confirm Deletion</wc-title>
-                <p>Are you sure you want to delete endpoint ${this.endpoint_id}<p>
+                <p>Are you sure you want to delete endpoint ${this.endpoint_id}?<p>
                 <form id="myForm">
                   <input class="submit-button" type="submit" value="Confirm">
                 </form>
@@ -78,7 +78,7 @@ class EndpointPage extends HTMLElement {
         const pageTitleElement = document.createElement("wc-page-heading-button")
         pageTitleElement.innerText = `Endpoint ${this.endpoint_id}`;
         pageTitleElement.buttonText = 'Delete';
-        pageTitleElement.buttonFunction = this.newDeleteAction.bind(this);
+        pageTitleElement.buttonFunction = this.newDeleteModal.bind(this);
         this.shawdow.append(pageTitleElement)
 
         this.shawdow.append(contentTemplate.content.cloneNode(true))
