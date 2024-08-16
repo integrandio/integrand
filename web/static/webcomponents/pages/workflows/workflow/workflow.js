@@ -14,18 +14,31 @@ class WorkflowPage extends HTMLElement {
         this.shawdow.append(jobTemplate.content.cloneNode(true))
     }
 
-    deleteWorkflowAction() {
-        const url = `/api/v1/workflow/${this.workflow_id}`
-        fetch(url, {
+    async deleteWorkflowAction(evt) {
+        const workflow_id = evt.currentTarget.workflow_param_id
+        const url = `/api/v1/workflow/${workflow_id}`
+        await fetch(url, {
             method: "Delete",
             headers: {"Content-Type": "application/json",}
-        }).then(res => {
-            // Check response to see if it's bad
-            res.json().then((workflowResponseData) => {
-                window.location.replace("/workflows");
-            });
         })
+        window.location.replace("/workflows");
     }
+
+    newDeleteModal() {
+        const modalMarkup = `
+            <wc-modal id="modalThing">
+                <wc-title>Confirm Deletion</wc-title>
+                <p>Are you sure you want to delete workflow ${this.workflow_id}?<p>
+                <form id="myForm">
+                  <input class="submit-button" type="submit" value="Confirm">
+                </form>
+            </wc-modal>`
+        const modal_element = fromHTML(modalMarkup);
+        this.shawdow.append(modal_element)
+        const formComponent = this.shawdow.querySelector('#myForm');
+        formComponent.addEventListener('submit', this.deleteWorkflowAction);
+        formComponent.workflow_param_id = this.workflow_id
+    };
 
     generateMarkup(workflow) {
         const topic_link = `/topics/${workflow.topicName}`
@@ -67,7 +80,7 @@ class WorkflowPage extends HTMLElement {
         const pageTitleElement = document.createElement("wc-page-heading-button")
         pageTitleElement.innerText = `Workflow ${this.workflow_id}`;
         pageTitleElement.buttonText = 'Delete';
-        pageTitleElement.buttonFunction = this.deleteWorkflowAction.bind(this);
+        pageTitleElement.buttonFunction = this.newDeleteModal.bind(this);
         this.shawdow.append(pageTitleElement)
 
         this.shawdow.append(contentTemplate.content.cloneNode(true))

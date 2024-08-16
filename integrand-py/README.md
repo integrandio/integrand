@@ -1,4 +1,4 @@
-# Integrand-py
+# Integrand-py: Integrand Test Suite and Automation
 
 This directory contains the Python client implementation of the Integrand. This client can be used in other python projects to interact with your Integrand instance
 

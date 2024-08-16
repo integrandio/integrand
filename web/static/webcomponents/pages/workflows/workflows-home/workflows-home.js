@@ -11,12 +11,19 @@ class WorkflowsHome extends HTMLElement {
         super()
         this.shawdow = this.attachShadow({mode: "open"})
         this.shawdow.append(jobsHomeTemplate.content.cloneNode(true))
+        this.pendingRequest = false;
         this.workflowfunctions = []
         this.topicNames = []
     }
 
     newWorkflow(e) {
         e.preventDefault()
+        // Check if a request is being processed by this same client
+        if (this.pendingRequest) {
+            return
+        } else {
+            this.pendingRequest = true
+        }
         const modal = this.shawdow.querySelector('#modalThing');
         const cardsContainer = this.shawdow.querySelector("#cardContainer");
         const data = new FormData(e.target);
@@ -32,7 +39,8 @@ class WorkflowsHome extends HTMLElement {
         }).then(res => {
             if (res.ok) {
                 return res.json();
-              }
+            }
+            this.pendingRequest = false
             throw new Error('Something went wrong');
         }).then(workflowResponse => {
             const element = this.generateWorkflowCard(workflowResponse.data)
@@ -41,11 +49,13 @@ class WorkflowsHome extends HTMLElement {
             const modal_element = fromHTML(successMessage);
             modal.innerHTML = '';
             modal.appendChild(modal_element)
+            this.pendingRequest = false
         }).catch((error) => {
             const errorMessage = `<h1>Unable to Create Workflow</h1>`
             const modal_element = fromHTML(errorMessage);
             modal.innerHTML = '';
             modal.appendChild(modal_element)
+            this.pendingRequest = false
         });
     }
 

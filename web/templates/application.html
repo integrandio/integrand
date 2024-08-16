@@ -1,10 +1,12 @@
 <wc-router>
   <wc-route path="/" title="App Home" component="wc-home"></wc-route>
+  
   <wc-route
     path="/endpoints"
     title="All Endpoints"
     component="endpoints-home"
   ></wc-route>
+
   <wc-route
     path="/endpoints/:endpoint_id"
     title="Endpoint"
@@ -38,6 +40,12 @@
     title="All API Keys"
     component="apikeys-home"
   ></wc-route>
+
+  <wc-route
+  path="/@me"
+  title="User Profile"
+  component="wc-profile"
+></wc-route>
 
   <wc-route path="*" title="404" component="wc-notfound"></wc-route>
   <wc-outlet></wc-outlet>
