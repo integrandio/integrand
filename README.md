@@ -65,7 +65,7 @@ docker run -d \
 ### 🐙 Docker Compose:
 ```yaml
 services:
-  openobserve:
+  integrand:
     image: registry.vineglue.com/integrand-app:latest
     restart: unless-stopped
     environment:
@@ -80,12 +80,7 @@ volumes:
   data:
 ```
 
-## Running Locally and Development
-1. Git clone the repo
-2. Create directories, `data/commitlog` and `data/databases` in the root of the project.
-2. `go run .` from the root directory to start the server.
-
-## Features
+## 🌟 Features
 
 ### Stream Based Abstractions
 Integrand is built upon the foundations used to build other data intensive systems like Kafka and RabbitMQ. The log is a datastructure that makes practical sense for handling Webhooks from outside services.
@@ -97,3 +92,19 @@ Manage endpoints, topics and access via a clean, easy to use Web UI. Built using
 Manage your Integrand instance via the provided REST API if you prefer to not to leave your commandline. Regular REST and SSE enpoints are exposed to allow for building of different types of applications and integrations.
 
 The requests are all documented in the docs on the website as well as the  `test-request.txt` file as curl requests.
+
+## Running Locally and Development
+
+### Project Setup
+1. Git clone the repo
+2. Create directories, `data/commitlog` and `data/databases` in the root of the project.
+2. `go run .` from the root directory to start the server.
+
+### Running the Test Suite
+
+The integration test suite is written in Python and requires a Python development environment setup.
+See the detailed instructions here:
+[Integrand-py](integrand-py/README.md)
+
+This same suite is executed in the CI/CD via Docker Compose. It can also be run locally like so as well:
+[Docker Compose File](docker-compose-python-integration.yml)
