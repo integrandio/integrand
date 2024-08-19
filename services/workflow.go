@@ -149,11 +149,11 @@ func sendLeadToClf(jsonBody map[string]interface{}, sinkURL string) error {
 }
 
 type CalendlyEventBody struct {
-	Event   string  `json:"event"`
-	Payload Payload `json:"payload"`
+	Event   string          `json:"event"`
+	Payload CalendlyPayload `json:"payload"`
 }
 
-type Payload struct {
+type CalendlyPayload struct {
 	FirstName      *string `json:"first_name"`
 	LastName       *string `json:"last_name"`
 	Name           string  `json:"name"`

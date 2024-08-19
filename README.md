@@ -28,6 +28,14 @@ Integrand is an infrastructure tool that focuses on handling webhooks and provid
 
 Integrand provides abstractions that are similar to other stream/message queue based applications such as Kafka, Rabitmq and others. Event's are the main data structure that are passed though topics which is a logical grouping. Workflows can be created in application that allow events to be worked on in the same process. In a distributed set up, rest like API's are avaliable to create message processors in any other languge.
 
+## Screenshots
+
+| UI Screens                                                       | UI Screens                                                       |
+| ----------------------------------------------------------- | ---------------------------------------------------------- |
+| ![](./screenshots/Topics.webp)  | ![](./screenshots/endpoints.webp)  |
+| ![](./screenshots/Workflows.webp) | ![](./screenshots/api-keys.webp) |
+
+
 ### Repo Structure
 
 Integrand is a monolith application that contains both backend and frontend making up the application.
