@@ -76,7 +76,7 @@ func CreateNewEmailUser(email string, plainPassword string) (persistence.User, e
 	}
 	id, err := persistence.DATASTORE.CreateEmailUser(user)
 	if err != nil {
-		return user, nil
+		return user, err
 	}
 	user.ID = id
 	return user, nil

@@ -27,12 +27,12 @@ type updateUserBody struct {
 }
 
 func (u *userAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// _, err := apiBrowserAPIAuthenticate(w, r)
-	// if err != nil {
-	// 	slog.Error(err.Error())
-	// 	apiMessageResponse(w, http.StatusUnauthorized, "Authentication needed")
-	// 	return
-	// }
+	_, err := apiBrowserAPIAuthenticate(w, r)
+	if err != nil {
+		slog.Error(err.Error())
+		apiMessageResponse(w, http.StatusUnauthorized, "Authentication needed")
+		return
+	}
 	switch {
 	case r.Method == http.MethodGet && userAllApi.MatchString(r.URL.Path):
 		u.getUsers(w, r)

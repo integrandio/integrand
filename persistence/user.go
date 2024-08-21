@@ -14,13 +14,13 @@ const (
 )
 
 type User struct {
-	ID           int
-	Email        string
-	AuthType     AuthType
-	Password     string
-	SocialID     string
-	CreatedAt    time.Time
-	LastModified time.Time
+	ID           int       `json:"id"`
+	Email        string    `json:"email"`
+	AuthType     AuthType  `json:"authType"`
+	Password     string    `json:"-"`                  // Password is often omitted in JSON responses
+	SocialID     string    `json:"socialId,omitempty"` // Omits if empty
+	CreatedAt    time.Time `json:"createdAt"`
+	LastModified time.Time `json:"lastModified,omitempty"`
 }
 
 func (dstore *Datastore) getAllUsers() ([]User, error) {
