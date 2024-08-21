@@ -92,6 +92,7 @@ class TestConnectorAPI:
         response = integrand.DeleteConnector(id)
         assert response['status'] == 'success'
 
+
 class TestTopicAPI:
     def test_get_topics_empty(self):
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
@@ -156,7 +157,6 @@ class TestTopicAPI:
         try:
             integrand.DeleteTopic(topicName)
         except HTTPError as e:
-            print(e.response.status_code)
             assert e.response.status_code == 500
         # Cleanup
         integrand.DeleteConnector(connectorId)
@@ -172,7 +172,6 @@ class TestTopicAPI:
         try:
             integrand.DeleteTopic(topicName)
         except HTTPError as e:
-            print(e.response.status_code)
             assert e.response.status_code == 500
         # Cleanup
         integrand.DeleteConnector(connectorId)
@@ -188,7 +187,6 @@ class TestMessages():
         res = integrand.EndpointRequest(id, createResponse['data']['securityKey'], data)
         assert res['message'] == 'message sent successfully'
         response = integrand.GetEventsFromTopic(topicName, 0, 1)
-        print(response)
         assert len(response['data']) == 1
         assert response['data'][0] == data
         # Clean up
@@ -371,4 +369,74 @@ class TestsWorkflow():
         integrand.DeleteWorkflow(id)
         integrand.DeleteTopic(sourceTopicName)
         integrand.DeleteTopic(sinkTopicName)
+        
+        
+class TestsUser():
+    def test_create_user(self):
+        integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
+        email = "test@gmail.com"
+        password = "p@ssword!"
+        response = integrand.CreateUser(email, password)
+        id = response['data']['id']
+        assert response['data']['email'] == email
+        assert response['data']['authType'] == 'email'
+        # Cleanup
+        integrand.DeleteUser(id)
+
+    def test_delete_user(self):
+        integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
+        email = "test@gmail.com"
+        password = "p@ssword!"
+        response = integrand.CreateUser(email, password)
+        id = response['data']['id']
+        integrand.DeleteUser(id)
+        assert response['status'] == 'success'
+        
+    def test_delete_root_user_raises_exception(self):
+        integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
+        try:
+            integrand.DeleteUser(0)
+        except HTTPError as e:
+            assert e.response.status_code == 500
+        
+    def test_update_user_password(self):
+        integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
+        email = "test@gmail.com"
+        password = "p@ssword!"
+        response = integrand.CreateUser(email, password)
+        id = response['data']['id']
+        newPassword = "newP@ssword!"
+        response = integrand.UpdateUser(id, oldPassword=password, newPassword=newPassword)
+        assert response['status'] == 'success'
+        # Try to authenticate with old password
+        try:
+             integrand.Login(email, password)
+        except HTTPError as e:
+            assert e.response.status_code == 401
+        # Authenticate with new password
+        integrand.Login(email, newPassword)
+        # Cleanup
+        integrand.DeleteUser(id)
+        
+    def test_get_all_users(self):
+        integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
+        response = integrand.GetUsers()
+        assert response['status'] == 'success'
+        assert len(response['data']) == 1
+        
+    def test_get_single_user(self):
+        ROOT_USER_ID = 1
+        integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
+        response = integrand.GetUser(ROOT_USER_ID)
+        assert response['status'] == 'success'
+        assert response['data']['id'] == ROOT_USER_ID
+        
+        
+class TestsAuth():
+    def test_login(self):
+        integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
+        email = "admin"
+        password = "admin"
+        http_status_code = integrand.Login(email, password)
+        assert http_status_code == 200
         
