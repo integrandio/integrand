@@ -124,7 +124,7 @@ func (dstore *Datastore) DeleteEmailUser(id int) (int, error) {
 	return int(rowsDeleted), nil
 }
 
-func (dstore *Datastore) UpdateEmailUser(id int, password string) (User, error) {
+func (dstore *Datastore) UpdateEmailUser(id int, newPassword string) (User, error) {
 	updateQuery := `
 		UPDATE users
 		SET password = ?, last_modified = CURRENT_TIMESTAMP
@@ -133,7 +133,7 @@ func (dstore *Datastore) UpdateEmailUser(id int, password string) (User, error) 
 	`
 
 	dstore.RWMutex.Lock()
-	row := dstore.db.QueryRow(updateQuery, id, password)
+	row := dstore.db.QueryRow(updateQuery, newPassword, id)
 	dstore.RWMutex.Unlock()
 	var user User
 	err := row.Scan(&user.ID, &user.Email, &user.AuthType, &user.CreatedAt, &user.LastModified)

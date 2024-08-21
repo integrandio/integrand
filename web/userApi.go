@@ -23,7 +23,8 @@ type createUserBody struct {
 }
 
 type updateUserBody struct {
-	Password string
+	OldPassword string
+	NewPassword string
 }
 
 func (u *userAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -136,7 +137,7 @@ func (u *userAPI) updateUser(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
-	user, err := services.UpdatePassword(id, updatedUser.Password)
+	user, err := services.UpdatePassword(id, updatedUser.OldPassword, updatedUser.NewPassword)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
