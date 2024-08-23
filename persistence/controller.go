@@ -66,25 +66,18 @@ func initialize_broker() error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	users, err := DATASTORE.getAllUsers()
+	endpoints, err := DATASTORE.GetAllEndpoints()
 	if err != nil {
 		slog.Error(err.Error())
 		return err
 	}
-	for _, user := range users {
-		endpoints, err := DATASTORE.GetAllEndpoints(user.ID)
+	for _, endpoint := range endpoints {
+		_, err := BROKER.GetTopic(endpoint.TopicName)
 		if err != nil {
-			slog.Error(err.Error())
-			return err
-		}
-		for _, endpoint := range endpoints {
-			_, err := BROKER.GetTopic(endpoint.TopicName)
+			_, err = BROKER.CreateTopic(endpoint.TopicName)
 			if err != nil {
-				_, err = BROKER.CreateTopic(endpoint.TopicName)
-				if err != nil {
-					slog.Error(err.Error())
-					return err
-				}
+				slog.Error(err.Error())
+				return err
 			}
 		}
 	}

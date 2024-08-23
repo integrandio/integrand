@@ -36,7 +36,7 @@ func CreateEventStream(topicName string) (persistence.TopicDetails, error) {
 
 func DeleteEventStream(topicName string, userId int) error {
 	// Check if the topic is being used by any endpoint
-	endpoints, err := GetEndpoints(userId)
+	endpoints, err := GetEndpoints()
 	if err != nil {
 		return err
 	}
