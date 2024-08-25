@@ -21,6 +21,7 @@ func LoginPage(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			log.Println(err)
 			// Invalid credentials, show the login page with an error message.
+			w.WriteHeader(401)
 			fmt.Fprintf(w, "Invalid credentials. Please try again.")
 			return
 		} else {

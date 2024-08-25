@@ -22,12 +22,12 @@ func MessageToSink(topicName string, userId int, value interface{}) error {
 	return nil
 }
 
-func GetEndpoints(userId int) ([]persistence.Endpoint, error) {
-	return persistence.DATASTORE.GetAllEndpoints(userId)
+func GetEndpoints() ([]persistence.Endpoint, error) {
+	return persistence.DATASTORE.GetAllEndpoints()
 }
 
-func GetEndpoint(EndpointID string, userId int) (persistence.Endpoint, error) {
-	return persistence.DATASTORE.GetEndpointByUser(EndpointID, userId)
+func GetEndpoint(EndpointID string) (persistence.Endpoint, error) {
+	return persistence.DATASTORE.GetEndpoint(EndpointID)
 }
 
 func GetEndpointBySecurityKey(EndpointID string, security_key string) (persistence.Endpoint, error) {

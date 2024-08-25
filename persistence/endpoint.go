@@ -28,10 +28,10 @@ func (dstore *Datastore) GetEndpointBySecurityKey(id string, security_key string
 	return stickey_connection, nil
 }
 
-func (dstore *Datastore) GetEndpointByUser(id string, userId int) (Endpoint, error) {
-	selectQuery := "SELECT id, security_key, topic_name, last_modified, user_id FROM stickey_connections WHERE id=? and user_id=?;"
+func (dstore *Datastore) GetEndpoint(id string) (Endpoint, error) {
+	selectQuery := "SELECT id, security_key, topic_name, last_modified, user_id FROM stickey_connections WHERE id=?;"
 	dstore.RWMutex.RLock()
-	row := dstore.db.QueryRow(selectQuery, id, userId)
+	row := dstore.db.QueryRow(selectQuery, id)
 	dstore.RWMutex.RUnlock()
 
 	var stickey_connection Endpoint
@@ -43,11 +43,11 @@ func (dstore *Datastore) GetEndpointByUser(id string, userId int) (Endpoint, err
 	return stickey_connection, nil
 }
 
-func (dstore *Datastore) GetAllEndpoints(userId int) ([]Endpoint, error) {
+func (dstore *Datastore) GetAllEndpoints() ([]Endpoint, error) {
 	stickey_connections := []Endpoint{}
-	selectQuery := "SELECT id, security_key, topic_name, last_modified FROM stickey_connections WHERE user_id=?;"
+	selectQuery := "SELECT id, security_key, topic_name, last_modified FROM stickey_connections;"
 	dstore.RWMutex.RLock()
-	rows, err := dstore.db.Query(selectQuery, userId)
+	rows, err := dstore.db.Query(selectQuery)
 	dstore.RWMutex.RUnlock()
 	if err != nil {
 		return stickey_connections, err

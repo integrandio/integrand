@@ -58,10 +58,10 @@ func (dstore *Datastore) DeleteAPIKey(key string, userID int) (int, error) {
 	return int(rowsDeleted), nil
 }
 
-func (dstore *Datastore) GetAPIKeysByUserID(userID int) ([]ApiKey, error) {
-	selectQuery := "SELECT id, key, created_at FROM api_keys WHERE user_id=?"
+func (dstore *Datastore) GetAPIKeys() ([]ApiKey, error) {
+	selectQuery := "SELECT id, key, created_at FROM api_keys;"
 	dstore.RWMutex.RLock()
-	rows, err := dstore.db.Query(selectQuery, userID)
+	rows, err := dstore.db.Query(selectQuery)
 	dstore.RWMutex.RUnlock()
 	if err != nil {
 		return nil, err

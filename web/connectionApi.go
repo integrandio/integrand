@@ -102,7 +102,7 @@ func (ga *glueAPI) endpointHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ga *glueAPI) getAllGlueHandlers(w http.ResponseWriter, _ *http.Request) {
-	endpoints, err := services.GetEndpoints(ga.userID)
+	endpoints, err := services.GetEndpoints()
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -124,7 +124,7 @@ func (ga *glueAPI) getGlueHandler(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	stickyConnection, err := services.GetEndpoint(matches[1], ga.userID)
+	stickyConnection, err := services.GetEndpoint(matches[1])
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")

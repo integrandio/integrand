@@ -204,3 +204,78 @@ class Integrand:
         response.raise_for_status()
         response_body = response.json()
         return response_body
+    
+    
+    def CreateUser(self, email: str, password: str):
+        url = f'{self.integrand_base_endpoint}/api/v1/user'
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {self.api_key}',
+        }
+        body = {
+            "email": email,
+            "password": password ,
+        }
+        response = requests.post(url, headers=headers, json=body)
+        response.raise_for_status()
+        response_body = response.json()
+        return response_body
+    
+    def DeleteUser(self, id: int):
+        url = f'{self.integrand_base_endpoint}/api/v1/user/{id}'
+        headers = {
+            'Authorization': f'Bearer {self.api_key}',
+        }
+        response = requests.delete(url, headers=headers)
+        response.raise_for_status()
+        response_body = response.json()
+        return response_body
+    
+    def UpdateUser(self, id: str, oldPassword: str, newPassword: str):
+        url = f'{self.integrand_base_endpoint}/api/v1/user/{id}'
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {self.api_key}',
+        }
+        body = {
+            "oldPassword": oldPassword,
+            "newPassword": newPassword,
+        }
+        response = requests.put(url, headers=headers, json=body)
+        response.raise_for_status()
+        response_body = response.json()
+        return response_body
+    
+    def GetUser(self, id: str):
+        url = f'{self.integrand_base_endpoint}/api/v1/user/{id}'
+        headers = {
+            'Authorization': f'Bearer {self.api_key}',
+        }
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        response_body = response.json()
+        return response_body
+    
+    def GetUsers(self):
+        url = f'{self.integrand_base_endpoint}/api/v1/user'
+        headers = {
+            'Authorization': f'Bearer {self.api_key}',
+        }
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        response_body = response.json()
+        return response_body
+    
+    def Login(self, email: str, password: str):
+        url = f'{self.integrand_base_endpoint}/login'
+        body = {
+            "email": email,
+            "password": password,
+        }
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+        response = requests.post(url, headers=headers, data=body)
+        response.raise_for_status()
+        return response.status_code
+        

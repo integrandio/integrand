@@ -29,8 +29,8 @@ func AuthenticateCookie(w http.ResponseWriter, r *http.Request) (int, error) {
 	return int(userID), nil
 }
 
-func ListAPIKeys(userId int) ([]persistence.ApiKey, error) {
-	return persistence.DATASTORE.GetAPIKeysByUserID(userId)
+func ListAPIKeys() ([]persistence.ApiKey, error) {
+	return persistence.DATASTORE.GetAPIKeys()
 }
 
 func AuthenticateToken(headerValue string) (persistence.ApiKey, error) {
@@ -76,7 +76,7 @@ func CreateNewEmailUser(email string, plainPassword string) (persistence.User, e
 	}
 	id, err := persistence.DATASTORE.CreateEmailUser(user)
 	if err != nil {
-		return user, nil
+		return user, err
 	}
 	user.ID = id
 	return user, nil

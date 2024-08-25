@@ -43,7 +43,7 @@ func (ka *keyAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (ka *keyAPI) listApiKeysHandler(w http.ResponseWriter, _ *http.Request) {
-	apiKeys, err := services.ListAPIKeys(ka.userID)
+	apiKeys, err := services.ListAPIKeys()
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
