@@ -395,7 +395,7 @@ class TestsUser():
     def test_delete_root_user_raises_exception(self):
         integrand = Integrand(INTEGRAND_URL, INTEGRAND_API_KEY)
         try:
-            integrand.DeleteUser(0)
+            integrand.DeleteUser(1)
         except HTTPError as e:
             assert e.response.status_code == 500
         

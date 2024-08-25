@@ -58,7 +58,7 @@ func CreateUser(email string, plainPassword string, auth_type persistence.AuthTy
 }
 
 func RemoveUser(id int) (int, error) {
-	if id == 0 {
+	if id == 1 {
 		return -1, errors.New("can't delete root user")
 	}
 	return persistence.DATASTORE.DeleteEmailUser(id)
