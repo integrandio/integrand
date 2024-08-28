@@ -15,11 +15,11 @@ var (
 	glueSingleApi = regexp.MustCompile(`^\/api/v1/connector\/(.*)$`)
 )
 
-type glueAPI struct {
+type endpointAPI struct {
 	userID int
 }
 
-func (ga *glueAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (ga *endpointAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case glueEndpointSingleApi.MatchString(r.URL.Path):
 		enableCors(&w)
@@ -29,7 +29,7 @@ func (ga *glueAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (ga *glueAPI) apier(w http.ResponseWriter, r *http.Request) {
+func (ga *endpointAPI) apier(w http.ResponseWriter, r *http.Request) {
 	userId, err := apiBrowserAPIAuthenticate(w, r)
 	if err != nil {
 		slog.Error(err.Error())
@@ -58,7 +58,7 @@ func (ga *glueAPI) apier(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (ga *glueAPI) endpointHandler(w http.ResponseWriter, r *http.Request) {
+func (ga *endpointAPI) endpointHandler(w http.ResponseWriter, r *http.Request) {
 	security_key := r.URL.Query().Get("apikey")
 	// Check the content type header and parse appropriately
 	matches := glueEndpointSingleApi.FindStringSubmatch(r.URL.Path)
@@ -88,7 +88,7 @@ func (ga *glueAPI) endpointHandler(w http.ResponseWriter, r *http.Request) {
 			apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 			return
 		}
-		err = services.MessageToSink(sticky.TopicName, sticky.UserId, i)
+		err = services.MessageToSink(sticky.TopicName, i)
 		if err != nil {
 			slog.Error(err.Error())
 			apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -101,8 +101,8 @@ func (ga *glueAPI) endpointHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (ga *glueAPI) getAllGlueHandlers(w http.ResponseWriter, _ *http.Request) {
-	endpoints, err := services.GetEndpoints()
+func (ga *endpointAPI) getAllGlueHandlers(w http.ResponseWriter, _ *http.Request) {
+	endpoints, err := services.GetEndpoints(ga.userID)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -118,13 +118,13 @@ func (ga *glueAPI) getAllGlueHandlers(w http.ResponseWriter, _ *http.Request) {
 	w.Write(resJsonBytes)
 }
 
-func (ga *glueAPI) getGlueHandler(w http.ResponseWriter, r *http.Request) {
+func (ga *endpointAPI) getGlueHandler(w http.ResponseWriter, r *http.Request) {
 	matches := glueSingleApi.FindStringSubmatch(r.URL.Path)
 	if len(matches) < 2 {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	stickyConnection, err := services.GetEndpoint(matches[1])
+	stickyConnection, err := services.GetEndpoint(matches[1], ga.userID)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -144,14 +144,14 @@ type CreateGlueBody struct {
 	TopicName string `json:"topicName"`
 }
 
-func (ga *glueAPI) createGlueHandler(w http.ResponseWriter, r *http.Request) {
+func (ga *endpointAPI) createGlueHandler(w http.ResponseWriter, r *http.Request) {
 	var createBody CreateGlueBody
 	if err := json.NewDecoder(r.Body).Decode(&createBody); err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
-	stickyConnection, err := services.CreateEndpoint(ga.userID, createBody.RouteID, createBody.TopicName)
+	stickyConnection, err := services.CreateEndpoint(ga.userID, createBody.RouteID, createBody.TopicName, ga.userID)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -166,13 +166,13 @@ func (ga *glueAPI) createGlueHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(resJsonBytes)
 }
 
-func (ga *glueAPI) deleteGlueHandler(w http.ResponseWriter, r *http.Request) {
+func (ga *endpointAPI) deleteGlueHandler(w http.ResponseWriter, r *http.Request) {
 	matches := glueSingleApi.FindStringSubmatch(r.URL.Path)
 	if len(matches) < 2 {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	_, err := services.RemoveEndpoint(ga.userID, matches[1])
+	_, err := services.RemoveEndpoint(matches[1], ga.userID)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")

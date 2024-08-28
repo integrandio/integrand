@@ -86,7 +86,7 @@ func (ta *topicAPI) getTopic(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	eventStream, err := services.GetEventStream(matches[1])
+	eventStream, err := services.GetEventStream(matches[1], ta.userID)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -112,7 +112,7 @@ func (ta *topicAPI) createTopic(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
 		return
 	}
-	topic, err := services.CreateEventStream(createBody.TopicName)
+	topic, err := services.CreateEventStream(createBody.TopicName, ta.userID)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -170,7 +170,7 @@ func (ta *topicAPI) getEvents(w http.ResponseWriter, r *http.Request) {
 	}
 
 	matches := topicEventsApi.FindStringSubmatch(r.URL.Path)
-	eventStream, err := services.GetEventStream(matches[1])
+	eventStream, err := services.GetEventStream(matches[1], ta.userID)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -229,7 +229,7 @@ func (ta *topicAPI) streamEvents(w http.ResponseWriter, r *http.Request) {
 	}
 	matches := topicConsumeApi.FindStringSubmatch(r.URL.Path)
 
-	eventStream, err := services.GetEventStream(matches[1])
+	eventStream, err := services.GetEventStream(matches[1], ta.userID)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")

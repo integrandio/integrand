@@ -7,15 +7,27 @@ import (
 )
 
 func GetEventStreams(userId int) ([]persistence.TopicDetails, error) {
-	return persistence.BROKER.GetTopics(userId), nil
+	err := isUserAuthorized(userId, "read_topic")
+	if err != nil {
+		return nil, err
+	}
+	return persistence.BROKER.GetTopics(), nil
 }
 
-func GetEventStream(topicName string) (persistence.TopicDetails, error) {
+func GetEventStream(topicName string, userId int) (persistence.TopicDetails, error) {
+	err := isUserAuthorized(userId, "read_topic")
+	if err != nil {
+		return persistence.TopicDetails{}, err
+	}
 	return persistence.BROKER.GetTopic(topicName)
 }
 
-func CreateEventStream(topicName string) (persistence.TopicDetails, error) {
+func CreateEventStream(topicName string, userId int) (persistence.TopicDetails, error) {
 	var topicDetails persistence.TopicDetails
+	err := isUserAuthorized(userId, "write_topic")
+	if err != nil {
+		return topicDetails, err
+	}
 	if topicName == "" {
 		// TODO: Should this be random?
 		topicName = utils.RandomString(5)
@@ -35,8 +47,12 @@ func CreateEventStream(topicName string) (persistence.TopicDetails, error) {
 }
 
 func DeleteEventStream(topicName string, userId int) error {
+	err := isUserAuthorized(userId, "write_topic")
+	if err != nil {
+		return err
+	}
 	// Check if the topic is being used by any endpoint
-	endpoints, err := GetEndpoints()
+	endpoints, err := persistence.DATASTORE.GetAllEndpoints()
 	if err != nil {
 		return err
 	}
@@ -46,7 +62,7 @@ func DeleteEventStream(topicName string, userId int) error {
 		}
 	}
 	// Check if the topic is being used by any workflow
-	workflows, err := GetWorkflows()
+	workflows, err := persistence.DATASTORE.GetWorkflows()
 	if err != nil {
 		return err
 	}

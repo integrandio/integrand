@@ -3,11 +3,18 @@ PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER NOT NULL PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
-  auth_type TEXT CHECK( auth_type IN ('email','google','github') ) NOT NULL,
-  password TEXT,
-  socialID TEXT,
+  password TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- API Key is associated with a user, it has all the same permissions
+CREATE TABLE IF NOT EXISTS api_keys (
+  id INTEGER NOT NULL PRIMARY KEY,
+  key TEXT UNIQUE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  user_id INTEGER,
+  FOREIGN KEY(user_ID) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS sessions (
@@ -16,21 +23,11 @@ CREATE TABLE IF NOT EXISTS sessions (
   time_accessed TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS stickey_connections (
+CREATE TABLE IF NOT EXISTS endpoints (
   id TEXT UNIQUE NOT NULL,
   security_key TEXT NOT NULL,
   topic_name TEXT NOT NULL,
-  last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  user_id INTEGER,
-  FOREIGN KEY(user_ID) REFERENCES users(id)
-);
-
-CREATE TABLE IF NOT EXISTS api_keys (
-  id INTEGER NOT NULL PRIMARY KEY,
-  key TEXT UNIQUE NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  user_id INTEGER,
-  FOREIGN KEY(user_ID) REFERENCES users(id)
+  last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS workflows (

@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func MessageToSink(topicName string, userId int, value interface{}) error {
+func MessageToSink(topicName string, value interface{}) error {
 	resBytes, err := json.Marshal(value)
 	if err != nil {
 		slog.Error(err.Error())
@@ -22,11 +22,19 @@ func MessageToSink(topicName string, userId int, value interface{}) error {
 	return nil
 }
 
-func GetEndpoints() ([]persistence.Endpoint, error) {
+func GetEndpoints(userID int) ([]persistence.Endpoint, error) {
+	err := isUserAuthorized(userID, "read_endpoint")
+	if err != nil {
+		return nil, err
+	}
 	return persistence.DATASTORE.GetAllEndpoints()
 }
 
-func GetEndpoint(EndpointID string) (persistence.Endpoint, error) {
+func GetEndpoint(EndpointID string, userID int) (persistence.Endpoint, error) {
+	err := isUserAuthorized(userID, "read_endpoint")
+	if err != nil {
+		return persistence.Endpoint{}, err
+	}
 	return persistence.DATASTORE.GetEndpoint(EndpointID)
 }
 
@@ -34,7 +42,11 @@ func GetEndpointBySecurityKey(EndpointID string, security_key string) (persisten
 	return persistence.DATASTORE.GetEndpointBySecurityKey(EndpointID, security_key)
 }
 
-func CreateEndpoint(userId int, EndpointID string, topicName string) (persistence.Endpoint, error) {
+func CreateEndpoint(userId int, EndpointID string, topicName string, userID int) (persistence.Endpoint, error) {
+	err := isUserAuthorized(userID, "write_endpoint")
+	if err != nil {
+		return persistence.Endpoint{}, err
+	}
 	if EndpointID == "" {
 		EndpointID = utils.RandomString(5)
 	}
@@ -49,10 +61,9 @@ func CreateEndpoint(userId int, EndpointID string, topicName string) (persistenc
 		RouteID:      EndpointID,
 		Security_key: security_key,
 		LastModified: time.Now(),
-		UserId:       userId,
 	}
 
-	_, err := persistence.BROKER.GetTopic(topicName)
+	_, err = persistence.BROKER.GetTopic(topicName)
 	if err != nil {
 		// TODO: Create the topic if it does not exist
 		_, err := persistence.BROKER.CreateTopic(topicName)
@@ -69,6 +80,10 @@ func CreateEndpoint(userId int, EndpointID string, topicName string) (persistenc
 	return sticky_connection, nil
 }
 
-func RemoveEndpoint(userId int, EndpointID string) (int, error) {
-	return persistence.DATASTORE.DeleteEndpoint(EndpointID, userId)
+func RemoveEndpoint(EndpointID string, userID int) (int, error) {
+	err := isUserAuthorized(userID, "write_endpoint")
+	if err != nil {
+		return 0, err
+	}
+	return persistence.DATASTORE.DeleteEndpoint(EndpointID)
 }

@@ -34,17 +34,22 @@ func Initialize() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	user := User{
 		Email:    os.Getenv("ROOT_EMAIL"),
 		Password: string(password),
-		AuthType: EMAIL,
 	}
-	id, err := DATASTORE.CreateEmailUser(user)
+
+	id, err := DATASTORE.CreateUser(user)
 	if err != nil {
 		// if the user already exists, we don't want this program to crash
 		slog.Error(err.Error())
 	}
 	user.ID = id
+	err = DATASTORE.createUserRole(user.ID, SUPER_USER)
+	if err != nil {
+		slog.Error(err.Error())
+	}
 	apiKey := os.Getenv("INITIAL_API_KEY")
 	// Generate and log an initial API key
 	_, err = DATASTORE.InsertAPIKey(apiKey, user.ID)

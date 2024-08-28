@@ -29,6 +29,18 @@ func AuthenticateCookie(w http.ResponseWriter, r *http.Request) (int, error) {
 	return int(userID), nil
 }
 
+func isUserAuthorized(userId int, requiredSecurable string) error {
+	securables, err := persistence.DATASTORE.GetSecurablesByUserId(userId)
+	if err != nil {
+		return err
+	}
+	contained := utils.Contains(securables, requiredSecurable)
+	if !contained {
+		return errors.New("user is not authorized")
+	}
+	return nil
+}
+
 func ListAPIKeys() ([]persistence.ApiKey, error) {
 	return persistence.DATASTORE.GetAPIKeys()
 }
@@ -49,7 +61,7 @@ func AuthenticateToken(headerValue string) (persistence.ApiKey, error) {
 }
 
 func EmailAuthenticate(Email string, password string) (persistence.User, error) {
-	user, err := persistence.DATASTORE.GetEmailUser(Email)
+	user, err := persistence.DATASTORE.GetUserByEmail(Email)
 	if err != nil {
 		slog.Error(err.Error())
 		return persistence.User{}, err
@@ -70,11 +82,10 @@ func CreateNewEmailUser(email string, plainPassword string) (persistence.User, e
 	user = persistence.User{
 		Email:        email,
 		Password:     string(password),
-		AuthType:     persistence.EMAIL,
 		CreatedAt:    time.Now(),
 		LastModified: time.Now(),
 	}
-	id, err := persistence.DATASTORE.CreateEmailUser(user)
+	id, err := persistence.DATASTORE.CreateUser(user)
 	if err != nil {
 		return user, err
 	}

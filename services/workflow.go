@@ -30,7 +30,7 @@ func Workflower() error {
 	log.Println("Starting all workflows")
 	for {
 		time.Sleep(100 * time.Millisecond)
-		currentWorkflows, _ := GetEnabledWorkflows()
+		currentWorkflows, _ := persistence.DATASTORE.GetEnabledWorkflows()
 
 		var wg sync.WaitGroup
 		for _, workflow := range currentWorkflows {

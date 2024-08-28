@@ -16,9 +16,9 @@ func NewNewWebRouter() *http.ServeMux {
 	// Application UI
 	mux.HandleFunc("/", applicationPage)
 
-	glueApi := &glueAPI{}
-	mux.Handle("/api/v1/connector", glueApi)
-	mux.Handle("/api/v1/connector/", glueApi)
+	endpointApi := &endpointAPI{}
+	mux.Handle("/api/v1/connector", endpointApi)
+	mux.Handle("/api/v1/connector/", endpointApi)
 
 	topicApi := &topicAPI{}
 	mux.Handle("/api/v1/topic", topicApi)

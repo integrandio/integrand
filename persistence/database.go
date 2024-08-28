@@ -3,6 +3,7 @@ package persistence
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"sync"
@@ -60,7 +61,7 @@ func setupConnection(isDevMode bool) (*Datastore, error) {
 	}
 	db, err := sql.Open("sqlite3", db_file)
 	if err != nil {
-		log.Println(db_file)
+		log.Println(err)
 		return nil, err
 	}
 	// Intialize our tables
@@ -69,8 +70,38 @@ func setupConnection(isDevMode bool) (*Datastore, error) {
 		return nil, err
 	}
 	if _, err := db.Exec(string(query)); err != nil {
+		log.Println(err)
 		return nil, err
 	}
+
+	//Intialize our auth table
+	query, err = os.ReadFile("data/scripts/auth.sql")
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	if _, err := db.Exec(string(query)); err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	// Intialize our tables
+	query, err = os.ReadFile("data/scripts/auth_setup.sql")
+	if err != nil {
+		return nil, err
+	}
+	if _, err := db.Exec(string(query)); err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	// tables := []string{"roles", "securables", "role_to_securable", "user_to_role"}
+	// for _, table := range tables {
+	// 	// Execute the query
+	// 	fmt.Println("Table ", table)
+	// 	select_query := fmt.Sprintf("SELECT * FROM %s", table)
+	// 	debug_table(db, select_query)
+	// }.
 
 	integrandDB := &Datastore{
 		db:      db,
@@ -78,4 +109,51 @@ func setupConnection(isDevMode bool) (*Datastore, error) {
 	}
 
 	return integrandDB, nil
+}
+
+func debug_table(db *sql.DB, select_query string) {
+	rows, err := db.Query(select_query)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// Get column names
+	columns, err := rows.Columns()
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// Make a slice for the values
+	values := make([]interface{}, len(columns))
+
+	// rows.Scan wants '[]interface{}' as an argument, so we must copy the
+	// references into such a slice
+	// See http://code.google.com/p/go-wiki/wiki/InterfaceSlice for details
+	scanArgs := make([]interface{}, len(values))
+	for i := range values {
+		scanArgs[i] = &values[i]
+	}
+
+	// Fetch rows
+	for rows.Next() {
+		err = rows.Scan(scanArgs...)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		// Print data
+		for i, value := range values {
+			switch value := value.(type) {
+			case nil:
+				fmt.Println(columns[i], ": NULL")
+
+			case []byte:
+				fmt.Println(columns[i], ": ", string(value))
+
+			default:
+				fmt.Println(columns[i], ": ", value)
+			}
+		}
+	}
+	fmt.Println("-----------------------------------")
 }

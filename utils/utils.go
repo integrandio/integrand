@@ -8,6 +8,16 @@ import (
 	"unsafe"
 )
 
+// see if a list of strings contains a certain string
+func Contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
 func GetEnvrionmentVariableString(env string, substitueVariable string) string {
 	value := os.Getenv(env)
 	if value == "" {

@@ -10,18 +10,16 @@ type Endpoint struct {
 	Security_key string    `json:"securityKey,omitempty"`
 	TopicName    string    `json:"topicName,omitempty"`
 	LastModified time.Time `json:"lastModified,omitempty"`
-	UserId       int       `json:"userId,omitempty"`
 }
 
 func (dstore *Datastore) GetEndpointBySecurityKey(id string, security_key string) (Endpoint, error) {
-	selectQuery := "SELECT id, security_key, topic_name, last_modified, user_id FROM stickey_connections WHERE id=? and security_key=?;"
+	selectQuery := "SELECT id, security_key, topic_name, last_modified FROM endpoints WHERE id=? and security_key=?;"
 	dstore.RWMutex.RLock()
 	row := dstore.db.QueryRow(selectQuery, id, security_key)
 	dstore.RWMutex.RUnlock()
 
 	var stickey_connection Endpoint
-
-	err := row.Scan(&stickey_connection.RouteID, &stickey_connection.Security_key, &stickey_connection.TopicName, &stickey_connection.LastModified, &stickey_connection.UserId)
+	err := row.Scan(&stickey_connection.RouteID, &stickey_connection.Security_key, &stickey_connection.TopicName, &stickey_connection.LastModified)
 	if err != nil {
 		return stickey_connection, err
 	}
@@ -29,14 +27,14 @@ func (dstore *Datastore) GetEndpointBySecurityKey(id string, security_key string
 }
 
 func (dstore *Datastore) GetEndpoint(id string) (Endpoint, error) {
-	selectQuery := "SELECT id, security_key, topic_name, last_modified, user_id FROM stickey_connections WHERE id=?;"
+	selectQuery := "SELECT id, security_key, topic_name, last_modified FROM endpoints WHERE id=?;"
 	dstore.RWMutex.RLock()
 	row := dstore.db.QueryRow(selectQuery, id)
 	dstore.RWMutex.RUnlock()
 
 	var stickey_connection Endpoint
 
-	err := row.Scan(&stickey_connection.RouteID, &stickey_connection.Security_key, &stickey_connection.TopicName, &stickey_connection.LastModified, &stickey_connection.UserId)
+	err := row.Scan(&stickey_connection.RouteID, &stickey_connection.Security_key, &stickey_connection.TopicName, &stickey_connection.LastModified)
 	if err != nil {
 		return stickey_connection, err
 	}
@@ -44,31 +42,31 @@ func (dstore *Datastore) GetEndpoint(id string) (Endpoint, error) {
 }
 
 func (dstore *Datastore) GetAllEndpoints() ([]Endpoint, error) {
-	stickey_connections := []Endpoint{}
-	selectQuery := "SELECT id, security_key, topic_name, last_modified FROM stickey_connections;"
+	endpoints := []Endpoint{}
+	selectQuery := "SELECT id, security_key, topic_name, last_modified FROM endpoints;"
 	dstore.RWMutex.RLock()
 	rows, err := dstore.db.Query(selectQuery)
 	dstore.RWMutex.RUnlock()
 	if err != nil {
-		return stickey_connections, err
+		return endpoints, err
 	}
 	for rows.Next() {
 		var stickey_connection Endpoint
 		err := rows.Scan(&stickey_connection.RouteID, &stickey_connection.Security_key, &stickey_connection.TopicName, &stickey_connection.LastModified)
 		if err != nil {
 			rows.Close()
-			return stickey_connections, err
+			return endpoints, err
 		}
-		stickey_connections = append(stickey_connections, stickey_connection)
+		endpoints = append(endpoints, stickey_connection)
 	}
 	rows.Close()
-	return stickey_connections, nil
+	return endpoints, nil
 }
 
 func (dstore *Datastore) InsertEndpoint(sticky_connection Endpoint) (int, error) {
-	insertQuery := "INSERT INTO stickey_connections(id, security_key, topic_name, user_id) VALUES(?, ?, ?, ?);"
+	insertQuery := "INSERT INTO endpoints(id, security_key, topic_name) VALUES(?, ?, ?);"
 	dstore.RWMutex.Lock()
-	res, err := dstore.db.Exec(insertQuery, sticky_connection.RouteID, sticky_connection.Security_key, sticky_connection.TopicName, sticky_connection.UserId)
+	res, err := dstore.db.Exec(insertQuery, sticky_connection.RouteID, sticky_connection.Security_key, sticky_connection.TopicName)
 	dstore.RWMutex.Unlock()
 	if err != nil {
 		return 0, err
@@ -80,10 +78,10 @@ func (dstore *Datastore) InsertEndpoint(sticky_connection Endpoint) (int, error)
 	return int(rowsCreated), nil
 }
 
-func (dstore *Datastore) DeleteEndpoint(stickey_connection_id string, userId int) (int, error) {
-	insertQuery := "DELETE FROM stickey_connections WHERE id=? AND user_id=?"
+func (dstore *Datastore) DeleteEndpoint(stickey_connection_id string) (int, error) {
+	insertQuery := "DELETE FROM endpoints WHERE id=?"
 	dstore.RWMutex.Lock()
-	res, err := dstore.db.Exec(insertQuery, stickey_connection_id, userId)
+	res, err := dstore.db.Exec(insertQuery, stickey_connection_id)
 	dstore.RWMutex.Unlock()
 	if err != nil {
 		return 0, err

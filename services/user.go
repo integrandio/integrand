@@ -9,7 +9,7 @@ import (
 )
 
 func GetUsers() ([]persistence.User, error) {
-	return persistence.DATASTORE.GetEmailUsers()
+	return persistence.DATASTORE.GetUsers()
 }
 
 func GetUser(id int) (persistence.User, error) {
@@ -34,7 +34,7 @@ func UpdatePassword(id int, oldPasswordPlain string, newPasswordPlain string) (p
 	}
 }
 
-func CreateUser(email string, plainPassword string, auth_type persistence.AuthType, socialId string) (persistence.User, error) {
+func CreateUser(email string, plainPassword string) (persistence.User, error) {
 	var user persistence.User
 	password, err := bcrypt.GenerateFromPassword([]byte(plainPassword), bcrypt.DefaultCost)
 	if err != nil {
@@ -44,11 +44,9 @@ func CreateUser(email string, plainPassword string, auth_type persistence.AuthTy
 	user = persistence.User{
 		Email:    email,
 		Password: string(password),
-		AuthType: auth_type,
-		SocialID: socialId,
 	}
 
-	id, err := persistence.DATASTORE.CreateEmailUser(user)
+	id, err := persistence.DATASTORE.CreateUser(user)
 	if err != nil {
 		return user, err
 	}
@@ -61,5 +59,5 @@ func RemoveUser(id int) (int, error) {
 	if id == 1 {
 		return -1, errors.New("can't delete root user")
 	}
-	return persistence.DATASTORE.DeleteEmailUser(id)
+	return persistence.DATASTORE.DeleteUserByID(id)
 }

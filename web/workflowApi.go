@@ -17,15 +17,17 @@ var (
 )
 
 type workflowAPI struct {
+	userID int
 }
 
 func (wf *workflowAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	_, err := apiBrowserAPIAuthenticate(w, r)
+	userId, err := apiBrowserAPIAuthenticate(w, r)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusUnauthorized, "Authentication needed")
 		return
 	}
+	wf.userID = userId
 	switch {
 	case r.Method == http.MethodGet && workflowFunctionApi.MatchString(r.URL.Path):
 		wf.getWorkflowFunctions(w, r)
@@ -51,7 +53,7 @@ func (wf *workflowAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (wf *workflowAPI) getWorkflows(w http.ResponseWriter, _ *http.Request) {
-	workflows, err := services.GetWorkflows()
+	workflows, err := services.GetWorkflows(wf.userID)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -77,7 +79,7 @@ func (wf *workflowAPI) getWorkflow(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	workflow, err := services.GetWorkflow(id)
+	workflow, err := services.GetWorkflow(wf.userID, id)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
@@ -111,7 +113,7 @@ func (wf *workflowAPI) createWorkflow(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusBadRequest, "invalid sink url sent")
 		return
 	}
-	workflow, err := services.CreateWorkflow(createBody.TopicName, createBody.FunctionName, createBody.SinkURL)
+	workflow, err := services.CreateWorkflow(createBody.TopicName, createBody.FunctionName, createBody.SinkURL, wf.userID)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -137,7 +139,7 @@ func (wf *workflowAPI) updateWorkflow(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	workflow, err := services.UpdateWorkflow(id)
+	workflow, err := services.UpdateWorkflow(wf.userID, id)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -163,7 +165,7 @@ func (wf *workflowAPI) deleteWorkflow(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	_, err = services.DeleteWorkflow(id)
+	_, err = services.DeleteWorkflow(wf.userID, id)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusBadRequest, "internal server error")
@@ -180,7 +182,11 @@ func (wf *workflowAPI) deleteWorkflow(w http.ResponseWriter, r *http.Request) {
 }
 
 func (wf *workflowAPI) getWorkflowFunctions(w http.ResponseWriter, _ *http.Request) {
-	workflowFunctions := services.GetAvaliableWorkflowFunctions()
+	workflowFunctions, err := services.GetAvaliableWorkflowFunctions(wf.userID)
+	if err != nil {
+		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
+		return
+	}
 	resJsonBytes, err := generateSuccessMessage(workflowFunctions)
 	if err != nil {
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")

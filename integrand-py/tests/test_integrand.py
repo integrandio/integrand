@@ -379,7 +379,6 @@ class TestsUser():
         response = integrand.CreateUser(email, password)
         id = response['data']['id']
         assert response['data']['email'] == email
-        assert response['data']['authType'] == 'email'
         # Cleanup
         integrand.DeleteUser(id)
 

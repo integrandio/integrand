@@ -15,6 +15,7 @@ var (
 )
 
 type userAPI struct {
+	userID int
 }
 
 type createUserBody struct {
@@ -28,12 +29,13 @@ type updateUserBody struct {
 }
 
 func (u *userAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	_, err := apiBrowserAPIAuthenticate(w, r)
+	userID, err := apiBrowserAPIAuthenticate(w, r)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusUnauthorized, "Authentication needed")
 		return
 	}
+	u.userID = userID
 	switch {
 	case r.Method == http.MethodGet && userAllApi.MatchString(r.URL.Path):
 		u.getUsers(w, r)

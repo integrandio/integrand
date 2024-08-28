@@ -170,7 +170,7 @@ type TopicDetails struct {
 	RetentionBytes int    `json:"retentionBytes"`
 }
 
-func (broker *Broker) GetTopics(UserID int) []TopicDetails {
+func (broker *Broker) GetTopics() []TopicDetails {
 	topicDetails := []TopicDetails{}
 	for _, topic := range broker.Topics {
 		topicDetails = append(topicDetails, topic.getTopicDetails())

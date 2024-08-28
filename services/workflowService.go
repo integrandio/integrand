@@ -6,31 +6,57 @@ import (
 	"log/slog"
 )
 
-func GetWorkflows() ([]persistence.Workflow, error) {
+func GetWorkflow(userID int, workflowID int) (persistence.Workflow, error) {
+	err := isUserAuthorized(userID, "read_workflow")
+	if err != nil {
+		return persistence.Workflow{}, err
+	}
+	return persistence.DATASTORE.GetWorkflow(workflowID)
+}
+
+func GetWorkflows(userID int) ([]persistence.Workflow, error) {
+	err := isUserAuthorized(userID, "read_workflow")
+	if err != nil {
+		return nil, err
+	}
 	return persistence.DATASTORE.GetWorkflows()
 }
 
-func GetEnabledWorkflows() ([]persistence.Workflow, error) {
+func GetEnabledWorkflows(userID int) ([]persistence.Workflow, error) {
+	err := isUserAuthorized(userID, "read_workflow")
+	if err != nil {
+		return nil, err
+	}
 	return persistence.DATASTORE.GetEnabledWorkflows()
 }
 
-func DeleteWorkflow(id int) (int, error) {
-	return persistence.DATASTORE.DeleteWorkflow(id)
+func DeleteWorkflow(userID int, workflowID int) (int, error) {
+	err := isUserAuthorized(userID, "write_workflow")
+	if err != nil {
+		return 0, err
+	}
+	return persistence.DATASTORE.DeleteWorkflow(workflowID)
 }
 
-func UpdateWorkflow(id int) (persistence.Workflow, error) {
-	workflow, err := persistence.DATASTORE.UpdateWorkflow(id)
+func UpdateWorkflow(userID int, workflowID int) (persistence.Workflow, error) {
+	err := isUserAuthorized(userID, "write_workflow")
+	if err != nil {
+		return persistence.Workflow{}, err
+	}
+	workflow, err := persistence.DATASTORE.UpdateWorkflow(workflowID)
 	if err != nil {
 		slog.Error("Failed to update workflow", "error", err)
 		return persistence.Workflow{}, err
 	}
 	return workflow, nil
 }
-func GetWorkflow(id int) (persistence.Workflow, error) {
-	return persistence.DATASTORE.GetWorkflow(id)
-}
 
-func CreateWorkflow(topicName string, functionName string, sinkURL string) (persistence.Workflow, error) {
+func CreateWorkflow(topicName string, functionName string, sinkURL string, userID int) (persistence.Workflow, error) {
+	err := isUserAuthorized(userID, "write_workflow")
+	if err != nil {
+		return persistence.Workflow{}, err
+	}
+
 	_, ok := persistence.FUNC_MAP[functionName]
 	if !ok {
 		slog.Error("function not found")
@@ -60,12 +86,16 @@ func CreateWorkflow(topicName string, functionName string, sinkURL string) (pers
 	return newWorkflow, nil
 }
 
-func GetAvaliableWorkflowFunctions() []string {
+func GetAvaliableWorkflowFunctions(userID int) ([]string, error) {
+	err := isUserAuthorized(userID, "read_workflow")
+	if err != nil {
+		return []string{}, err
+	}
 	keys := make([]string, len(persistence.FUNC_MAP))
 	i := 0
 	for f := range persistence.FUNC_MAP {
 		keys[i] = f
 		i++
 	}
-	return keys
+	return keys, nil
 }
