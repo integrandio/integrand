@@ -8,7 +8,6 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
-	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -29,12 +28,12 @@ func AuthenticateCookie(w http.ResponseWriter, r *http.Request) (int, error) {
 	return int(userID), nil
 }
 
-func isUserAuthorized(userId int, requiredSecurable string) error {
+func isUserAuthorized(userId int, requiredSecurable persistence.Securable) error {
 	securables, err := persistence.DATASTORE.GetSecurablesByUserId(userId)
 	if err != nil {
 		return err
 	}
-	contained := utils.Contains(securables, requiredSecurable)
+	contained := utils.Contains(securables, string(requiredSecurable))
 	if !contained {
 		return errors.New("user is not authorized")
 	}
@@ -71,26 +70,6 @@ func EmailAuthenticate(Email string, password string) (persistence.User, error) 
 	} else {
 		return persistence.User{}, errors.New("password not valid")
 	}
-}
-
-func CreateNewEmailUser(email string, plainPassword string) (persistence.User, error) {
-	var user persistence.User
-	password, err := bcrypt.GenerateFromPassword([]byte(plainPassword), bcrypt.DefaultCost)
-	if err != nil {
-		return user, err
-	}
-	user = persistence.User{
-		Email:        email,
-		Password:     string(password),
-		CreatedAt:    time.Now(),
-		LastModified: time.Now(),
-	}
-	id, err := persistence.DATASTORE.CreateUser(user)
-	if err != nil {
-		return user, err
-	}
-	user.ID = id
-	return user, nil
 }
 
 func GetSession(w http.ResponseWriter, r *http.Request) persistence.SessionDB {

@@ -23,7 +23,7 @@ func MessageToSink(topicName string, value interface{}) error {
 }
 
 func GetEndpoints(userID int) ([]persistence.Endpoint, error) {
-	err := isUserAuthorized(userID, "read_endpoint")
+	err := isUserAuthorized(userID, persistence.READ_ENDPOINT)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func GetEndpoints(userID int) ([]persistence.Endpoint, error) {
 }
 
 func GetEndpoint(EndpointID string, userID int) (persistence.Endpoint, error) {
-	err := isUserAuthorized(userID, "read_endpoint")
+	err := isUserAuthorized(userID, persistence.READ_ENDPOINT)
 	if err != nil {
 		return persistence.Endpoint{}, err
 	}
@@ -43,7 +43,7 @@ func GetEndpointBySecurityKey(EndpointID string, security_key string) (persisten
 }
 
 func CreateEndpoint(userId int, EndpointID string, topicName string, userID int) (persistence.Endpoint, error) {
-	err := isUserAuthorized(userID, "write_endpoint")
+	err := isUserAuthorized(userID, persistence.WRITE_ENDPOINT)
 	if err != nil {
 		return persistence.Endpoint{}, err
 	}
@@ -81,7 +81,7 @@ func CreateEndpoint(userId int, EndpointID string, topicName string, userID int)
 }
 
 func RemoveEndpoint(EndpointID string, userID int) (int, error) {
-	err := isUserAuthorized(userID, "write_endpoint")
+	err := isUserAuthorized(userID, persistence.WRITE_ENDPOINT)
 	if err != nil {
 		return 0, err
 	}

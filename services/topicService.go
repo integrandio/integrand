@@ -7,7 +7,7 @@ import (
 )
 
 func GetEventStreams(userId int) ([]persistence.TopicDetails, error) {
-	err := isUserAuthorized(userId, "read_topic")
+	err := isUserAuthorized(userId, persistence.READ_TOPIC)
 	if err != nil {
 		return nil, err
 	}
@@ -15,7 +15,7 @@ func GetEventStreams(userId int) ([]persistence.TopicDetails, error) {
 }
 
 func GetEventStream(topicName string, userId int) (persistence.TopicDetails, error) {
-	err := isUserAuthorized(userId, "read_topic")
+	err := isUserAuthorized(userId, persistence.READ_TOPIC)
 	if err != nil {
 		return persistence.TopicDetails{}, err
 	}
@@ -24,7 +24,7 @@ func GetEventStream(topicName string, userId int) (persistence.TopicDetails, err
 
 func CreateEventStream(topicName string, userId int) (persistence.TopicDetails, error) {
 	var topicDetails persistence.TopicDetails
-	err := isUserAuthorized(userId, "write_topic")
+	err := isUserAuthorized(userId, persistence.WRITE_TOPIC)
 	if err != nil {
 		return topicDetails, err
 	}
@@ -47,7 +47,7 @@ func CreateEventStream(topicName string, userId int) (persistence.TopicDetails, 
 }
 
 func DeleteEventStream(topicName string, userId int) error {
-	err := isUserAuthorized(userId, "write_topic")
+	err := isUserAuthorized(userId, persistence.WRITE_TOPIC)
 	if err != nil {
 		return err
 	}

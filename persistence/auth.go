@@ -33,6 +33,21 @@ const (
 	INTEGRAND_USER  AuthRole = "integrand_user"
 )
 
+type Securable string
+
+const (
+	READ_TOPIC     Securable = "read_topic"
+	WRITE_TOPIC    Securable = "write_topic"
+	READ_ENDPOINT  Securable = "read_endpoint"
+	WRITE_ENDPOINT Securable = "write_endpoint"
+	READ_WORKFLOW  Securable = "read_workflow"
+	WRITE_WORKFLOW Securable = "write_workflow"
+	READ_USER      Securable = "read_user"
+	WRITE_USER     Securable = "write_user"
+	READ_API_KEY   Securable = "read_api_key"
+	WRITE_API_KEY  Securable = "write_api_key"
+)
+
 func (dstore *Datastore) createUserRole(userId int, role AuthRole) error {
 	insert_query := `INSERT INTO user_to_role(user_id, role_id) SELECT users.id, roles.id FROM users INNER JOIN roles ON users.id = ? AND roles.name = ?;`
 

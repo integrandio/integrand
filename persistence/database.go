@@ -111,7 +111,7 @@ func setupConnection(isDevMode bool) (*Datastore, error) {
 	return integrandDB, nil
 }
 
-func debug_table(db *sql.DB, select_query string) {
+func _debug_table(db *sql.DB, select_query string) {
 	rows, err := db.Query(select_query)
 	if err != nil {
 		panic(err.Error())

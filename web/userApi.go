@@ -59,7 +59,7 @@ func (u *userAPI) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u *userAPI) getUsers(w http.ResponseWriter, _ *http.Request) {
-	users, err := services.GetUsers()
+	users, err := services.GetUsers(u.userID)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -85,7 +85,7 @@ func (u *userAPI) getUser(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	user, err := services.GetUser(id)
+	user, err := services.GetUser(u.userID, id)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -107,7 +107,7 @@ func (u *userAPI) createUser(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
-	user, err := services.CreateNewEmailUser(newUser.Email, newUser.Password)
+	user, err := services.CreateUser(u.userID, newUser.Email, newUser.Password)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -139,7 +139,7 @@ func (u *userAPI) updateUser(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusBadRequest, "invalid request body")
 		return
 	}
-	user, err := services.UpdatePassword(id, updatedUser.OldPassword, updatedUser.NewPassword)
+	user, err := services.UpdatePassword(u.userID, id, updatedUser.OldPassword, updatedUser.NewPassword)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
@@ -165,7 +165,7 @@ func (u *userAPI) deleteUser(w http.ResponseWriter, r *http.Request) {
 		apiMessageResponse(w, http.StatusBadRequest, "incorrect request sent")
 		return
 	}
-	user, err := services.RemoveUser(id)
+	user, err := services.RemoveUser(u.userID, id)
 	if err != nil {
 		slog.Error(err.Error())
 		apiMessageResponse(w, http.StatusInternalServerError, "internal server error")
