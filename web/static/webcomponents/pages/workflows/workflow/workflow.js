@@ -14,8 +14,7 @@ class WorkflowPage extends HTMLElement {
         this.shawdow.append(jobTemplate.content.cloneNode(true))
     }
 
-    async deleteWorkflowAction(evt) {
-        const workflow_id = evt.currentTarget.workflow_param_id
+    async deleteWorkflowAction(workflow_id = this.workflow_id) {
         const url = `/api/v1/workflow/${workflow_id}`
         await fetch(url, {
             method: "Delete",
@@ -25,19 +24,14 @@ class WorkflowPage extends HTMLElement {
     }
 
     newDeleteModal() {
-        const modalMarkup = `
-            <wc-modal id="modalThing">
-                <wc-title>Confirm Deletion</wc-title>
-                <p>Are you sure you want to delete workflow ${this.workflow_id}?<p>
-                <form id="myForm">
-                  <input class="submit-button" type="submit" value="Confirm">
-                </form>
-            </wc-modal>`
-        const modal_element = fromHTML(modalMarkup);
-        this.shawdow.append(modal_element)
-        const formComponent = this.shawdow.querySelector('#myForm');
-        formComponent.addEventListener('submit', this.deleteWorkflowAction);
-        formComponent.workflow_param_id = this.workflow_id
+        const modalContainer = document.createElement("wc-modal")
+        modalContainer.id = "modalThing"
+        const confirmDeletionContainer = document.createElement("wc-delete-alert")
+        confirmDeletionContainer.titleText = "Delete Workflow";
+        confirmDeletionContainer.descriptionText = `Are you sure you want to delete workflow ${this.workflow_id}?`;
+        confirmDeletionContainer.buttonFunction = this.deleteWorkflowAction.bind(this);
+        modalContainer.appendChild(confirmDeletionContainer)
+        this.shawdow.appendChild(modalContainer)
     };
 
     generateMarkup(workflow) {

@@ -37,7 +37,6 @@ class UsersHome extends HTMLElement {
   }
 
   attachDeleteHandlers() {
-    console.log('Attaching delete handler')
     const deleteButtons = this.shadow.querySelectorAll(".delete-button");
     deleteButtons.forEach((button) => {
       button.addEventListener("click", (event) => {
@@ -65,7 +64,6 @@ class UsersHome extends HTMLElement {
   }
 
   async deleteUser(id) {
-    console.log(this.usersData)
     try {
       const response = await fetch(`/api/v1/user/${id}`, {
         method: "DELETE",
@@ -76,7 +74,6 @@ class UsersHome extends HTMLElement {
       }
       const numericId = parseInt(id, 10);
       this.usersData = this.usersData.filter((user) => user.id !== numericId);
-      console.log(this.usersData)
       this.updateUsersComponent();
     } catch (error) {
       console.error("Error deleting User:", error);
@@ -112,7 +109,6 @@ class UsersHome extends HTMLElement {
         const newUser = userResponse.data
         this.usersData.unshift(newUser); // Add new key to the top of the list
         this.updateUsersComponent()
-        console.log(`New User with email ${newUser.email} is created.`); // Log creation
         const successMessage = `<h1>User Successfully Created</h1>`
         const modal_element = fromHTML(successMessage);
         modal.innerHTML = '';
