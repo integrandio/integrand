@@ -14,8 +14,7 @@ class EndpointPage extends HTMLElement {
         this.shawdow.append(jobTemplate.content.cloneNode(true))
     }
 
-    async deleteConnectorAction(evt) {
-        const endpoint_id = evt.currentTarget.endpoint_param_id
+    async deleteEndpointAction(endpoint_id = this.endpoint_id) {
         const url = `/api/v1/connector/${endpoint_id}`
         await fetch(url, {
             method: "Delete",
@@ -25,19 +24,14 @@ class EndpointPage extends HTMLElement {
     }
 
     newDeleteModal() {
-        const modalMarkup = `
-            <wc-modal id="modalThing">
-                <wc-title>Confirm Deletion</wc-title>
-                <p>Are you sure you want to delete endpoint ${this.endpoint_id}?<p>
-                <form id="myForm">
-                  <input class="submit-button" type="submit" value="Confirm">
-                </form>
-            </wc-modal>`
-        const modal_element = fromHTML(modalMarkup);
-        this.shawdow.append(modal_element)
-        const formComponent = this.shawdow.querySelector('#myForm');
-        formComponent.addEventListener('submit', this.deleteConnectorAction);
-        formComponent.endpoint_param_id = this.endpoint_id
+        const modalContainer = document.createElement("wc-modal")
+        modalContainer.id = "modalThing"
+        const confirmDeletionContainer = document.createElement("wc-delete-alert")
+        confirmDeletionContainer.titleText = "Delete Endpoint";
+        confirmDeletionContainer.descriptionText = `Are you sure you want to delete endpoint ${this.endpoint_id}?`;
+        confirmDeletionContainer.buttonFunction = this.deleteEndpointAction.bind(this);
+        modalContainer.appendChild(confirmDeletionContainer)
+        this.shawdow.appendChild(modalContainer)
     };
 
     generateMarkup(endpoint) {
