@@ -57,13 +57,15 @@ class TopicsHome extends HTMLElement {
     newTopicAction() {
         const modalMarkup = `
         <wc-modal id="modalThing">
-            <wc-title>Create New Connector</wc-title>
-            <form id="myForm">
-              <label for="topicName">Topic Name:</label><br>
-              <input type="text" id="topicName" name="topicName" value="">
-              <br>
-              <input type="submit" value="Create">
-            </form>
+            <div class="creator-container">
+                <wc-title>Create New Topic</wc-title>
+                <form id="myForm" class="formulator">
+                    <label for="topicName">Topic Name:</label>
+                    <input type="text" id="topicName" name="topicName" value="">
+                    <br>
+                    <input type="submit" value="Create">
+                </form>
+            </div>
         </wc-modal>`
 
         const modal_element = fromHTML(modalMarkup);
@@ -89,7 +91,6 @@ class TopicsHome extends HTMLElement {
     async generateEndpointsContainer () {
         const topicResponse = await fetch('/api/v1/topic');
         const topicJsonData = await topicResponse.json();
-        console.log(topicJsonData)
 
         const endpoint_card_container = document.createElement("data-cards-container")
         endpoint_card_container.id = "cardContainer"

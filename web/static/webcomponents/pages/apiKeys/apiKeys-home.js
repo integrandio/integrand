@@ -30,7 +30,6 @@ class ApiKeysHome extends HTMLElement {
   }
 
   attachDeleteHandlers() {
-    console.log('Attaching delete handler')
     const deleteButtons = this.shadow.querySelectorAll(".delete-button");
     deleteButtons.forEach((button) => {
       button.addEventListener("click", (event) => {
@@ -68,7 +67,6 @@ class ApiKeysHome extends HTMLElement {
       }
       this.apiKeysData = this.apiKeysData.filter((key) => key.key !== apiKey);
       this.updateApiKeysComponent();
-      console.log(`API key deleted: ${apiKey}`); // Log deletion
     } catch (error) {
       console.error("Error deleting API key:", error);
     }
@@ -87,7 +85,6 @@ class ApiKeysHome extends HTMLElement {
       const newApiKey = { key: data.data };
       this.apiKeysData.unshift(newApiKey); // Add new key to the top of the list
       this.updateApiKeysComponent();
-      console.log(`New API key created: ${newApiKey.key}`); // Log creation
       this.showSuccessMessage(newApiKey.key);
       this.renderApiKeys()
     } catch (error) {

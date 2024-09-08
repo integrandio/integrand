@@ -17,7 +17,6 @@ func main() {
 	utils.GetEnvrionmentVariableString("ROOT_EMAIL", "admin")
 	utils.GetEnvrionmentVariableString("ROOT_PASSWORD", "admin")
 	utils.GetEnvrionmentVariableString("INITIAL_API_KEY", "11111")
-	utils.GetEnvrionmentVariableString("SINK_URL", "http://localhost:5000")
 
 	// to change the flags on the default logger
 	log.SetFlags(log.LstdFlags | log.Lshortfile)

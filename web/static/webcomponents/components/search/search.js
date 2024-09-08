@@ -60,7 +60,6 @@ class Searchbar extends HTMLElement {
             return "not found"
         }
         const jsonData = await response.json();
-        console.log(jsonData)
         return 0;
     }
 

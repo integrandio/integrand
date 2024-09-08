@@ -95,8 +95,8 @@ class Router extends HTMLElement {
       is = null,
       resourceUrl = null,
     } = this.activeRoute;
-    // Debug what is getting passed in
-    console.log(params)
+    // Debug what is getting passed into the params
+    // console.log(params)
     if (component) {
       // Remove all child nodes under outlet element
       while (this.outlet.firstChild) {

@@ -28,8 +28,6 @@ class PageHeadingButton extends HTMLElement {
     super()
     this.shawdow = this.attachShadow({mode: "open"});
     this.shawdow.append(pageHeadingButtonTemplate.content.cloneNode(true));
-    this.buttonText = ""
-    this.button = this.shawdow.querySelector(".button");
     this._button_action = function() { return };
   }
 
@@ -46,8 +44,9 @@ class PageHeadingButton extends HTMLElement {
   }
 
   connectedCallback() {
-    this.button.innerText = this.button_text
-    this.button.addEventListener('click', this.buttonClick.bind(this))
+    const button = this.shawdow.querySelector(".button");
+    button.innerText = this.button_text
+    button.addEventListener('click', this.buttonClick.bind(this))
   }
 }
 

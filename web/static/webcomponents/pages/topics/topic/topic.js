@@ -30,7 +30,6 @@ class TopicPage extends HTMLElement {
         </ul>
         </div>`;
         const divElementContainer = fromHTML(markup)
-        console.log('Attaching delete handler')
         const selectButtons = divElementContainer.querySelectorAll(".select-button");
         selectButtons.forEach((button) => {
           button.addEventListener("click", (event) => {
@@ -48,7 +47,6 @@ class TopicPage extends HTMLElement {
         const endpoint = `/api/v1/topic/${this.topic_id}/events?offset=${offset}&limit=1`
         const response = await fetch(endpoint);
         const jsonData = await response.json();
-        console.log(jsonData)
         let thingData = JSON.stringify(jsonData.data[0], undefined, 2);
         let markup = `<wc-modal id="modalThing">
         <wc-title>Offset ${offset}</wc-title>
@@ -58,8 +56,7 @@ class TopicPage extends HTMLElement {
         this.shawdow.append(divElementContainer)
     }
 
-    async deleteTopicAction(evt) {
-        const topic_id = evt.currentTarget.topic_param_id
+    async deleteTopicAction(topic_id = this.topic_id) {
         const url = `/api/v1/topic/${topic_id}`
         await fetch(url, {
             method: "Delete",
@@ -69,19 +66,14 @@ class TopicPage extends HTMLElement {
     }
 
     newDeleteModal() {
-        const modalMarkup = `
-            <wc-modal id="modalThing">
-                <wc-title>Confirm Deletion</wc-title>
-                <p>Are you sure you want to delete topic ${this.topic_id}?<p>
-                <form id="myForm">
-                  <input class="submit-button" type="submit" value="Confirm">
-                </form>
-            </wc-modal>`
-        const modal_element = fromHTML(modalMarkup);
-        this.shawdow.append(modal_element)
-        const formComponent = this.shawdow.querySelector('#myForm');
-        formComponent.addEventListener('submit', this.deleteTopicAction);
-        formComponent.topic_param_id = this.topic_id
+        const modalContainer = document.createElement("wc-modal")
+        modalContainer.id = "modalThing"
+        const confirmDeletionContainer = document.createElement("wc-delete-alert")
+        confirmDeletionContainer.titleText = "Delete Topic";
+        confirmDeletionContainer.descriptionText = `Are you sure you want to delete topic ${this.topic_id}?`;
+        confirmDeletionContainer.buttonFunction = this.deleteTopicAction.bind(this);
+        modalContainer.appendChild(confirmDeletionContainer)
+        this.shawdow.appendChild(modalContainer)
     };
 
     generateMarkup(topic) {
@@ -114,7 +106,7 @@ class TopicPage extends HTMLElement {
     async connectedCallback(){
         const response = await fetch(`/api/v1/topic/${this.topic_id}`);
         const jsonData = await response.json();
-        console.log(jsonData)
+
         let element = this.generateMarkup(jsonData.data)
         const contentTemplate = document.createElement("template")
         contentTemplate.content.append(element);
@@ -126,7 +118,7 @@ class TopicPage extends HTMLElement {
         pageTitleElement.buttonFunction = this.newDeleteModal.bind(this);
         this.shawdow.append(pageTitleElement)
         this.shawdow.append(contentTemplate.content.cloneNode(true))
-        console.log(jsonData.data)
+
         this.createTopicExplorer(jsonData.data.oldestOffset, jsonData.data.nextOffset)
         this.shawdow.addEventListener("select-message", (event) => {
             this.getTopicMessage(event.detail)
